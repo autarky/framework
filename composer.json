@@ -1,0 +1,30 @@
+{
+	"name": "autarky/framework",
+	"description": "Autarky - PHP framework for self-sufficient developers",
+	"keywords": ["autarky", "framework"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Andreas Lutro",
+			"email": "anlutro@gmail.com"
+		}
+	],
+	"require": {
+		"symfony/http-kernel": "2.4.*",
+		"symfony/http-foundation": "2.4.*",
+		"symfony/browser-kit": "2.4.*",
+		"stack/builder": "1.0.*",
+		"nikic/fast-route": "dev-master",
+		"wart/wart": "0.2.*",
+		"twig/twig": "1.15.*"
+	},
+	"require-dev": {
+		"mockery/mockery": "0.9.*"
+	},
+	"autoload": {
+		"psr-4": {
+			"Autarky\\": "src/"
+		}
+	},
+	"minimum-stability": "stable"
+}
