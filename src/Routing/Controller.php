@@ -32,7 +32,7 @@ abstract class Controller extends ContainerAware
 
 	protected function getSession()
 	{
-		return $this->container->resolve('Symfony\Component\HttpFoundation\Session\Session');
+		return $this->container->resolve('Symfony\Component\HttpFoundation\Session\SessionInterface');
 	}
 
 	protected function response($content, $statusCode = 200)

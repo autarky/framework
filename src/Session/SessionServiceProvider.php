@@ -33,62 +33,71 @@ class SessionServiceProvider extends ServiceProvider
 
 	public function registerSessionHandler()
 	{
-		$this->app->getContainer()
-		->share('SessionHandlerInterface', function ($container) {
-			switch ($this->app->getConfig()->get('session.handler')) {
-				case 'native':
-					return new \SessionHandler;
+		$this->app->getContainer()->share(
+			'SessionHandlerInterface',
+			function ($container) {
+				switch ($this->app->getConfig()->get('session.handler')) {
+					case 'native':
+						return new \SessionHandler;
 
-				case 'file':
-					$path = $this->app->getConfig()->get('path.session');
+					case 'file':
+						$path = $this->app->getConfig()->get('path.session');
 
-					return new NativeFileSessionHandler($path);
+						return new NativeFileSessionHandler($path);
 
-				case 'pdo':
-					return new PdoSessionHandler($container->resolve('\PDO'),
-						$this->app->getConfig()->get('session.handler-options'));
+					case 'pdo':
+						return new PdoSessionHandler($container->resolve('PDO'),
+							$this->app->getConfig()->get('session.handler-options'));
 
-				case 'mongo':
-					return new MongoDbSessionHandler($container->resolve('\MongoClient'),
-						$this->app->getConfig()->get('session.handler-options'));
+					case 'mongo':
+						return new MongoDbSessionHandler($container->resolve('MongoClient'),
+							$this->app->getConfig()->get('session.handler-options'));
 
-				case 'memcache':
-					return new MemcacheSessionHandler($container->resolve('\Memcache'),
-						$this->app->getConfig()->get('session.handler-options'));
+					case 'memcache':
+						return new MemcacheSessionHandler($container->resolve('Memcache'),
+							$this->app->getConfig()->get('session.handler-options'));
 
-				case 'memcached':
-					return new MemcachedSessionHandler($container->resolve('\Memcached'),
-						$this->app->getConfig()->get('session.handler-options'));
+					case 'memcached':
+						return new MemcachedSessionHandler($container->resolve('Memcached'),
+							$this->app->getConfig()->get('session.handler-options'));
 
-				case 'null':
-					return new NullSessionHandler;
+					case 'null':
+						return new NullSessionHandler;
 
-				default:
-					throw new \RuntimeException('Unknown session handler type: '.
-						$this->app->getConfig()->get('session.handler'));
-			}
-		});
+					default:
+						throw new \RuntimeException('Unknown session handler type: '.
+							$this->app->getConfig()->get('session.handler'));
+				}
+			});
 	}
 
 	public function registerSessionStorage()
 	{
-		$this->app->getContainer()
-		->share('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface', function ($container) {
-			if ($this->app->getConfig()->get('session.mock')) {
-				return new MockArraySessionStorage;
-			}
-			$handler = $container['SessionHandlerInterface'];
-			$options = $this->app->getConfig()->get('session.handler-options');
+		$this->app->getContainer()->share(
+			'Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface',
+			function ($container) {
+				if ($this->app->getConfig()->get('session.mock')) {
+					return new MockArraySessionStorage;
+				}
 
-			return new NativeSessionStorage($options, $handler);
-		});
+				$handler = $container['SessionHandlerInterface'];
+				$options = $this->app->getConfig()->get('session.handler-options');
+
+				return new NativeSessionStorage($options, $handler);
+			});
 	}
 
 	public function registerSession()
 	{
-		$this->app->getContainer()
-		->share('Symfony\Component\HttpFoundation\Session\Session', function ($container) {
-			return new Session($container['Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface']);
-		});
+		$this->app->getContainer()->share(
+			'Symfony\Component\HttpFoundation\Session\Storage\SessionInterface',
+			function ($container) {
+				return new Session($container['Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface']);
+			});
+
+		$this->app->getContainer()->alias(
+			'Symfony\Component\HttpFoundation\Session\Storage\Session',
+			'Symfony\Component\HttpFoundation\Session\Storage\SessionInterface'
+		);
 	}
 }
