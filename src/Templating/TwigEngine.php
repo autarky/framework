@@ -13,9 +13,12 @@ namespace Autarky\Templating;
 use Twig_Environment;
 use Twig_Loader_Filesystem;
 
+use Autarky\Templating\Twig\ExtensionsLoader;
+
 class TwigEngine implements TemplatingEngineInterface
 {
 	protected $twig;
+	protected $app;
 
 	public function __construct($app, Twig_Environment $env = null)
 	{
@@ -29,6 +32,22 @@ class TwigEngine implements TemplatingEngineInterface
 		}
 
 		$this->twig = $env;
+		$this->app = $app;
+
+		$this->loadExtensions();
+	}
+
+	protected function loadExtensions()
+	{
+		$loader = new ExtensionsLoader($this->twig, $this->app);
+
+		$loader->loadCoreExtensions([
+			'RoutingExtension'
+		]);
+
+		if ($extensions = $this->app->getConfig()->get('twig.extensions')) {
+			$loader->loadUserExtensions($extensions);
+		}
 	}
 
 	public function render($view, array $data = array())
