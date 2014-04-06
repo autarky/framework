@@ -52,6 +52,7 @@ class TwigEngine implements TemplatingEngineInterface
 
 	public function render($view, array $data = array())
 	{
+		$view = $this->transformViewName($view);
 		return $this->twig->loadTemplate($view)
 			->render($data);
 	}
@@ -60,5 +61,14 @@ class TwigEngine implements TemplatingEngineInterface
 	{
 		$this->twig->getLoader()
 			->addPath($location, $namespace);
+	}
+
+	protected function transformViewName($name)
+	{
+		if (strpos($name, ':') !== false) {
+			$name = '@' . str_replace(':', '/', $name);
+		}
+
+		return $name;
 	}
 }
