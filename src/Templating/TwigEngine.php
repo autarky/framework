@@ -12,13 +12,16 @@ namespace Autarky\Templating;
 
 use Twig_Environment;
 use Twig_Loader_Filesystem;
+use Twig_Error_Loader;
 
 use Autarky\Templating\Twig\ExtensionsLoader;
+use Autarky\Support\Str;
 
 class TwigEngine implements TemplatingEngineInterface
 {
 	protected $twig;
 	protected $app;
+	protected $namespaces = [];
 
 	public function __construct($app, Twig_Environment $env = null)
 	{
@@ -53,14 +56,25 @@ class TwigEngine implements TemplatingEngineInterface
 	public function render($view, array $data = array())
 	{
 		$view = $this->transformViewName($view);
-		return $this->twig->loadTemplate($view)
-			->render($data);
+		try {
+			return $this->twig->loadTemplate($view)
+				->render($data);
+		} catch (Twig_Error_Loader $e) {
+			throw new Twig_Error_Loader(str_replace($this->namespaces, 
+					array_keys($this->namespaces), $e->getMessage()));
+		}
 	}
 
 	public function addNamespace($namespace, $location)
 	{
+		$this->namespaces[$namespace] = $this->transformNamespace($namespace);
 		$this->twig->getLoader()
-			->addPath($location, $namespace);
+			->addPath($location, $this->namespaces[$namespace]);
+	}
+
+	protected function transformNamespace($namespace)
+	{
+		return '{{'. str_replace('/', '_', $namespace) .'}}';
 	}
 
 	protected function transformViewName($name)
@@ -68,7 +82,9 @@ class TwigEngine implements TemplatingEngineInterface
 		if (strpos($name, ':') !== false) {
 			$name = '@' . str_replace(':', '/', $name);
 		}
-
+		if (Str::containsAny($name, array_keys($this->namespaces))) {
+			$name = str_replace(array_keys($this->namespaces), $this->namespaces, $name);
+		}
 		return $name;
 	}
 }
