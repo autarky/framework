@@ -31,9 +31,17 @@ class IlluminateContainer implements ContainerInterface
 			return $this->container->singleton($abstract, $concrete);
 		} elseif ($concrete instanceof Closure) {
 			return $this->container->bindShared($abstract, $concrete);
-		} else {
+		} elseif (is_object($concrete)) {
 			return $this->container->instance($abstract, $concrete);
+		} else {
+			throw new \InvalidArgumentException('$concrete must be null, string,'
+				.' closure or object, '.gettype($concrete).' given');
 		}
+	}
+
+	public function alias($alias, $target)
+	{
+		return $this->container->alias($target, $alias);
 	}
 
 	public function resolve($abstract)

@@ -107,6 +107,15 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$this->assertNotSame($o, $o2);
 		$this->assertSame($o->cl, $o2->cl);
 	}
+
+	/** @test */
+	public function alias()
+	{
+		$c = $this->makeContainer();
+		$c->share('foo', function() { return new LowerClass; });
+		$c->alias(__NAMESPACE__.'\\LowerClass', 'foo');
+		$this->assertSame($c->resolve('foo'), $c->resolve(__NAMESPACE__.'\\UpperClass')->cl);
+	}
 }
 
 class LowerClass {}

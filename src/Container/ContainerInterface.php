@@ -10,39 +10,52 @@
 
 namespace Autarky\Container;
 
+/**
+ * A container in Autarky is a class that contains information about how to
+ * resolve different objects.
+ *
+ * The container has two jobs - it needs to receive information (usually from
+ * service providers) on how it should resolve different keys/classes/interfaces
+ * and, of course, resolve these when asked to.
+ *
+ * A few method arguments repeat themselves in this interface's methods.
+ *
+ * $abstract is the key that the container should store the metainformation
+ * under. Under the hood the container keeps a hashmap of abstract => concrete
+ * in some fashion. $abstract can be a plain string or a string that represeents
+ * a class or an interface.
+ *
+ * $concrete tells the container how $abstract should be resolved when it is
+ * requested. Sometimes $concrete will be left as null - in this case, $abstract
+ * should fill $concrete's role. Common use cases for this would be binding a
+ * singleton class onto the container but not constructing it until it is
+ * requested to be resolved.
+ *
+ * The container should to the best of its abilities try and recursively resolve
+ * all classes' dependencies automatically.
+ *
+ * @link http://en.wikipedia.org/wiki/Service_locator_pattern
+ * @link http://en.wikipedia.org/wiki/Inversion_of_control
+ * @link http://martinfowler.com/articles/injection.html
+ */
 interface ContainerInterface
 {
 	/**
-	 * Bind something to the container.
+	 * Bind something to the container. Something that is bound will be re-
+	 * constructed each time, so there is no singleton. The exception is if
+	 * $concrete is an object, in which case the object will be bound onto the
+	 * container as a singleton.
 	 *
-	 * $abstract must be a string. It should be the key for which the concrete
-	 * is stored in the IoC container. Usually this should be the class name or
-	 * the interface/abstract class which role it fulfills, but it can also be
-	 * a more generic key like "session" or "db".
-	 *
-	 * $concrete can either be an object, a string or a closure. If an object
-	 * is provided, then that object is stored as a singleton service which is
-	 * returned by resolve() each time.
-	 *
-	 * If a string is provided, then the IoC container will try to resolve by
-	 * this key when $abstract is requested via resolve(). If a closure is
-	 * provided, then the return value of this closure will be the return value
-	 * of resolve().
-	 *
-	 * If $concrete is left out, it just means you want to tell the IoC
-	 * container it should know about $abstract for events or whatever else.
-	 *
-	 * @param  string $abstract The IoC key.
-	 * @param  mixed  $concrete What should be resolved.
+	 * @param  string $abstract
+	 * @param  mixed  $concrete
 	 *
 	 * @return void
 	 */
 	public function bind($abstract, $concrete = null);
 
 	/**
-	 * Bind something to the container and share it.
-	 *
-	 * This works like bind, except it binds it as a shared/singleton object.
+	 * Bind something to the container and share it, effectively making it a
+	 * shared/singleton object.
 	 *
 	 * @param  string $abstract
 	 * @param  mixed  $concrete
@@ -52,7 +65,18 @@ interface ContainerInterface
 	public function share($abstract, $concrete = null);
 
 	/**
-	 * Resolve an object from the IoC container.
+	 * Define an alias.
+	 *
+	 * @param  string $alias
+	 * @param  string $target The abstract key the alias points towards.
+	 *
+	 * @return void
+	 */
+	public function alias($alias, $target);
+
+	/**
+	 * Resolve an object from the IoC container. Dependencies of the resolved
+	 * object should also be resolved recursively if possible.
 	 *
 	 * @param  string $abstract
 	 *
