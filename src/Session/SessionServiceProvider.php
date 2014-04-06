@@ -90,14 +90,14 @@ class SessionServiceProvider extends ServiceProvider
 	public function registerSession()
 	{
 		$this->app->getContainer()->share(
-			'Symfony\Component\HttpFoundation\Session\Storage\SessionInterface',
+			'Symfony\Component\HttpFoundation\Session\SessionInterface',
 			function ($container) {
 				return new Session($container['Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface']);
 			});
 
 		$this->app->getContainer()->alias(
-			'Symfony\Component\HttpFoundation\Session\Storage\Session',
-			'Symfony\Component\HttpFoundation\Session\Storage\SessionInterface'
+			'Symfony\Component\HttpFoundation\Session\Session',
+			'Symfony\Component\HttpFoundation\Session\SessionInterface'
 		);
 	}
 }
