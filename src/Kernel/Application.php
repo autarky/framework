@@ -101,6 +101,8 @@ class Application implements HttpKernelInterface, ArrayAccess
 	public function setContainer(ContainerInterface $container)
 	{
 		$this->container = $container;
+		$this->container->share('\Autarky\Container\ContainerInterface', $this->container);
+		$this->container->share('\\'.get_class($this->container), $this->container);
 		$container->share('\\'.get_class($this), $this);
 	}
 
@@ -113,6 +115,7 @@ class Application implements HttpKernelInterface, ArrayAccess
 	{
 		$this->config = $config;
 		$this->container->share('\Autarky\Config\LoaderInterface', $this->config);
+		$this->container->share('\\'.get_class($this->config), $this->config);
 	}
 
 	public function getConfig()
@@ -122,8 +125,9 @@ class Application implements HttpKernelInterface, ArrayAccess
 
 	public function setRouter(RouterInterface $router)
 	{
-		$this->container->share('\Autarky\Routing\RouterInterface', $router);
 		$this->router = $router;
+		$this->container->share('\Autarky\Routing\RouterInterface', $this->router);
+		$this->container->share('\\'.get_class($this->router), $this->router);
 	}
 
 	public function getRouter()
