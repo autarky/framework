@@ -17,7 +17,7 @@ class TwigServiceProvider extends ServiceProvider
 	public function register()
 	{
 		$this->app->getContainer()
-		->share('\Autarky\Templating\TemplatingEngineInterface', function() {
+		->share('Autarky\Templating\TemplatingEngineInterface', function() {
 			return new TwigEngine($this->app);
 		});
 	}

@@ -19,7 +19,7 @@ class EventServiceProvider extends ServiceProvider
 	public function register()
 	{
 		$this->app->getContainer()
-		->share('\Symfony\Component\EventDispatcher\EventDispatcherInterface', function() {
+		->share('Symfony\Component\EventDispatcher\EventDispatcherInterface', function() {
 			return new EventDispatcher;
 		});
 	}

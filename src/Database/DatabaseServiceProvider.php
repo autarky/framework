@@ -17,7 +17,7 @@ class DatabaseServiceProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->getContainer()->share('\PDO', function ($container) {
+		$this->app->getContainer()->share('PDO', function ($container) {
 			$dsn = $this->app->getConfig()->get('database.dsn');
 			$username = $this->app->getConfig()->get('database.username');
 			$password = $this->app->getConfig()->get('database.password');

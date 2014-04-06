@@ -6,7 +6,7 @@ Currently a work in progress - none of the class names, method names or naming c
 
 Features include:
 
-- Automatic dependency injection via typehinting in constructor parameters, utilizing Wart, an extension of Pimple
+- Automatic dependency injection via typehinting in constructor parameters
 - Utilizes Symfony's HttpFoundation for easy handling of responses and requests as well as the session
 - Comes with an implementation of nikic's FastRoute, a very performant router
 - Comes with Twig, the most robust, extensible templating engine available in PHP

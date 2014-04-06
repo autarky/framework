@@ -15,7 +15,7 @@
 		"symfony/browser-kit": "2.4.*",
 		"stack/builder": "1.0.*",
 		"nikic/fast-route": "dev-master@dev",
-		"wart/wart": "0.2.*",
+		"illuminate/container": "4.1.*",
 		"twig/twig": "1.15.*"
 	},
 	"require-dev": {

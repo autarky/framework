@@ -20,19 +20,19 @@ abstract class Controller extends ContainerAware
 {
 	protected function view($name, array $data = array())
 	{
-		return $this->container->resolve('\Autarky\Templating\TemplatingEngineInterface')
+		return $this->container->resolve('Autarky\Templating\TemplatingEngineInterface')
 			->render($name, $data);
 	}
 
 	protected function url($name, array $params = array())
 	{
-		return $this->container->resolve('\Autarky\Routing\RouterInterface')
+		return $this->container->resolve('Autarky\Routing\RouterInterface')
 			->getRouteUrl($name, $params);
 	}
 
 	protected function getSession()
 	{
-		return $this->container->resolve('\Symfony\Component\HttpFoundation\Session\Session');
+		return $this->container->resolve('Symfony\Component\HttpFoundation\Session\Session');
 	}
 
 	protected function response($content, $statusCode = 200)
