@@ -56,16 +56,17 @@ class Arr
 	{
 		$segments = explode('.', $key);
 
+		$key = array_pop($segments);
+
 		// iterate through all of $segments except the last one
-		foreach (array_slice($segments, 0, -1) as $segment) {
+		foreach ($segments as $segment) {
 			if (!array_key_exists($segment, $data)) {
 				$data[$segment] = [];
 			}
+
+			$data =& $data[$segment];
 		}
 
-		// get the last element of $segments
-		$segment = array_slice($segments, -1, 1);
-
-		$data[$segment] = $value;
+		$data[$key] = $value;
 	}
 }

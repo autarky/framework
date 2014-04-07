@@ -48,17 +48,17 @@ class PhpFileStore implements ConfigInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function set($key, $value)
+	public function set($fullKey, $value)
 	{
-		list($namespace, $group, $key) = $this->parseKey($key);
+		list($namespace, $group, $key) = $this->parseKey($fullKey);
 
-		if (!array_key_exists($dataKey, $this->data)) {
-			$this->loadData($namespace, $group, $dataKey);
+		if (!array_key_exists($group, $this->data)) {
+			$this->loadData($namespace, $group, $key);
 		}
 
 		$dataKey = $namespace === null ? $group : $namespace .':'. $group;
 		
-		return Arr::set($this->data, $key, $value);
+		return Arr::set($this->data, $fullKey, $value);
 	}
 
 	/**
