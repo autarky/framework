@@ -23,12 +23,30 @@ use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 use Autarky\Container\ContainerInterface;
 use Autarky\Container\ContainerAwareInterface;
 
+/**
+ * FastRoute implementation of the router.
+ */
 class Router implements RouterInterface
 {
+	/**
+	 * @var \Autarky\Container\ContainerInterface
+	 */
 	protected $container;
+
+	/**
+	 * @var \FastRoute\RouteCollector
+	 */
 	protected $routeCollector;
-	protected $requests = [];
+
+	/**
+	 * @var \Symfony\Component\HttpFoundation\Request
+	 */
 	protected $currentRequest;
+
+	/**
+	 * @var array
+	 */
+	protected $namedRoutes = [];
 
 	public function __construct(ContainerInterface $container)
 	{
@@ -38,6 +56,9 @@ class Router implements RouterInterface
 		);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function addRoute($methods, $url, $handler, $name = null)
 	{
 		$methods = (array) $methods;
@@ -45,6 +66,10 @@ class Router implements RouterInterface
 		$route = new Route($methods, $url, $handler, $name);
 
 		if ($name !== null) {
+			if (array_key_exists($name, $this->namedRoutes)) {
+				throw new \InvalidArgumentException("Route with name $name already exists");
+			}
+
 			$this->namedRoutes[$name] = $route;
 		}
 
@@ -55,6 +80,9 @@ class Router implements RouterInterface
 		return $route;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getRouteUrl($name, array $params = array())
 	{
 		$path = $this->getRoute($name)
@@ -75,6 +103,9 @@ class Router implements RouterInterface
 		return $this->namedRoutes[$name];
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function dispatch(Request $request)
 	{
 		$this->currentRequest = $request;
@@ -87,7 +118,7 @@ class Router implements RouterInterface
 				// add the request as the first parameter
 				array_unshift($result[2], $request);
 
-				return $this->makeResponse($this->getResult($result[1], $result[2]));
+				return $this->getResult($result[1], $result[2]);
 				break;
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
@@ -106,22 +137,15 @@ class Router implements RouterInterface
 
 	protected function getResult($callback, $args)
 	{
+		if ($callback instanceof Closure) {
+			return $callback();
+		}
+
 		list($class, $method) = explode(':', $callback);
 		$obj = $this->container->resolve($class);
 
-		if ($obj instanceof ContainerAwareInterface) {
-			$obj->setContainer($this->container);
-		} else {
-			var_dump($obj);die();
-		}
-
-		return call_user_func_array([$obj, $method], $args);
-	}
-
-	protected function makeResponse($result)
-	{
-		if ($result instanceof Response) return $result;
-		return new Response($result);
+		$result = call_user_func_array([$obj, $method], $args);
+		return $result instanceof Response ? $result : new Response($result);
 	}
 
 	protected function getDispatcher()

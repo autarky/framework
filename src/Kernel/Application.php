@@ -18,29 +18,66 @@ use Stack\Builder as StackBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-use Autarky\Config\LoaderInterface as ConfigLoaderInterface;
+use Autarky\Config\ConfigInterface;
 use Autarky\Container\ContainerInterface;
 use Autarky\Routing\RouterInterface;
 
+/**
+ * The main application of the framework.
+ */
 class Application implements HttpKernelInterface, ArrayAccess
 {
+	/**
+	 * @var \SplPriorityQueue
+	 */
 	protected $middlewares;
+
+	/**
+	 * @var \Stack\Builder
+	 */
 	protected $stack;
+
+	/**
+	 * @var array
+	 */
 	protected $providers = [];
+
+	/**
+	 * @var \Autarky\Config\ConfigInterface
+	 */
 	protected $config;
+
+	/**
+	 * @var \Autarky\Container\ContainerInterface
+	 */
 	protected $container;
+
+	/**
+	 * @var \Autarky\Routing\RouterInterface
+	 */
 	protected $router;
 
+	/**
+	 * @var \Closure|string
+	 */
 	protected $environment;
+
+	/**
+	 * @var boolean
+	 */
 	protected $booted = false;
+
+	/**
+	 * @var \SplStack
+	 */
 	protected $configCallbacks;
 
 	/**
 	 * Bootstrap the application instance with the default container and config
 	 * loader for convenience.
 	 *
-	 * @param  string $rootPath      Path to your app root. The config loader
-	 * will look for the "config" directory in this path.
+	 * @param  string $rootPath  Path to your app root. The config loader will
+	 * look for the "config" directory in this path.
 	 * @param  string|\Closure $environment  @see setEnvironment()
 	 *
 	 * @return static
@@ -51,7 +88,7 @@ class Application implements HttpKernelInterface, ArrayAccess
 
 		$app->setContainer(new \Autarky\Container\IlluminateContainer);
 
-		$app->setConfig(new \Autarky\Config\PhpLoader($rootPath.DIRECTORY_SEPARATOR.'config'));
+		$app->setConfig(new \Autarky\Config\PhpFileStore($rootPath.'/config'));
 
 		return $app;
 	}
@@ -63,9 +100,22 @@ class Application implements HttpKernelInterface, ArrayAccess
 		$this->setEnvironment($environment);
 	}
 
-	public function config(Closure $callback)
+	/**
+	 * Push a configuration on top of the stack. The config callbacks will be
+	 * executed when the application is booted. If the application is already
+	 * booted, the callback will be executed at once.
+	 *
+	 * @param  callable $callback
+	 *
+	 * @return void
+	 */
+	public function config(callable $callback)
 	{
-		$this->configCallbacks->push($callback);
+		if ($this->booted) {
+			call_user_func($callback, $this);
+		} else {
+			$this->configCallbacks->push($callback);
+		}
 	}
 
 	/**
@@ -83,21 +133,38 @@ class Application implements HttpKernelInterface, ArrayAccess
 		$this->environment = $environment;
 	}
 
+	/**
+	 * Resolve the environment.
+	 *
+	 * @return void
+	 */
 	protected function resolveEnvironment()
 	{
-		if ($this->environment instanceof \Closure) {
+		if ($this->environment instanceof Closure) {
 			$environment = $this->environment;
 			$this->environment = $environment();
 		}
 
-		$this->config->setEnvironment($this->environment);
+		if ($this->config !== null) {
+			$this->config->setEnvironment($this->environment);
+		}
 	}
 
+	/**
+	 * Get the current environment.
+	 *
+	 * @return string
+	 */
 	public function getEnvironment()
 	{
 		return $this->environment;
 	}
 
+	/**
+	 * Set the application's container.
+	 *
+	 * @param \Autarky\Container\ContainerInterface $container
+	 */
 	public function setContainer(ContainerInterface $container)
 	{
 		$this->container = $container;
@@ -106,23 +173,43 @@ class Application implements HttpKernelInterface, ArrayAccess
 		$container->share(get_class($this), $this);
 	}
 
+	/**
+	 * Get the application's container.
+	 *
+	 * @return \Autarky\Container\ContainerInterface
+	 */
 	public function getContainer()
 	{
 		return $this->container;
 	}
 
-	public function setConfig(ConfigLoaderInterface $config)
+	/**
+	 * Set the application's config store.
+	 *
+	 * @param \Autarky\Config\ConfigInterface $config
+	 */
+	public function setConfig(ConfigInterface $config)
 	{
 		$this->config = $config;
-		$this->container->share('Autarky\Config\LoaderInterface', $this->config);
+		$this->container->share('Autarky\Config\ConfigInterface', $this->config);
 		$this->container->share(get_class($this->config), $this->config);
 	}
 
+	/**
+	 * Get the application's config store.
+	 *
+	 * @return \Autarky\Config\ConfigInterface
+	 */
 	public function getConfig()
 	{
 		return $this->config;
 	}
 
+	/**
+	 * Set the application's router.
+	 *
+	 * @param \Autarky\Routing\RouterInterface $router
+	 */
 	public function setRouter(RouterInterface $router)
 	{
 		$this->router = $router;
@@ -130,11 +217,22 @@ class Application implements HttpKernelInterface, ArrayAccess
 		$this->container->share(get_class($this->router), $this->router);
 	}
 
+	/**
+	 * Get the application's router.
+	 *
+	 * @return \Autarky\Routing\RouterInterface
+	 */
 	public function getRouter()
 	{
 		return $this->router;
 	}
 
+	/**
+	 * Add a middleware to the application.
+	 *
+	 * @param \Symfony\Component\HttpFoundation\HttpKernelInterface $middleware
+	 * @param int $priority
+	 */
 	public function addMiddleware(HttpKernelInterface $middleware, $priority = null)
 	{
 		$this->middlewares->insert($middleware, (int) $priority);
@@ -158,7 +256,7 @@ class Application implements HttpKernelInterface, ArrayAccess
 		}
 
 		foreach ($this->configCallbacks as $callback) {
-			$callback($this);
+			call_user_func($callback, $this);
 		}
 
 		$this->booted = true;
@@ -190,6 +288,9 @@ class Application implements HttpKernelInterface, ArrayAccess
 			->send();
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
 		if ($this->router === null) {

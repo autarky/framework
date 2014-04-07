@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 
 use Autarky\Kernel\ServiceProvider;
 
+/**
+ * Service provider for symfony's session classes.
+ */
 class SessionServiceProvider extends ServiceProvider
 {
 	public function register()

@@ -18,6 +18,11 @@ class IlluminateContainer implements ContainerInterface
 	public function __construct(Container $container = null)
 	{
 		$this->container = $container ?: new Container;
+		$this->container->resolvingAny(function($object, $container) {
+			if ($object instanceof ContainerAwareInterface) {
+				$object->setContainer($this);
+			}
+		});
 	}
 
 	public function bind($abstract, $concrete = null)

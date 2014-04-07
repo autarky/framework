@@ -10,6 +10,13 @@
 
 namespace Autarky\Kernel;
 
+/**
+ * Abstract class for service providers.
+ *
+ * Service providers are modular application configuration classes. They can do
+ * anything from binding a service class onto the IoC container to add a bunch
+ * of routes with distinct functionality.
+ */
 abstract class ServiceProvider
 {
 	public function __construct($app)

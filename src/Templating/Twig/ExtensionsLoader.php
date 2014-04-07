@@ -13,6 +13,10 @@ namespace Autarky\Templating\Twig;
 use Twig_Environment;
 use Autarky\Kernel\Application;
 
+/**
+ * Class responsible for adding Twig extensions, both user-defined ones and
+ * those that are part of the core framework.
+ */
 class ExtensionsLoader
 {
 	public function __construct(Twig_Environment $twig, Application $app)

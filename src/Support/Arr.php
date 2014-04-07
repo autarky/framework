@@ -10,8 +10,20 @@
 
 namespace Autarky\Support;
 
+/**
+ * Array utility functions.
+ */
 class Arr
 {
+	/**
+	 * Get an element from an array.
+	 *
+	 * @param  array  $data
+	 * @param  string $key     Specify a nested element by separating keys with full stops.
+	 * @param  mixed  $default If the element is not found, return this.
+	 *
+	 * @return mixed
+	 */
 	public static function get(array $data, $key, $default = null)
 	{
 		if ($key === null) {
@@ -33,6 +45,13 @@ class Arr
 		return $data;
 	}
 
+	/**
+	 * Set an element of an array.
+	 *
+	 * @param array  $data
+	 * @param string $key   Specify a nested element by separating keys with full stops.
+	 * @param mixed  $value
+	 */
 	public static function set(array &$data, $key, $value)
 	{
 		$segments = explode('.', $key);

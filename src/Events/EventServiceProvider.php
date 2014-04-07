@@ -10,10 +10,14 @@
 
 namespace Autarky\Events;
 
-use Autarky\Kernel\ServiceProvider;
-
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+use Autarky\Kernel\ServiceProvider;
+
+/**
+ * Simple service provider that binds a share instance of symfony's event
+ * dispatcher onto the container.
+ */
 class EventServiceProvider extends ServiceProvider
 {
 	public function register()

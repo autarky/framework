@@ -10,6 +10,9 @@
 
 namespace Autarky\Support;
 
+/**
+ * Trait for namespaced resource resolvers. Provides shared functionality.
+ */
 trait NamespacedResourceResolver
 {
 	/**
@@ -83,10 +86,17 @@ trait NamespacedResourceResolver
 		return [$namespace, $group, $key];
 	}
 
+	/**
+	 * Get the possible locations given a namespace.
+	 *
+	 * @param  string $namespace Leave out to search the global namespace.
+	 *
+	 * @return array
+	 */
 	protected function getLocations($namespace = null)
 	{
 		if ($namespace === null) {
-			return $this->getDefaultPaths();
+			return $this->getDefaultLocations();
 		}
 
 		if (!array_key_exists($namespace, $this->locations)) {
@@ -97,10 +107,15 @@ trait NamespacedResourceResolver
 		// override locations at the end.
 		return $this->locations[$namespace] + array_map(function($path) use($namespace) {
 			return $path .'/'. $namespace;
-		}, $this->getDefaultPaths());
+		}, $this->getDefaultLocations());
 	}
 
-	protected function getDefaultPaths()
+	/**
+	 * Get the locations available for the global namespace.
+	 *
+	 * @return array
+	 */
+	protected function getDefaultLocations()
 	{
 		return $this->environment === null ? [$this->location] :
 			[$this->location, $this->location.'/'.$this->environment];

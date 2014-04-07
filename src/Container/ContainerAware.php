@@ -10,6 +10,12 @@
 
 namespace Autarky\Container;
 
+/**
+ * Simple implementation of ContainerAwareInterface that other classes can
+ * extend from.
+ *
+ * @see ContainerAwareInterface
+ */
 abstract class ContainerAware implements ContainerAwareInterface
 {
 	protected $container;

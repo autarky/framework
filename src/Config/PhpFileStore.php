@@ -13,24 +13,30 @@ namespace Autarky\Config;
 use Autarky\Support\NamespacedResourceResolver;
 use Autarky\Support\Arr;
 
-class PhpLoader implements LoaderInterface
+/**
+ * Config store using .php files. Said .php files should return an array of
+ * config values. Example:
+ *
+ * config/foo.php
+ * return ['bar' => 'baz'];
+ * PhpFileStore::get('foo.bar') == 'baz'
+ */
+class PhpFileStore implements ConfigInterface
 {
 	use NamespacedResourceResolver;
 
 	protected $data = [];
 
-	public function __construct($location)
+	/**
+	 * @param string $path Path to config files in the global namespace.
+	 */
+	public function __construct($path)
 	{
-		$this->setLocation($location);
+		$this->setLocation($path);
 	}
 
 	/**
-	 * Get an item from the config.
-	 *
-	 * @param  string $key
-	 * @param  mixed  $default
-	 *
-	 * @return mixed
+	 * {@inheritdoc}
 	 */
 	public function get($key, $default = null)
 	{
@@ -40,10 +46,7 @@ class PhpLoader implements LoaderInterface
 	}
 
 	/**
-	 * Set an item in the config.
-	 *
-	 * @param string $key
-	 * @param mixed  $value
+	 * {@inheritdoc}
 	 */
 	public function set($key, $value)
 	{

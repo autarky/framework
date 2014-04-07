@@ -10,6 +10,9 @@
 
 namespace Autarky\Templating\Twig;
 
+use Twig_Extension;
+use Twig_SimpleFunction;
+
 use Autarky\Routing\RouterInterface;
 
 /**
@@ -17,7 +20,7 @@ use Autarky\Routing\RouterInterface;
  *
  * Parts shamelessly stolen from Symfony 2.
  */
-class RoutingExtension extends \Twig_Extension
+class RoutingExtension extends Twig_Extension
 {
     protected $router;
 
@@ -29,7 +32,7 @@ class RoutingExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
+            new Twig_SimpleFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
         );
     }
 

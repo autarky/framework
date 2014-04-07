@@ -10,8 +10,22 @@
 
 namespace Autarky\Routing;
 
+/**
+ * Class that represents a single route in the application.
+ */
 class Route
 {
+	protected $methods;
+	protected $pattern;
+	protected $handler;
+	protected $name;
+
+	/**
+	 * @param array  $methods HTTP methods allowed for this route
+	 * @param string $pattern
+	 * @param mixed  $handler
+	 * @param string $name
+	 */
 	public function __construct(array $methods, $pattern, $handler, $name = null)
 	{
 		$this->methods = $methods;

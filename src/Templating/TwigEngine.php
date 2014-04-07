@@ -12,6 +12,7 @@ namespace Autarky\Templating;
 
 use Twig_Environment;
 
+use Autarky\Kernel\Application;
 use Autarky\Templating\Twig\FileLoader;
 use Autarky\Templating\Twig\ExtensionsLoader;
 
@@ -20,7 +21,7 @@ class TwigEngine implements TemplatingEngineInterface
 	protected $twig;
 	protected $app;
 
-	public function __construct($app, Twig_Environment $env = null)
+	public function __construct(Application $app, Twig_Environment $env = null)
 	{
 		if ($env === null) {
 			$loader = new FileLoader($app->getConfig()->get('path.templates'));
@@ -50,12 +51,18 @@ class TwigEngine implements TemplatingEngineInterface
 		}
 	}
 
-	public function render($view, array $data = array())
+	/**
+	 * {@inheritdoc}
+	 */
+	public function render($name, array $data = array())
 	{
-		return $this->twig->loadTemplate($view)
+		return $this->twig->loadTemplate($name)
 			->render($data);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function addNamespace($namespace, $location)
 	{
 		$this->twig->getLoader()

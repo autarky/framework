@@ -12,7 +12,22 @@ namespace Autarky\Templating;
 
 use Autarky\Support\NamespacedResourceResolverInterface;
 
+/**
+ * Interface for templating engines.
+ *
+ * Templating engines in Autarky must support namespaces.
+ *
+ * @see  \Autarky\Support\NamespacedResourceResolverInterface
+ */
 interface TemplatingEngineInterface extends NamespacedResourceResolverInterface
 {
-	public function render($view, array $params = array());
+	/**
+	 * Render a template.
+	 *
+	 * @param  string $name   Name of the template.
+	 * @param  array  $params
+	 *
+	 * @return string
+	 */
+	public function render($name, array $params = array());
 }

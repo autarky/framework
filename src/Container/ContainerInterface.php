@@ -78,6 +78,9 @@ interface ContainerInterface
 	 * Resolve an object from the IoC container. Dependencies of the resolved
 	 * object should also be resolved recursively if possible.
 	 *
+	 * If the object resolved is an instance of ContainerAwareInterface, the
+	 * container should call setContainer($this) on it.
+	 *
 	 * @param  string $abstract
 	 *
 	 * @return mixed
