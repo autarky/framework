@@ -11,8 +11,8 @@
 namespace Autarky\Templating;
 
 use Twig_Environment;
-use Twig_Loader_Filesystem;
 
+use Autarky\Templating\Twig\FileLoader;
 use Autarky\Templating\Twig\ExtensionsLoader;
 
 class TwigEngine implements TemplatingEngineInterface
@@ -23,7 +23,7 @@ class TwigEngine implements TemplatingEngineInterface
 	public function __construct($app, Twig_Environment $env = null)
 	{
 		if ($env === null) {
-			$loader = new Twig_Loader_Filesystem($app->getConfig()->get('path.templates'));
+			$loader = new FileLoader($app->getConfig()->get('path.templates'));
 			$config = [
 				'cache' => $app->getConfig()->get('path.templates-cache'),
 				'debug' => $app->getConfig()->get('app.debug'),
@@ -52,7 +52,6 @@ class TwigEngine implements TemplatingEngineInterface
 
 	public function render($view, array $data = array())
 	{
-		$view = $this->transformViewName($view);
 		return $this->twig->loadTemplate($view)
 			->render($data);
 	}
@@ -61,14 +60,5 @@ class TwigEngine implements TemplatingEngineInterface
 	{
 		$this->twig->getLoader()
 			->addPath($location, $namespace);
-	}
-
-	protected function transformViewName($name)
-	{
-		if (strpos($name, ':') !== false) {
-			$name = '@' . str_replace(':', '/', $name);
-		}
-
-		return $name;
 	}
 }
