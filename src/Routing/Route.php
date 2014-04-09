@@ -49,4 +49,24 @@ class Route
 			return array_shift($params);
 		}, $this->pattern);
 	}
+
+	/**
+	 * Get the handler for the route.
+	 *
+	 * @return \Closure|string
+	 */
+	public function getHandler()
+	{
+		return $this->handler;
+	}
+
+	/**
+	 * Get the route's name.
+	 *
+	 * @return string|null
+	 */
+	public function getName()
+	{
+		return $this->name;
+	}
 }

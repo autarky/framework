@@ -62,6 +62,16 @@ abstract class Controller extends ContainerAware
 	}
 
 	/**
+	 * Get the logger.
+	 *
+	 * @return \Psr\Log\LoggerInterface
+	 */
+	protected function getLogger()
+	{
+		return $this->container->resolve('Psr\Log\LoggerInterface');
+	}
+
+	/**
 	 * Create a response.
 	 *
 	 * @param  string  $content

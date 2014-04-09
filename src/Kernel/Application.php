@@ -162,6 +162,11 @@ class Application implements HttpKernelInterface, ArrayAccess
 		return $this->environment;
 	}
 
+	public function getErrorHandler()
+	{
+		return $this->errorHandler;
+	}
+
 	/**
 	 * Set the application's container.
 	 *

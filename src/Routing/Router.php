@@ -44,6 +44,11 @@ class Router implements RouterInterface
 	protected $currentRequest;
 
 	/**
+	 * @var \Autarky\Routing\Route
+	 */
+	protected $currentRoute;
+
+	/**
 	 * @var array
 	 */
 	protected $namedRoutes = [];
@@ -54,6 +59,22 @@ class Router implements RouterInterface
 		$this->routeCollector = new RouteCollector(
 			new RouteParser, new DataGenerator
 		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getCurrentRequest()
+	{
+		return $this->currentRequest;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getCurrentRoute()
+	{
+		return $this->currentRoute;
 	}
 
 	/**
@@ -74,7 +95,7 @@ class Router implements RouterInterface
 		}
 
 		foreach ($methods as $method) {
-			$this->routeCollector->addRoute($method, $url, $handler);
+			$this->routeCollector->addRoute($method, $url, $route);
 		}
 
 		return $route;
@@ -109,6 +130,7 @@ class Router implements RouterInterface
 	public function dispatch(Request $request)
 	{
 		$this->currentRequest = $request;
+		$this->currentRoute = null;
 
 		$result = $this->getDispatcher()
 			->dispatch($request->getMethod(), $request->getPathInfo());
@@ -135,8 +157,11 @@ class Router implements RouterInterface
 		}
 	}
 
-	protected function getResult($callback, $args)
+	protected function getResult($route, $args)
 	{
+		$this->currentRoute = $route;
+		$callback = $route->getHandler();
+
 		if ($callback instanceof Closure) {
 			return $callback();
 		}

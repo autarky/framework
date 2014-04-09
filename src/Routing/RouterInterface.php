@@ -45,4 +45,18 @@ interface RouterInterface
 	 * @return string
 	 */
 	public function getRouteUrl($name, array $params = array());
+
+	/**
+	 * Get the current request the router is handling.
+	 *
+	 * @return \Symfoy\Component\HttpFoundation\Request
+	 */
+	public function getCurrentRequest();
+
+	/**
+	 * Get the route matched to the current request.
+	 *
+	 * @return \Autarky\Routing\Route
+	 */
+	public function getCurrentRoute();
 }
