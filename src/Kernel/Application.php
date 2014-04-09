@@ -98,6 +98,8 @@ class Application implements HttpKernelInterface, ArrayAccess
 		$this->middlewares = new SplPriorityQueue;
 		$this->configCallbacks = new SplStack;
 		$this->setEnvironment($environment);
+		$this->errorHandler = new ErrorHandler;
+		$this->errorHandler->register();
 	}
 
 	/**
@@ -297,7 +299,11 @@ class Application implements HttpKernelInterface, ArrayAccess
 			throw new \Exception('No router set!');
 		}
 
-		return $this->router->dispatch($request);
+		try {
+			return $this->router->dispatch($request);
+		} catch (\Exception $exception) {
+			return $this->errorHandler->handle($exception);
+		}
 	}
 
 	public function offsetGet($key)
