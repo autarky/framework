@@ -27,7 +27,7 @@ class ErrorHandler
 		return $this->handlers;
 	}
 
-	public function pushHandler(callable $handler)
+	public function appendHandler(callable $handler)
 	{
 		$this->handlers->push($handler);
 	}
