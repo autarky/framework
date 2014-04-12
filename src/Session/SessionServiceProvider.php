@@ -32,6 +32,7 @@ class SessionServiceProvider extends ServiceProvider
 		$this->registerSessionHandler();
 		$this->registerSessionStorage();
 		$this->registerSession();
+		$this->registerMiddleware();
 	}
 
 	public function registerSessionHandler()
@@ -102,5 +103,10 @@ class SessionServiceProvider extends ServiceProvider
 			'Symfony\Component\HttpFoundation\Session\Session',
 			'Symfony\Component\HttpFoundation\Session\SessionInterface'
 		);
+	}
+
+	public function registerMiddleware()
+	{
+		$this->app->addMiddleware(__NAMESPACE__.'\Middleware');
 	}
 }

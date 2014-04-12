@@ -16,7 +16,9 @@ use ArrayAccess;
 use SplPriorityQueue;
 use Stack\Builder as StackBuilder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 
 use Autarky\Config\ConfigInterface;
 use Autarky\Container\ContainerInterface;
@@ -25,7 +27,7 @@ use Autarky\Routing\RouterInterface;
 /**
  * The main application of the framework.
  */
-class Application implements HttpKernelInterface, ArrayAccess
+class Application implements HttpKernelInterface, TerminableInterface, ArrayAccess
 {
 	/**
 	 * @var \SplPriorityQueue
@@ -237,10 +239,10 @@ class Application implements HttpKernelInterface, ArrayAccess
 	/**
 	 * Add a middleware to the application.
 	 *
-	 * @param \Symfony\Component\HttpFoundation\HttpKernelInterface $middleware
-	 * @param int $priority
+	 * @param string $middleware
+	 * @param int    $priority
 	 */
-	public function addMiddleware(HttpKernelInterface $middleware, $priority = null)
+	public function addMiddleware($middleware, $priority = null)
 	{
 		$this->middlewares->insert($middleware, (int) $priority);
 	}
@@ -313,6 +315,14 @@ class Application implements HttpKernelInterface, ArrayAccess
 		$response->prepare($request);
 
 		return $response;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function terminate(Request $request, Response $response)
+	{
+		//
 	}
 
 	/**
