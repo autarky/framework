@@ -94,6 +94,9 @@ class Route
 
 	public function callFilters($when, array $args, ContainerInterface $container = null)
 	{
+		// add $this as first argument to all filters
+		array_unshift($args, $this);
+
 		$filters = $this->{$when.'Filters'};
 
 		if (empty($filters)) {
