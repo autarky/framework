@@ -305,10 +305,14 @@ class Application implements HttpKernelInterface, ArrayAccess
 		}
 
 		try {
-			return $this->router->dispatch($request);
+			$response = $this->router->dispatch($request);
 		} catch (\Exception $exception) {
-			return $this->errorHandler->handle($exception);
+			$response = $this->errorHandler->handle($exception);
 		}
+
+		$response->prepare($request);
+
+		return $response;
 	}
 
 	/**
