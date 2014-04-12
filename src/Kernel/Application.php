@@ -311,6 +311,38 @@ class Application implements HttpKernelInterface, ArrayAccess
 		}
 	}
 
+	/**
+	 * @see \Autarky\Container\ContainerInterface::resolve()
+	 */
+	public function resolve()
+	{
+		return call_user_func_array([$this->container, 'resolve'], func_get_args());
+	}
+
+	/**
+	 * @see \Autarky\Container\ContainerInterface::bind()
+	 */
+	public function bind()
+	{
+		return call_user_func_array([$this->container, 'bind'], func_get_args());
+	}
+
+	/**
+	 * @see \Autarky\Container\ContainerInterface::share()
+	 */
+	public function share()
+	{
+		return call_user_func_array([$this->container, 'share'], func_get_args());
+	}
+
+	/**
+	 * @see \Autarky\Container\ContainerInterface::alias()
+	 */
+	public function alias()
+	{
+		return call_user_func_array([$this->container, 'alias'], func_get_args());
+	}
+
 	public function offsetGet($key)
 	{
 		return $this->container->resolve($key);
