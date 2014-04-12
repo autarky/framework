@@ -10,6 +10,7 @@
 
 namespace Autarky\Routing;
 
+use Closure;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -49,6 +50,20 @@ class Router implements RouterInterface
 	protected $currentRoute;
 
 	/**
+	 * The filters that are currently applied to every route being added.
+	 *
+	 * @var array
+	 */
+	protected $currentFilters = [];
+
+	/**
+	 * The URL prefix that is currently applied to every route being added.
+	 *
+	 * @var null|string
+	 */
+	protected $currentPrefix;
+
+	/**
 	 * @var array
 	 */
 	protected $namedRoutes = [];
@@ -78,13 +93,74 @@ class Router implements RouterInterface
 	}
 
 	/**
+	 * Define a filter.
+	 *
+	 * @param  string $name
+	 * @param  mixed  $handler Closure, or 'Class:method' string
+	 *
+	 * @return void
+	 */
+	public function defineFilter($name, $handler)
+	{
+		$this->filters[$name] = $handler;
+	}
+
+	/**
+	 * Get a filter's handler by name.
+	 *
+	 * @param  string $name
+	 *
+	 * @return mixed
+	 */
+	public function getFilter($name)
+	{
+		if (!array_key_exists($name, $this->filters)) {
+			throw new \InvalidArgumentException("Filter with name $name is not defined");
+		}
+
+		return $this->filters[$name];
+	}
+
+	/**
+	 * Define a route group.
+	 *
+	 * @param  array   $flags    Valid keys are 'before', 'after', 'prefix'
+	 * @param  Closure $callback First argument is the router ($this)
+	 *
+	 * @return void
+	 */
+	public function group(array $flags, Closure $callback)
+	{
+		$oldPrefix = $this->currentPrefix;
+		$oldFilters = $this->currentFilters;
+
+		foreach (['before', 'after'] as $when) {
+			if (array_key_exists($when, $flags)) {
+				foreach ((array) $flags[$when] as $filter) {
+					$this->currentFilters[] = [$when, $this->getFilter($filter)];
+				}
+			}
+		}
+
+		if (array_key_exists('prefix', $flags)) {
+			$this->currentPrefix = ($this->currentPrefix === null) ? $flags['prefix']
+				: rtrim($this->currentPrefix, '/') .'/'. ltrim($flags['prefix'], '/');
+		}
+
+		$callback($this);
+
+		$this->currentPrefix = $oldPrefix;
+		$this->currentFilters = $oldFilters;
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public function addRoute($methods, $url, $handler, $name = null)
 	{
 		$methods = (array) $methods;
 
-		$route = new Route($methods, $url, $handler, $name);
+		$route = $this->createRoute($methods, $url, $handler, $name);
 
 		if ($name !== null) {
 			if (array_key_exists($name, $this->namedRoutes)) {
@@ -96,6 +172,21 @@ class Router implements RouterInterface
 
 		foreach ($methods as $method) {
 			$this->routeCollector->addRoute($method, $url, $route);
+		}
+
+		return $route;
+	}
+
+	protected function createRoute($methods, $url, $handler, $name)
+	{
+		if ($this->currentPrefix !== null) {
+			$url = rtrim($this->currentPrefix, '/') .'/'. ltrim($url, '/');
+		}
+
+		$route = new Route($methods, $url, $handler, $name);
+
+		foreach ($this->currentFilters as $filter) {
+			$route->addFilter($filter[0], $filter[1]);
 		}
 
 		return $route;
@@ -160,16 +251,9 @@ class Router implements RouterInterface
 	protected function getResult($route, $args)
 	{
 		$this->currentRoute = $route;
-		$callback = $route->getHandler();
 
-		if ($callback instanceof Closure) {
-			return $callback();
-		}
+		$result = $route->run($args, $this->container);
 
-		list($class, $method) = explode(':', $callback);
-		$obj = $this->container->resolve($class);
-
-		$result = call_user_func_array([$obj, $method], $args);
 		return $result instanceof Response ? $result : new Response($result);
 	}
 
