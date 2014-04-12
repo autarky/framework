@@ -14,7 +14,7 @@
 		"symfony/http-foundation": "2.4.*",
 		"symfony/browser-kit": "2.4.*",
 		"stack/builder": "1.0.*",
-		"nikic/fast-route": "dev-master@dev",
+		"nikic/fast-route": "0.1.*",
 		"illuminate/container": "4.1.*",
 		"twig/twig": "1.15.*",
 		"monolog/monolog": "1.*"
