@@ -96,7 +96,9 @@ class SessionServiceProvider extends ServiceProvider
 		$this->app->getContainer()->share(
 			'Symfony\Component\HttpFoundation\Session\SessionInterface',
 			function ($container) {
-				return new Session($container['Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface']);
+				$session = new Session($container['Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface']);
+				$session->setName($this->app->getConfig()->get('session.cookie.name', 'autarky_session'));
+				return $session;
 			});
 
 		$this->app->getContainer()->alias(
