@@ -239,8 +239,8 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	/**
 	 * Add a middleware to the application.
 	 *
-	 * @param string $middleware
-	 * @param int    $priority
+	 * @param \Closure|string|array $middleware
+	 * @param int                   $priority
 	 */
 	public function addMiddleware($middleware, $priority = null)
 	{
@@ -258,7 +258,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 
 		$this->resolveEnvironment();
 
-		$providers = $this->config->get('app.providers');
+		$providers = $this->config->get('app.providers', []);
 
 		foreach ($providers as $provider) {
 			(new $provider($this))->register();
@@ -274,11 +274,12 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	/**
 	 * Run the application.
 	 *
-	 * @param  \Symfony\Component\HttpFoundation\Request $request Optional
+	 * @param  \Symfony\Component\HttpFoundation\Request $request
+	 * @param  bool $send
 	 *
 	 * @return mixed
 	 */
-	public function run(Request $request = null)
+	public function run(Request $request = null, $send = true)
 	{
 		$this->boot();
 
@@ -289,12 +290,13 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		$this->stack = new StackBuilder;
 
 		foreach ($this->middlewares as $middleware) {
-			$this->stack->push($middleware);
+			call_user_func_array([$this->stack, 'push'], (array) $middleware);
 		}
 
-		return $this->stack->resolve($this)
-			->handle($request)
-			->send();
+		$response = $this->stack->resolve($this)
+			->handle($request);
+
+		return $send ? $response->send() : $response;
 	}
 
 	/**

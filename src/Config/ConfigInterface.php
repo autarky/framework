@@ -35,4 +35,11 @@ interface ConfigInterface extends NamespacedResourceResolverInterface
 	 * @param mixed  $value
 	 */
 	public function set($key, $value);
+
+	/**
+	 * Set the environment.
+	 *
+	 * @param string $environment
+	 */
+	public function setEnvironment($environment);
 }

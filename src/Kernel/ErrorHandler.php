@@ -17,9 +17,18 @@ use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 
 class ErrorHandler
 {
+	protected $handlers;
+	protected $errorHandler;
+	protected $exceptionHandler;
+	protected $rethrow = false;
+
 	public function __construct()
 	{
 		$this->handlers = new SplDoublyLinkedList;
+
+		if (php_sapi_name() === 'cli') {
+			$this->rethrow = true;
+		}
 	}
 
 	public function getHandlers()
@@ -39,12 +48,16 @@ class ErrorHandler
 
 	public function register()
 	{
-		$this->errorHandler = SymfonyErrorHandler::register();
-		$this->exceptionHandler = SymfonyExceptionHandler::register();
+		if (!$this->rethrow) {
+			$this->errorHandler = SymfonyErrorHandler::register();
+			$this->exceptionHandler = SymfonyExceptionHandler::register();
+		}
 	}
 
 	public function handle(Exception $exception)
 	{
+		if ($this->rethrow) throw $exception;
+
 		foreach ($this->handlers as $handler) {
 			$result = call_user_func($handler, $exception);
 
