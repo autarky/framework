@@ -35,16 +35,26 @@ class Middleware implements HttpKernelInterface
 
 		if ($this->session->isStarted()) {
 			$this->session->save();
-			$params = session_get_cookie_params();
+
+			$params = array_merge(
+				session_get_cookie_params(),
+				$this->app->getConfig()->get('session.cookie', [])
+			);
+
+			if ($params['lifetime'] !== 0) {
+				$params['lifetime'] = $request->server->get('REQUEST_TIME') + $params['lifetime'];
+			}
+
 			$cookie = new Cookie(
 				$this->session->getName(),
 				$this->session->getId(),
-				0 === $params['lifetime'] ? 0 : $request->server->get('REQUEST_TIME') + $params['lifetime'],
+				$params['lifetime'],
 				$params['path'],
 				$params['domain'],
 				$params['secure'],
 				$params['httponly']
 			);
+
 			$response->headers->setCookie($cookie);
 		}
 
