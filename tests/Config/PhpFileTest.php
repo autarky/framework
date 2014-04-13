@@ -34,4 +34,19 @@ class Test extends PHPUnit_Framework_TestCase
 		$config->set('testfile.foo', 'baz');
 		$this->assertEquals('baz', $config->get('testfile.foo'));
 	}
+
+	/** @test */
+	public function getNonexistantKeys()
+	{
+		$config = $this->makeConfig();
+		$this->assertEquals(null, $config->get('testfile.bar'));
+		$this->assertEquals(null, $config->get('testfile.bar.baz'));
+	}
+
+	/** @test */
+	public function getDefault()
+	{
+		$config = $this->makeConfig();
+		$this->assertEquals('bar', $config->get('testfile.bar', 'bar'));
+	}
 }

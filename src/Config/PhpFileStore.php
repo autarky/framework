@@ -42,7 +42,7 @@ class PhpFileStore implements ConfigInterface
 	{
 		list($namespace, $group, $key) = $this->parseKey($key);
 
-		return $this->getFromNamespace($namespace, $group, $key);
+		return $this->getFromNamespace($namespace, $group, $key, $default);
 	}
 
 	/**
