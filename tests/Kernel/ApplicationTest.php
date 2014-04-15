@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class Test extends PHPUnit_Framework_TestCase
+class ApplicationTest extends PHPUnit_Framework_TestCase
 {
 	public function makeApp($response)
 	{

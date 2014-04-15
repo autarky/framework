@@ -11,6 +11,8 @@
 namespace Autarky\Kernel;
 
 use Exception;
+use ReflectionClass;
+use ReflectionFunction;
 use SplDoublyLinkedList;
 use Symfony\Component\Debug\ErrorHandler as SymfonyErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
@@ -22,11 +24,13 @@ class ErrorHandler
 	protected $exceptionHandler;
 	protected $rethrow = false;
 
-	public function __construct()
+	public function __construct($rethrow = null)
 	{
 		$this->handlers = new SplDoublyLinkedList;
 
-		if (php_sapi_name() === 'cli') {
+		if ($rethrow !== null) {
+			$this->rethrow = (bool) $rethrow;
+		} else if (php_sapi_name() === 'cli') {
 			$this->rethrow = true;
 		}
 	}
@@ -59,6 +63,8 @@ class ErrorHandler
 		if ($this->rethrow) throw $exception;
 
 		foreach ($this->handlers as $handler) {
+			if (!$this->matchesTypehint($handler, $exception)) continue;
+
 			$result = call_user_func($handler, $exception);
 
 			if ($result !== null) {
@@ -66,10 +72,29 @@ class ErrorHandler
 			}
 		}
 
-		return $this->handleException($exception);
+		return $this->defaultHandler($exception);
 	}
 
-	public function handleException(Exception $exception)
+	protected function matchesTypehint(callable $handler, Exception $exception)
+	{
+		$params = (new ReflectionFunction($handler))
+			->getParameters();
+
+		if (empty($params)) {
+			return true;
+		}
+
+		$handlerHint = $params[0]
+			->getClass();
+
+		if (!$handlerHint) {
+			return true;
+		}
+
+		return $handlerHint->isInstance($exception);
+	}
+
+	protected function defaultHandler(Exception $exception)
 	{
 		return $this->exceptionHandler->createResponse($exception);
 	}
