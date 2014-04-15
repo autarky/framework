@@ -4,7 +4,7 @@ namespace Autarky\Tests\Config;
 use PHPUnit_Framework_TestCase;
 use Autarky\Config\PhpFileStore;
 
-class Test extends PHPUnit_Framework_TestCase
+class PhpFileTest extends PHPUnit_Framework_TestCase
 {
 	public function makeConfig()
 	{
