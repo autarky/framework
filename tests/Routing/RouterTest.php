@@ -4,12 +4,22 @@ namespace Autarky\Tests\Routing;
 use PHPUnit_Framework_TestCase;
 use Autarky\Container\IlluminateContainer;
 use Autarky\Routing\Router;
+use Symfony\Component\HttpFoundation\Request;
 
 class Test extends PHPUnit_Framework_TestCase
 {
 	public function makeRouter()
 	{
 		return new Router(new IlluminateContainer);
+	}
+
+	/** @test */
+	public function basicRouting()
+	{
+		$router = $this->makeRouter();
+		$router->addRoute('get', '/one/{v}', function($r, $v) { return 'v:'.$v; });
+		$response = $router->dispatch(Request::create('/one/foo'));
+		$this->assertEquals('v:foo', $response->getContent());
 	}
 
 	/** @test */

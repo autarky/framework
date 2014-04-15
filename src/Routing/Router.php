@@ -171,7 +171,7 @@ class Router implements RouterInterface
 		}
 
 		foreach ($methods as $method) {
-			$this->routeCollector->addRoute($method, $url, $route);
+			$this->routeCollector->addRoute(strtoupper($method), $url, $route);
 		}
 
 		return $route;
@@ -239,7 +239,7 @@ class Router implements RouterInterface
 				break;
 
 			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-				throw new MethodNotAllowedHttpException('Method '.$request->getMethod().' not allowed for URL '.$request->getUrl());
+				throw new MethodNotAllowedHttpException($result[1], 'Method '.$request->getMethod().' not allowed for URL '.$request->getUri());
 				break;
 
 			default:
