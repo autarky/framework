@@ -130,7 +130,9 @@ class Route
 			return call_user_func_array($handler, $args);
 		}
 
-		list($class, $method) = explode(':', $handler);
+		$segments = explode(':', $handler);
+		$class = $segments[0];
+		$method = isset($segments[1]) ? $segments[1] : 'filter';
 
 		$obj = $container ? $container->resolve($class) : new $class;
 
