@@ -43,7 +43,7 @@ class TwigEngine implements TemplatingEngineInterface
 		$loader = new ExtensionsLoader($this->twig, $this->app);
 
 		$loader->loadCoreExtensions([
-			'RoutingExtension'
+			'RoutingExtension', 'PartialExtension',
 		]);
 
 		if ($extensions = $this->app->getConfig()->get('twig.extensions')) {
