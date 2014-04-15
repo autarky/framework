@@ -6,7 +6,7 @@ use Autarky\Container\IlluminateContainer;
 use Autarky\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
 
-class Test extends PHPUnit_Framework_TestCase
+class RouterTest extends PHPUnit_Framework_TestCase
 {
 	public function makeRouter()
 	{
@@ -20,6 +20,23 @@ class Test extends PHPUnit_Framework_TestCase
 		$router->addRoute('get', '/one/{v}', function($r, $v) { return 'v:'.$v; });
 		$response = $router->dispatch(Request::create('/one/foo'));
 		$this->assertEquals('v:foo', $response->getContent());
+	}
+
+	/** @test */
+	public function routeNotFoundThrowsException()
+	{
+		$this->setExpectedException('Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
+		$router = $this->makeRouter();
+		$router->dispatch(Request::create('/foo'));
+	}
+
+	/** @test */
+	public function methodNotAllowedThrowsException()
+	{
+		$this->setExpectedException('Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException');
+		$router = $this->makeRouter();
+		$router->addRoute('get', '/foo', function() {});
+		$router->dispatch(Request::create('/foo', 'post'));
 	}
 
 	/** @test */
