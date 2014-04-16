@@ -62,6 +62,68 @@ abstract class Controller extends ContainerAware
 	}
 
 	/**
+	 * Flash something to the session.
+	 *
+	 * @param  string $key
+	 * @param  mixed  $value
+	 *
+	 * @return void
+	 */
+	protected function flash($key, $value)
+	{
+		$this->getSession()
+			->getFlashBag()
+			->set($key, $value);
+	}
+
+	/**
+	 * Flash an array of messages to the session.
+	 *
+	 * @param  array  $messages
+	 *
+	 * @return void
+	 */
+	public function flashMessages($messages)
+	{
+		$flashBag = $this->getSession()
+			->getFlashBag();
+
+		foreach ((array) $messages as $message) {
+			$flashBag->add('_messages', $message);
+		}
+	}
+
+	/**
+	 * Flash input to session.
+	 *
+	 * @param  \Symfony\Component\HttpFoundation\Request $request Optional
+	 *
+	 * @return void
+	 */
+	protected function flashInput(Request $request = null)
+	{
+		if ($request === null) {
+			$request = $this->container
+				->resolve('Autarky\Routing\RouterInterface')
+				->getCurrentRequest();
+		}
+
+		$this->flash('_old_input', $request->request->all());
+	}
+
+	/**
+	 * Get old input flashed to the session.
+	 *
+	 * @return array
+	 */
+	protected function getOldInput()
+	{
+		return $this->getSession()
+			->getFlashBag()
+			->peek('_old_input', []);
+	}
+
+	/**
 	 * Get the logger.
 	 *
 	 * @return \Psr\Log\LoggerInterface

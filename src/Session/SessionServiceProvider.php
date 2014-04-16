@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 
 use Autarky\Kernel\ServiceProvider;
 
@@ -96,7 +97,11 @@ class SessionServiceProvider extends ServiceProvider
 		$this->app->getContainer()->share(
 			'Symfony\Component\HttpFoundation\Session\SessionInterface',
 			function ($container) {
-				$session = new Session($container['Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface']);
+				$session = new Session(
+					$container['Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface'],
+					null,
+					new AutoExpireFlashBag()
+				);
 				$session->setName($this->app->getConfig()->get('session.cookie.name', 'autarky_session'));
 				return $session;
 			});
