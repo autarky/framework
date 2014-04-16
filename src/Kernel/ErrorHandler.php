@@ -50,11 +50,11 @@ class ErrorHandler
 		$this->handlers->unshift($handler);
 	}
 
-	public function register()
+	public function register($debug = false)
 	{
 		if (!$this->rethrow) {
-			$this->errorHandler = SymfonyErrorHandler::register();
-			$this->exceptionHandler = SymfonyExceptionHandler::register();
+			$this->errorHandler = SymfonyErrorHandler::register(null, $debug);
+			$this->exceptionHandler = SymfonyExceptionHandler::register($debug);
 		}
 	}
 

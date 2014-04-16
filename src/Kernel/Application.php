@@ -78,30 +78,41 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 * Bootstrap the application instance with the default container and config
 	 * loader for convenience.
 	 *
-	 * @param  string $rootPath  Path to your app root. The config loader will
-	 * look for the "config" directory in this path.
-	 * @param  string|\Closure $environment  @see setEnvironment()
+	 * @param  string $rootPath     Path to your app root. The config loader
+	 *                              will look for the "config" directory in this
+	 *                              path.
+	 * @param  mixed  $environment  See setEnvironment()
 	 *
 	 * @return static
 	 */
 	public static function bootstrap($rootPath, $environment)
 	{
-		$app = new static($environment);
-
-		$app->setContainer(new \Autarky\Container\IlluminateContainer);
-
-		$app->setConfig(new \Autarky\Config\PhpFileStore($rootPath.'/config'));
-
-		return $app;
+		return new static(
+			$environment,
+			new \Autarky\Container\IlluminateContainer,
+			new \Autarky\Config\PhpFileStore($rootPath.'/config')
+		);
 	}
 
-	public function __construct($environment)
-	{
+	/**
+	 * @param mixed $environment See setEnvironment()
+	 * @param mixed $container   See setContainer()
+	 * @param mixed $config      See setConfig()
+	 */
+	public function __construct(
+		$environment,
+		ContainerInterface $container,
+		ConfigInterface $config
+	) {
 		$this->middlewares = new SplPriorityQueue;
 		$this->configCallbacks = new SplStack;
+
 		$this->setEnvironment($environment);
+		$this->setContainer($container);
+		$this->setConfig($config);
+
 		$this->errorHandler = new ErrorHandler;
-		$this->errorHandler->register();
+		$this->errorHandler->register($config->get('app.debug', false));
 	}
 
 	/**
