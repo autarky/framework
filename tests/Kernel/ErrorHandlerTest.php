@@ -10,7 +10,7 @@ class ErrorHandlerTest extends PHPUnit_Framework_TestCase
 {
 	protected function makeHandler()
 	{
-		return new ErrorHandler(false);
+		return new ErrorHandler(true, false);
 	}
 
 	/** @test */

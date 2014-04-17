@@ -11,20 +11,21 @@
 namespace Autarky\Kernel;
 
 use Exception;
+use ErrorException;
 use ReflectionClass;
 use ReflectionFunction;
 use SplDoublyLinkedList;
+use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\ErrorHandler as SymfonyErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 
 class ErrorHandler
 {
 	protected $handlers;
-	protected $errorHandler;
-	protected $exceptionHandler;
+	protected $debug = false;
 	protected $rethrow = false;
 
-	public function __construct($rethrow = null)
+	public function __construct($debug = false, $rethrow = null)
 	{
 		$this->handlers = new SplDoublyLinkedList;
 
@@ -33,6 +34,8 @@ class ErrorHandler
 		} else if (php_sapi_name() === 'cli') {
 			$this->rethrow = true;
 		}
+
+		$this->debug = (bool) $debug;
 	}
 
 	public function getHandlers()
@@ -50,11 +53,13 @@ class ErrorHandler
 		$this->handlers->unshift($handler);
 	}
 
-	public function register($debug = false)
+	public function register()
 	{
 		if (!$this->rethrow) {
-			$this->errorHandler = SymfonyErrorHandler::register(null, $debug);
-			$this->exceptionHandler = SymfonyExceptionHandler::register($debug);
+			ini_set('display_errors', 0);
+			set_exception_handler([$this, 'handleUncaught']);
+			set_error_handler([$this, 'handleError']);
+			register_shutdown_function([$this, 'handleShutdown']);
 		}
 	}
 
@@ -96,6 +101,30 @@ class ErrorHandler
 
 	protected function defaultHandler(Exception $exception)
 	{
-		return $this->exceptionHandler->createResponse($exception);
+		return (new SymfonyExceptionHandler($this->debug))
+			->createResponse($exception);
+	}
+
+	public function handleUncaught(Exception $exception)
+	{
+		return $this->handle($exception)
+			->send();
+	}
+
+	public function handleError($level, $message, $file = '', $line = 0, $context = array())
+	{
+		if (error_reporting() & $level) {
+			throw new ErrorException($message, 0, $level, $file, $line);
+		}
+	}
+
+	public function handleShutdown()
+	{
+		$error = error_get_last();
+
+		if ($error !== null) {
+			extract($error);
+			$this->handleUncaught(new FatalErrorException($message, $type, 0, $file, $line));
+		}
 	}
 }

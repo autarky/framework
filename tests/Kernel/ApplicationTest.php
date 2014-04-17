@@ -14,9 +14,7 @@ class ApplicationTest extends PHPUnit_Framework_TestCase
 {
 	public function makeApp($response)
 	{
-		$app = new Application('testing');
-		$app->setContainer(new IlluminateContainer);
-		$app->setConfig(new ArrayStore);
+		$app = new Application('testing', new IlluminateContainer, new ArrayStore);
 		$mockRouter = m::mock('Autarky\Routing\RouterInterface');
 		$mockRouter->shouldReceive('dispatch')->andReturn(new Response($response));
 		$app->setRouter($mockRouter);
