@@ -43,8 +43,8 @@ class RoutingExtension extends Twig_Extension
 	public function getFunctions()
 	{
 		return array(
-			new Twig_SimpleFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
-			new Twig_SimpleFunction('asset', array($this, 'getAsset')),
+			new Twig_SimpleFunction('url', [$this, 'getUrl'], ['is_safe_callback' => [$this, 'isUrlGenerationSafe']]),
+			new Twig_SimpleFunction('asset', [$this, 'getAsset']),
 		);
 	}
 
