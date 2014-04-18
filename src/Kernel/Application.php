@@ -40,11 +40,6 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected $stack;
 
 	/**
-	 * @var array
-	 */
-	protected $providers = [];
-
-	/**
 	 * @var \Autarky\Config\ConfigInterface
 	 */
 	protected $config;
