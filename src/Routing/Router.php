@@ -84,6 +84,11 @@ class Router implements RouterInterface
 		return $this->currentRequest;
 	}
 
+	public function setCurrentRequest(Request $request)
+	{
+		$this->currentRequest = $request;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -160,6 +165,10 @@ class Router implements RouterInterface
 	{
 		$methods = (array) $methods;
 
+		if (substr($url, 0, 1) !== '/') {
+			$url = '/'.$url;
+		}
+
 		$route = $this->createRoute($methods, $url, $handler, $name);
 
 		if ($name !== null) {
@@ -195,15 +204,25 @@ class Router implements RouterInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getRouteUrl($name, array $params = array())
+	public function getRouteUrl($name, array $params = array(), $relative = false)
 	{
 		$path = $this->getRoute($name)
 			->getPath($params);
 
-		return rtrim(
-			$this->currentRequest->getSchemeAndHttpHost() .
-			$this->currentRequest->getBaseUrl(), '/') .
-			$path;
+		if ($relative) {
+			$root = $this->currentRequest->getBaseUrl();
+		} else {
+			$root = $this->getRootUrl();
+		}
+
+		return $root.$path;
+	}
+
+	public function getRootUrl()
+	{
+		$host = $this->currentRequest->getSchemeAndHttpHost();
+		$base = $this->currentRequest->getBaseUrl();
+		return rtrim($host.$base, '/');
 	}
 
 	protected function getRoute($name)

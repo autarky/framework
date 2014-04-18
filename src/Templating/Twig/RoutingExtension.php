@@ -23,22 +23,54 @@ use Autarky\Routing\RouterInterface;
 class RoutingExtension extends Twig_Extension
 {
 	protected $router;
+	protected $assetRoot;
 
 	public function __construct(RouterInterface $router)
 	{
 		$this->router = $router;
 	}
 
+	/**
+	 * Set the root URL for assets. Useful if you're using CDNs.
+	 *
+	 * @param string $assetRoot
+	 */
+	public function setAssetRoot($assetRoot)
+	{
+		$this->assetRoot = ltrim($assetRoot, '/');
+	}
+
 	public function getFunctions()
 	{
 		return array(
 			new Twig_SimpleFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
+			new Twig_SimpleFunction('asset', array($this, 'getAsset')),
 		);
 	}
 
 	public function getUrl($name, $parameters = array(), $relative = false)
 	{
 		return $this->router->getRouteUrl($name, $parameters, $relative);
+	}
+
+	public function getAsset($path, $relative = false)
+	{
+		if (substr($path, 0, 1) !== '/') {
+			$path = '/'.$path;
+		}
+
+		if ($this->assetRoot) {
+			return $this->assetRoot.$path;
+		}
+
+		if ($relative) {
+			$base = $this->router
+				->getCurrentRequest()
+				->getBaseUrl();
+			return $base.$path;
+		}
+
+		return $this->router->getRootUrl().$path;
 	}
 
 	/**

@@ -8,18 +8,40 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
-	public function makeRouter()
+	public function makeRouter($request = null)
 	{
-		return new Router(new IlluminateContainer);
+		$router = new Router(new IlluminateContainer);
+		if ($request) $router->setCurrentRequest($request);
+		return $router;
 	}
 
 	/** @test */
 	public function basicRouting()
 	{
 		$router = $this->makeRouter();
-		$router->addRoute('get', '/one/{v}', function($r, $v) { return 'v:'.$v; });
-		$response = $router->dispatch(Request::create('/one/foo'));
-		$this->assertEquals('v:foo', $response->getContent());
+		$router->addRoute('get', '/foo/{v}', function($r, $v) { return 'v:'.$v; });
+		$response = $router->dispatch(Request::create('/foo/bar'));
+		$this->assertEquals('v:bar', $response->getContent());
+	}
+
+	/** @test */
+	public function urlGeneration()
+	{
+		$router = $this->makeRouter(Request::create('/'));
+		$router->addRoute('get', '/foo/{v}', function() {}, 'name');
+		$this->assertEquals('http://localhost/foo/bar', $router->getRouteUrl('name', ['bar']));
+		$this->assertEquals('/foo/bar', $router->getRouteUrl('name', ['bar'], true));
+	}
+
+	/** @test */
+	public function canAddRoutesWithoutLeadingSlash()
+	{
+		$router = $this->makeRouter();
+		$router->addRoute('get', 'foo/{v}', function() { return 'test'; }, 'name');
+		$response = $router->dispatch(Request::create('/foo/foo'));
+		$this->assertEquals('test', $response->getContent());
+		$this->assertEquals('http://localhost/foo/bar', $router->getRouteUrl('name', ['bar']));
+		$this->assertEquals('/foo/bar', $router->getRouteUrl('name', ['bar'], true));
 	}
 
 	/** @test */
