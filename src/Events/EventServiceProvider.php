@@ -10,8 +10,6 @@
 
 namespace Autarky\Events;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Autarky\Kernel\ServiceProvider;
 
 /**
@@ -25,11 +23,11 @@ class EventServiceProvider extends ServiceProvider
 		$this->app->getContainer()->share(
 			'Symfony\Component\EventDispatcher\EventDispatcherInterface',
 			function() {
-				return new EventDispatcher;
+				return new EventDispatcher($this->app->getContainer());
 			});
 
 		$this->app->getContainer()->alias(
-			'Symfony\Component\EventDispatcher\EventDispatcher',
+			'Autarky\Events\EventDispatcher',
 			'Symfony\Component\EventDispatcher\EventDispatcherInterface');
 	}
 }

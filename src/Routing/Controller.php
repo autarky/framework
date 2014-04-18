@@ -124,6 +124,30 @@ abstract class Controller extends ContainerAware
 	}
 
 	/**
+	 * Get the event dispatcher instance.
+	 *
+	 * @return \Symfony\Symfony\Component\EventDispatcher\EventDispatcherInterface
+	 */
+	protected function getEventDispatcher()
+	{
+		return $this->container->resolve('Symfony\Symfony\Component\EventDispatcher\EventDispatcherInterface');
+	}
+
+	/**
+	 * Dispatch an event.
+	 *
+	 * @param  string $name
+	 * @param  mixed  $data
+	 *
+	 * @return mixed
+	 */
+	protected function dispatchEvent($name, $data = null)
+	{
+		return $this->getEventDispatcher()
+			->dispatch($name, $data);
+	}
+
+	/**
 	 * Get the logger.
 	 *
 	 * @return \Psr\Log\LoggerInterface
