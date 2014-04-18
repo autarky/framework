@@ -57,10 +57,11 @@ class LogServiceProvider extends ServiceProvider
 			->prependHandler(function($exception) {
 				$request = $this->app->getRouter()->getCurrentRequest();
 				$route = $this->app->getRouter()->getCurrentRoute();
+				$routeName = ($route && $route->getName()) ? $route->getName() : 'No route';
 				$context = [
 					'method' => $request->getMethod(),
 					'uri' => $request->getRequestUri(),
-					'name' => $route->getName() ?: 'Unnamed route',
+					'name' => $routeName,
 				];
 
 				$this->app->getContainer()->resolve('Psr\Log\LoggerInterface')
