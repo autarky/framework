@@ -19,6 +19,9 @@ class RoutingServiceProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->setRouter(new Router($this->app->getContainer()));
+		$this->app->setRouter(new Router(
+			$this->app->getContainer(),
+			$this->app->getConfig()->get('path.route-cache')
+		));
 	}
 }

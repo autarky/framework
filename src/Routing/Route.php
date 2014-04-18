@@ -18,6 +18,8 @@ use Autarky\Container\ContainerInterface;
  */
 class Route
 {
+	protected static $router;
+
 	protected $methods;
 	protected $pattern;
 	protected $handler;
@@ -137,5 +139,21 @@ class Route
 		$obj = $container ? $container->resolve($class) : new $class;
 
 		return call_user_func_array([$obj, $method], $args);
+	}
+
+	public static function setRouter(RouterInterface $router)
+	{
+		static::$router = $router;
+	}
+
+	public static function __set_state($data)
+	{
+		$route = new static($data['methods'], $data['pattern'], $data['handler'], $data['name']);
+		$route->beforeFilters = $data['beforeFilters'];
+		$route->afterFilters = $data['afterFilters'];
+		if (isset(static::$router) && $data['name']) {
+			static::$router->addNamedRoute($data['name'], $route);
+		}
+		return $route;
 	}
 }

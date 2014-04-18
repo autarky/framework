@@ -40,6 +40,11 @@ class Router implements RouterInterface
 	protected $routeCollector;
 
 	/**
+	 * @var mixed
+	 */
+	protected $dispatchData;
+
+	/**
 	 * @var \Symfony\Component\HttpFoundation\Request
 	 */
 	protected $currentRequest;
@@ -68,9 +73,19 @@ class Router implements RouterInterface
 	 */
 	protected $namedRoutes = [];
 
-	public function __construct(ContainerInterface $container)
+	public function __construct(ContainerInterface $container, $cachePath = null)
 	{
 		$this->container = $container;
+
+		if ($cachePath) {
+			$this->cachePath = $cachePath;
+			if (file_exists($cachePath)) {
+				Route::setRouter($this);
+				$this->dispatchData = require $cachePath;
+				return;
+			}
+		}
+
 		$this->routeCollector = new RouteCollector(
 			new RouteParser, new DataGenerator
 		);
@@ -163,6 +178,10 @@ class Router implements RouterInterface
 	 */
 	public function addRoute($methods, $url, $handler, $name = null)
 	{
+		// if dispatchData is set, we're using cached data and routes can no
+		// longer be added.
+		if (isset($this->dispatchData)) return;
+
 		$methods = (array) $methods;
 
 		if (substr($url, 0, 1) !== '/') {
@@ -171,12 +190,8 @@ class Router implements RouterInterface
 
 		$route = $this->createRoute($methods, $url, $handler, $name);
 
-		if ($name !== null) {
-			if (array_key_exists($name, $this->namedRoutes)) {
-				throw new \InvalidArgumentException("Route with name $name already exists");
-			}
-
-			$this->namedRoutes[$name] = $route;
+		if ($name) {
+			$this->addNamedRoute($name, $route);
 		}
 
 		foreach ($methods as $method) {
@@ -184,6 +199,15 @@ class Router implements RouterInterface
 		}
 
 		return $route;
+	}
+
+	public function addNamedRoute($name, Route $route)
+	{
+		if (array_key_exists($name, $this->namedRoutes)) {
+			throw new \InvalidArgumentException("Route with name $name already exists");
+		}
+
+		$this->namedRoutes[$name] = $route;
 	}
 
 	protected function createRoute($methods, $url, $handler, $name)
@@ -228,7 +252,7 @@ class Router implements RouterInterface
 	protected function getRoute($name)
 	{
 		if (!array_key_exists($name, $this->namedRoutes)) {
-			throw new RouteNotFoundException("Route with name $name not found.");
+			throw new \RuntimeException("Route with name $name not found.");
 		}
 
 		return $this->namedRoutes[$name];
@@ -279,6 +303,28 @@ class Router implements RouterInterface
 
 	protected function getDispatcher()
 	{
-		return new Dispatcher($this->routeCollector->getData());
+		if (isset($this->dispatchData)) {
+			$dispatchData = $this->dispatchData;
+		} else if (isset($this->routeCollector)) {
+			$dispatchData = $this->generateDispatchData();
+		} else {
+			throw new \RuntimeException('No dipsatch data or route collector set');
+		}
+
+		return new Dispatcher($dispatchData);
+	}
+
+	protected function generateDispatchData()
+	{
+		$data = $this->routeCollector->getData();
+
+		if (isset($this->cachePath)) {
+			file_put_contents(
+				$this->cachePath,
+				'<?php return ' . var_export($data, true) . ';'
+			);
+		}
+
+		return $data;
 	}
 }
