@@ -6,7 +6,7 @@ use PHPUnit_Framework_TestCase;
 use Autarky\Events\EventDispatcher;
 use Autarky\Container\IlluminateContainer;
 
-class Test extends PHPUnit_Framework_TestCase
+class EventDispatcherTest extends PHPUnit_Framework_TestCase
 {
 	protected function mockEvent()
 	{
