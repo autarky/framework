@@ -14,27 +14,27 @@ use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 
 use Autarky\Container\ContainerInterface;
 
- class EventDispatcher extends SymfonyEventDispatcher
- {
- 	protected $container;
+class EventDispatcher extends SymfonyEventDispatcher
+{
+	protected $container;
 
- 	public function __construct(ContainerInterface $container)
- 	{
- 		$this->container = $container;
- 	}
+	public function __construct(ContainerInterface $container)
+	{
+		$this->container = $container;
+	}
 
- 	public function addListener($name, $listener, $priority = 0)
- 	{
- 		if (is_string($listener)) {
- 			$listener = function($event) use($listener) {
-	 			$segments = explode(':', $listener);
-	 			$class = $segments[0];
-	 			$method = isset($segments[1]) ? $segments[1] : 'handle';
- 				return $this->container->resolve($class)
- 					->$method($event);
- 			};
- 		}
+	public function addListener($name, $listener, $priority = 0)
+	{
+		if (is_string($listener)) {
+			$listener = function($event) use($listener) {
+				$segments = explode(':', $listener);
+				$class = $segments[0];
+				$method = isset($segments[1]) ? $segments[1] : 'handle';
+				return $this->container->resolve($class)
+					->$method($event);
+			};
+		}
 
- 		return parent::addListener($name, $listener, $priority);
- 	}
- }
+		return parent::addListener($name, $listener, $priority);
+	}
+}
