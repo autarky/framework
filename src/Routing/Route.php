@@ -106,7 +106,7 @@ class Route
 		}
 
 		foreach ($filters as $filter) {
-			$result = $this->getHandlerResult($filter, $args, $container);
+			$result = $this->getHandlerResult($filter, $args, $container, 'filter');
 			if ($result !== null) return $result;
 		}
 	}
@@ -117,7 +117,7 @@ class Route
 			return $result;
 		}
 
-		$result = $this->getHandlerResult($this->handler, $args, $container);
+		$result = $this->getHandlerResult($this->handler, $args, $container, 'action');
 
 		if ($afterResult = $this->callFilters('after', (array) $result, $container)) {
 			return $afterResult;
@@ -132,9 +132,7 @@ class Route
 			return call_user_func_array($handler, $args);
 		}
 
-		$segments = explode(':', $handler);
-		$class = $segments[0];
-		$method = isset($segments[1]) ? $segments[1] : 'filter';
+		list($class, $method) = \Autarky\splitclm($listener, $action);
 
 		$obj = $container ? $container->resolve($class) : new $class;
 

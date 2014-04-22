@@ -27,9 +27,7 @@ class EventDispatcher extends SymfonyEventDispatcher
 	{
 		if (is_string($listener)) {
 			$listener = function($event) use($listener) {
-				$segments = explode(':', $listener);
-				$class = $segments[0];
-				$method = isset($segments[1]) ? $segments[1] : 'handle';
+				list($class, $method) = \Autarky\splitclm($listener, 'handle');
 				return $this->container->resolve($class)
 					->$method($event);
 			};
