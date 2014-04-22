@@ -49,4 +49,12 @@ class PhpFileTest extends PHPUnit_Framework_TestCase
 		$config = $this->makeConfig();
 		$this->assertEquals('bar', $config->get('testfile.bar', 'bar'));
 	}
+
+	/** @test */
+	public function environmentOverrides()
+	{
+		$config = $this->makeConfig();
+		$config->setEnvironment('override');
+		$this->assertEquals('baz', $config->get('testfile.foo'));
+	}
 }
