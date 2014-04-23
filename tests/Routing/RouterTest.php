@@ -20,7 +20,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	public function basicRouting()
 	{
 		$router = $this->makeRouter();
-		$router->addRoute('get', '/foo/{v}', function($r, $v) { return 'v:'.$v; });
+		$router->addRoute('get', '/foo/{v}', function($v) { return 'v:'.$v; });
 		$response = $router->dispatch(Request::create('/foo/bar'));
 		$this->assertEquals('v:bar', $response->getContent());
 	}
@@ -66,11 +66,13 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	public function routeGroupFilter()
 	{
 		$router = $this->makeRouter();
-		$router->defineFilter('foo', function() { return 'foo'; });
+		$router->defineFilter('foo', function() { return 'from filter'; });
 		$router->group(['before' => 'foo'], function($router) use(&$route) {
 			$route = $router->addRoute('get', '/foo', function() {});
 		});
-		$this->assertEquals('foo', $route->run());
+		$response = $router->dispatch(Request::create('/foo'));
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals('from filter', $response->getContent());
 	}
 
 	/** @test */
@@ -81,5 +83,29 @@ class RouterTest extends PHPUnit_Framework_TestCase
 			$route = $router->addRoute('get', '/bar', function() {});
 		});
 		$this->assertEquals('foo/bar', $route->getPath([]));
+	}
+
+	/** @test */
+	public function beforeFiltersAreCalled()
+	{
+		$router = $this->makeRouter();
+		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
+		$route->addBeforeFilter(function() { return; });
+		$route->addBeforeFilter(function() { return 'bar'; });
+		$response = $router->dispatch(Request::create('/foo'));
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals('bar', $response->getContent());
+	}
+
+	/** @test */
+	public function afterFiltersAreCalled()
+	{
+		$router = $this->makeRouter();
+		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
+		$route->addAfterFilter(function() { return; });
+		$route->addAfterFilter(function() { return 'baz'; });
+		$response = $router->dispatch(Request::create('/foo'));
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals('baz', $response->getContent());
 	}
 }

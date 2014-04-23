@@ -271,10 +271,7 @@ class Router implements RouterInterface
 
 		switch ($result[0]) {
 			case \FastRoute\Dispatcher::FOUND:
-				// add the request as the first parameter
-				array_unshift($result[2], $request);
-
-				return $this->getResult($result[1], $result[2]);
+				return $this->makeResponse($this->getResult($request, $result[1], $result[2]));
 				break;
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
@@ -292,13 +289,43 @@ class Router implements RouterInterface
 		}
 	}
 
-	protected function getResult($route, $args)
+	protected function getResult(Request $request, Route $route, array $args)
 	{
 		$this->currentRoute = $route;
 
+		foreach ($route->getBeforeFilters() as $filter) {
+			if ($result = $this->callFilter($filter, [$route, $request])) {
+				return $result;
+			}
+		}
+
 		$result = $route->run($args, $this->container);
 
+		foreach ($route->getAfterFilters() as $filter) {
+			if ($afterResult = $this->callFilter($filter, [$route, $request, $result])) {
+				return $afterResult;
+			}
+		}
+
+		return $result;
+	}
+
+	protected function makeResponse($result)
+	{
 		return $result instanceof Response ? $result : new Response($result);
+	}
+
+	protected function callFilter($filter, array $args)
+	{
+		if ($filter instanceof Closure) {
+			return call_user_func_array($filter, $args);
+		}
+
+		list($class, $method) = \Autarky\splitclm($filter);
+
+		$obj = $this->container->resolve($class);
+
+		return call_user_func_array([$obj, $method], $args);
 	}
 
 	protected function getDispatcher()

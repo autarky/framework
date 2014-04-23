@@ -80,22 +80,11 @@ class Route
 	}
 
 	/**
-	 * Add a filter to the route.
-	 *
-	 * @param string $when   'before' or 'after'
-	 * @param mixed  $filter callable or 'Class:method'
-	 */
-	public function addFilter($when, $filter)
-	{
-		$this->{$when.'Filters'}[] = $filter;
-	}
-
-	/**
 	 * @see addFilter
 	 */
 	public function addBeforeFilter($filter)
 	{
-		return $this->addFilter('before', $filter);
+		$this->beforeFilters[] = $filter;
 	}
 
 	/**
@@ -103,34 +92,24 @@ class Route
 	 */
 	public function addAfterFilter($filter)
 	{
-		return $this->addFilter('after', $filter);
+		$this->afterFilters[] = $filter;
 	}
 
-	/**
-	 * Call the route's filters.
-	 *
-	 * @param  string                                $when      'before' or 'after'
-	 * @param  array                                 $args
-	 * @param  \Autarky\Container\ContainerInterface $container
-	 *
-	 * @return mixed
-	 */
-	public function callFilters($when, array $args, ContainerInterface $container = null)
+	public function addFilter($when, $filter)
 	{
-		// add $this as first argument to all filters
-		array_unshift($args, $this);
-
-		$filters = $this->{$when.'Filters'};
-
-		if (empty($filters)) {
-			return;
-		}
-
-		foreach ($filters as $filter) {
-			$result = $this->getHandlerResult($filter, $args, $container, 'filter');
-			if ($result !== null) return $result;
-		}
+		$this->{'add'.ucfirst($when).'Filter'}($filter);
 	}
+
+	public function getBeforeFilters()
+	{
+		return $this->beforeFilters;
+	}
+
+	public function getAfterFilters()
+	{
+		return $this->afterFilters;
+	}
+
 
 	/**
 	 * Run the route.
@@ -142,36 +121,11 @@ class Route
 	 */
 	public function run(array $args = array(), ContainerInterface $container = null)
 	{
-		if ($result = $this->callFilters('before', $args, $container)) {
-			return $result;
+		if ($this->handler instanceof Closure) {
+			return call_user_func_array($this->handler, $args);
 		}
 
-		$result = $this->getHandlerResult($this->handler, $args, $container, 'action');
-
-		if ($afterResult = $this->callFilters('after', (array) $result, $container)) {
-			return $afterResult;
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Get the result from a handler.
-	 *
-	 * @param  mixed                                 $handler
-	 * @param  array                                 $args
-	 * @param  \Autarky\Container\ContainerInterface $container
-	 * @param  string                                $action
-	 *
-	 * @return mixed
-	 */
-	protected function getHandlerResult($handler, array $args, ContainerInterface $container = null, $action = 'action')
-	{
-		if ($handler instanceof Closure) {
-			return call_user_func_array($handler, $args);
-		}
-
-		list($class, $method) = \Autarky\splitclm($handler, $action);
+		list($class, $method) = \Autarky\splitclm($this->handler, 'action');
 
 		$obj = $container ? $container->resolve($class) : new $class;
 
