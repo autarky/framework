@@ -3,6 +3,7 @@ namespace Autarky\Tests\Events;
 
 use Mockery as m;
 use PHPUnit_Framework_TestCase;
+
 use Autarky\Events\EventDispatcher;
 use Autarky\Container\IlluminateContainer;
 

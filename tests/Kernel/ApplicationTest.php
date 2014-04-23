@@ -3,12 +3,13 @@ namespace Autarky\Tests\Kernel;
 
 use PHPUnit_Framework_TestCase;
 use Mockery as m;
-use Autarky\Kernel\Application;
-use Autarky\Config\ArrayStore;
-use Autarky\Container\IlluminateContainer;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+
+use Autarky\Kernel\Application;
+use Autarky\Config\ArrayStore;
+use Autarky\Container\IlluminateContainer;
 
 class ApplicationTest extends PHPUnit_Framework_TestCase
 {

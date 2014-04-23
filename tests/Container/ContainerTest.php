@@ -1,16 +1,8 @@
 <?php
-/**
- * This file is part of the Autarky package.
- *
- * (c) Andreas Lutro <anlutro@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Autarky\Tests\Container;
 
 use PHPUnit_Framework_TestCase;
+
 use Autarky\Container\IlluminateContainer;
 
 class ContainerTest extends PHPUnit_Framework_TestCase

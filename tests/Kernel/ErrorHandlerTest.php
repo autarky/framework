@@ -3,8 +3,9 @@ namespace Autarky\Tests\Kernel;
 
 use PHPUnit_Framework_TestCase;
 use Mockery as m;
-use Autarky\Kernel\ErrorHandler;
 use Exception;
+
+use Autarky\Kernel\ErrorHandler;
 
 class ErrorHandlerTest extends PHPUnit_Framework_TestCase
 {

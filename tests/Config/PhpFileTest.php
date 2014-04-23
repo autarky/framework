@@ -2,6 +2,7 @@
 namespace Autarky\Tests\Config;
 
 use PHPUnit_Framework_TestCase;
+
 use Autarky\Config\PhpFileStore;
 
 class PhpFileTest extends PHPUnit_Framework_TestCase

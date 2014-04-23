@@ -2,9 +2,10 @@
 namespace Autarky\Tests\Routing;
 
 use PHPUnit_Framework_TestCase;
+use Symfony\Component\HttpFoundation\Request;
+
 use Autarky\Container\IlluminateContainer;
 use Autarky\Routing\Router;
-use Symfony\Component\HttpFoundation\Request;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {

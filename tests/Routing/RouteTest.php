@@ -1,13 +1,4 @@
 <?php
-/**
- * This file is part of the Autarky package.
- *
- * (c) Andreas Lutro <anlutro@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Autarky\Tests\Routing;
 
 use PHPUnit_Framework_TestCase;
@@ -39,5 +30,27 @@ class RouteTest extends PHPUnit_Framework_TestCase
 		$route->addAfterFilter(function() { return; });
 		$route->addAfterFilter(function() { return 'baz'; });
 		$this->assertEquals('baz', $route->run());
+	}
+
+	/** @test */
+	public function routeCanBeRan()
+	{
+		$route = new Route(['get'], '/', function() { return 'foo'; });
+		$this->assertEquals('foo', $route->run());
+	}
+
+	/** @test */
+	public function routeWithClassHandlerCanBeRan()
+	{
+		$route = new Route(['get'], '/', __NAMESPACE__.'\RouteHandlerStub:handle');
+		$this->assertEquals('foo', $route->run());
+	}
+}
+
+class RouteHandlerStub
+{
+	public function handle()
+	{
+		return 'foo';
 	}
 }
