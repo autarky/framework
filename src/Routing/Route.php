@@ -11,6 +11,9 @@
 namespace Autarky\Routing;
 
 use Closure;
+use ReflectionFunction;
+use Symfony\Component\HttpFoundation\Request;
+
 use Autarky\Container\ContainerInterface;
 
 /**
@@ -114,22 +117,48 @@ class Route
 	/**
 	 * Run the route.
 	 *
-	 * @param  array                                 $args
-	 * @param  \Autarky\Container\ContainerInterface $container
+	 * @param \Symfony\Component\HttpFoundation\Request $request
+	 * @param array                                     $args
+	 * @param \Autarky\Container\ContainerInterface     $container
 	 *
 	 * @return mixed
 	 */
-	public function run(array $args = array(), ContainerInterface $container = null)
+	public function run(Request $request = null, array $args = array(), ContainerInterface $container = null)
 	{
 		if ($this->handler instanceof Closure) {
-			return call_user_func_array($this->handler, $args);
+			$callable = $this->handler;
+		} else {
+			list($class, $method) = \Autarky\splitclm($this->handler, 'action');
+
+			$obj = $container ? $container->resolve($class) : new $class;
+			$callable = [$obj, $method];
 		}
 
-		list($class, $method) = \Autarky\splitclm($this->handler, 'action');
+		if ($request) {
+			$this->addRequestToArgs($args, $callable, $request);
+		}
 
-		$obj = $container ? $container->resolve($class) : new $class;
+		return call_user_func_array($callable, $args);
+	}
 
-		return call_user_func_array([$obj, $method], $args);
+	protected function maybeAddRequest(array &$args, callable $callable, Request $request)
+	{
+		$params = (new ReflectionFunction($callable))
+			->getParameters();
+
+		if (empty($params)) return;
+
+		$paramClass = $params[0]
+			->getClass();
+
+		if (!$paramClass) return;
+
+		if (
+			$paramClass->isSubclassOf('Symfony\Component\HttpFoundation\Request') ||
+			$paramClass->getName() == 'Symfony\Component\HttpFoundation\Request'
+		) {
+			array_unshift($args, $request);
+		}
 	}
 
 	/**

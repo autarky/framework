@@ -299,7 +299,7 @@ class Router implements RouterInterface
 			}
 		}
 
-		$result = $route->run($args, $this->container);
+		$result = $route->run($request, $args, $this->container);
 
 		foreach ($route->getAfterFilters() as $filter) {
 			if ($afterResult = $this->callFilter($filter, [$route, $request, $result])) {
