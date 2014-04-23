@@ -162,6 +162,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 
 		if ($this->config !== null) {
 			$this->config->setEnvironment($this->environment);
+			$this->errorHandler->setDebug($this->config->get('app.debug'));
 		}
 	}
 

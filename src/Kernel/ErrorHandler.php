@@ -40,6 +40,16 @@ class ErrorHandler
 			$this->rethrow = true;
 		}
 
+		$this->setDebug($debug);
+	}
+
+	/**
+	 * Set whether the error handler is in debug mode or not.
+	 *
+	 * @param bool $debug
+	 */
+	public function setDebug($debug)
+	{
 		$this->debug = (bool) $debug;
 	}
 
