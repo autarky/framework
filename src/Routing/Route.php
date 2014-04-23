@@ -79,21 +79,42 @@ class Route
 		return $this->name;
 	}
 
+	/**
+	 * Add a filter to the route.
+	 *
+	 * @param string $when   'before' or 'after'
+	 * @param mixed  $filter callable or 'Class:method'
+	 */
 	public function addFilter($when, $filter)
 	{
 		$this->{$when.'Filters'}[] = $filter;
 	}
 
+	/**
+	 * @see addFilter
+	 */
 	public function addBeforeFilter($filter)
 	{
 		return $this->addFilter('before', $filter);
 	}
 
+	/**
+	 * @see addFilter
+	 */
 	public function addAfterFilter($filter)
 	{
 		return $this->addFilter('after', $filter);
 	}
 
+	/**
+	 * Call the route's filters.
+	 *
+	 * @param  string                                $when      'before' or 'after'
+	 * @param  array                                 $args
+	 * @param  \Autarky\Container\ContainerInterface $container
+	 *
+	 * @return mixed
+	 */
 	public function callFilters($when, array $args, ContainerInterface $container = null)
 	{
 		// add $this as first argument to all filters
@@ -111,6 +132,14 @@ class Route
 		}
 	}
 
+	/**
+	 * Run the route.
+	 *
+	 * @param  array                                 $args
+	 * @param  \Autarky\Container\ContainerInterface $container
+	 *
+	 * @return mixed
+	 */
 	public function run(array $args = array(), ContainerInterface $container = null)
 	{
 		if ($result = $this->callFilters('before', $args, $container)) {
@@ -126,24 +155,48 @@ class Route
 		return $result;
 	}
 
-	protected function getHandlerResult($handler, array $args, ContainerInterface $container = null)
+	/**
+	 * Get the result from a handler.
+	 *
+	 * @param  mixed                                 $handler
+	 * @param  array                                 $args
+	 * @param  \Autarky\Container\ContainerInterface $container
+	 * @param  string                                $action
+	 *
+	 * @return mixed
+	 */
+	protected function getHandlerResult($handler, array $args, ContainerInterface $container = null, $action = 'action')
 	{
 		if ($handler instanceof Closure) {
 			return call_user_func_array($handler, $args);
 		}
 
-		list($class, $method) = \Autarky\splitclm($listener, $action);
+		list($class, $method) = \Autarky\splitclm($handler, $action);
 
 		$obj = $container ? $container->resolve($class) : new $class;
 
 		return call_user_func_array([$obj, $method], $args);
 	}
 
+	/**
+	 * Set the router the route objects use.
+	 *
+	 * Somewhat of a hack to make var_export caching work.
+	 *
+	 * @param \Autarky\Routing\RouterInterface $router
+	 */
 	public static function setRouter(RouterInterface $router)
 	{
 		static::$router = $router;
 	}
 
+	/**
+	 * Re-build a Route object from data that has been var_export-ed.
+	 *
+	 * @param  array $data
+	 *
+	 * @return static
+	 */
 	public static function __set_state($data)
 	{
 		$route = new static($data['methods'], $data['pattern'], $data['handler'], $data['name']);

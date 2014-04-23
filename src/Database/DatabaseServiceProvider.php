@@ -25,10 +25,14 @@ class DatabaseServiceProvider extends ServiceProvider
 			$dsn = $this->app->getConfig()->get('database.dsn');
 			$username = $this->app->getConfig()->get('database.username');
 			$password = $this->app->getConfig()->get('database.password');
+
 			$options = [
-				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-				PDO::ATTR_STRINGIFY_FETCHES => false,
+				PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
 				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_CLASS,
+				PDO::ATTR_CASE               => PDO::CASE_NATURAL,
+				PDO::ATTR_ORACLE_NULLS       => PDO::NULL_NATURAL,
+				PDO::ATTR_STRINGIFY_FETCHES  => false,
+				PDO::ATTR_EMULATE_PREPARES   => false,
 			];
 
 			return new PDO($dsn, $username, $password, $options);

@@ -15,6 +15,10 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Formatter\LineFormatter;
 
+/**
+ * Simple service provider that binds a Monolog instance onto the container and
+ * registers an error handler that logs all errors.
+ */
 class LogServiceProvider extends ServiceProvider
 {
 	public function register()

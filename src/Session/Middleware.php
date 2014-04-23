@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 use Autarky\Kernel\Application;
 
+/**
+ * Session middleware.
+ */
 class Middleware implements HttpKernelInterface
 {
 	public function __construct(Application $app)

@@ -12,6 +12,9 @@ namespace Autarky\Config;
 
 use Autarky\Support\Arr;
 
+/**
+ * Simple array-based store primarily for testing purposes.
+ */
 class ArrayStore implements ConfigInterface
 {
 	protected $data = [];

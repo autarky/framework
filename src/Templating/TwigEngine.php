@@ -16,9 +16,19 @@ use Autarky\Kernel\Application;
 use Autarky\Templating\Twig\FileLoader;
 use Autarky\Templating\Twig\ExtensionsLoader;
 
+/**
+ * Templating engine utilizing Twig.
+ */
 class TwigEngine implements TemplatingEngineInterface
 {
+	/**
+	 * @var \Twig_Environment
+	 */
 	protected $twig;
+
+	/**
+	 * @var \Autarky\Kernel\Application
+	 */
 	protected $app;
 
 	public function __construct(Application $app, Twig_Environment $env = null)

@@ -14,6 +14,12 @@ use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 
 use Autarky\Container\ContainerInterface;
 
+/**
+ * Event dispatcher.
+ *
+ * Override Symfony's class to have access to resolving classes from the
+ * container as event listeners.
+ */
 class EventDispatcher extends SymfonyEventDispatcher
 {
 	protected $container;
@@ -23,6 +29,12 @@ class EventDispatcher extends SymfonyEventDispatcher
 		$this->container = $container;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 *
+	 * The listener can be a string of 'Class:method' or just 'Class'. If no
+	 * method is provided, the method 'handle' is used.
+	 */
 	public function addListener($name, $listener, $priority = 0)
 	{
 		if (is_string($listener)) {
