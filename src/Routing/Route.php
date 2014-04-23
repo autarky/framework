@@ -11,6 +11,7 @@
 namespace Autarky\Routing;
 
 use Closure;
+use ReflectionMethod;
 use ReflectionFunction;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -143,8 +144,13 @@ class Route
 
 	protected function addRequestToArgs(array &$args, callable $callable, Request $request)
 	{
-		$params = (new ReflectionFunction($callable))
-			->getParameters();
+		if (is_array($callable)) {
+			$refl = new ReflectionMethod($callable[0], $callable[1]);
+		} else {
+			$refl = new ReflectionFunction($callable);
+		}
+
+		$params = $refl->getParameters();
 
 		if (empty($params)) return;
 

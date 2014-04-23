@@ -34,6 +34,9 @@ class RouteTest extends PHPUnit_Framework_TestCase
 	{
 		$route = new Route(['get'], '/request/{v}', function(Request $r, $v) { return $v; });
 		$this->assertEquals('foo', $route->run(Request::create('/'), ['foo']));
+
+		$route = new Route(['get'], '/request/{v}', __NAMESPACE__.'\RouteHandlerStub:handleRequest');
+		$this->assertEquals('foo', $route->run(Request::create('/'), ['foo']));
 	}
 }
 
@@ -42,5 +45,10 @@ class RouteHandlerStub
 	public function handle()
 	{
 		return 'foo';
+	}
+
+	public function handleRequest(Request $request, $var)
+	{
+		return $var;
 	}
 }
