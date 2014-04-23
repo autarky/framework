@@ -141,7 +141,7 @@ class Route
 		return call_user_func_array($callable, $args);
 	}
 
-	protected function maybeAddRequest(array &$args, callable $callable, Request $request)
+	protected function addRequestToArgs(array &$args, callable $callable, Request $request)
 	{
 		$params = (new ReflectionFunction($callable))
 			->getParameters();
