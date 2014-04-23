@@ -30,6 +30,11 @@ use Autarky\Routing\RouterInterface;
 class Application implements HttpKernelInterface, TerminableInterface, ArrayAccess
 {
 	/**
+	 * The framework version.
+	 */
+	const VERSION = '0.2.0';
+
+	/**
 	 * @var \SplPriorityQueue
 	 */
 	protected $middlewares;
