@@ -1,6 +1,6 @@
 # Autarky
 
-A minimalist framework designed for the right mix of flexibility, speed of development and clean object oriented programming, trying to find a sweet spot between microframeworks such as Silex and the full-stack, rapid development Laravel 4.
+A minimalist framework designed for the right mix of flexibility, speed of development and clean object oriented programming. Heavily inspired by Python's Flask, Autarky tries to find a sweet spot between microframeworks such as Silex and the full-stack, rapid development Laravel 4.
 
 Currently a work in progress - none of the class names, method names or naming conventions should be considered stable, so use at your own risk - but if you want to help shape a new framework, please put your ideas, thoughts and concerns in the github issues!
 
