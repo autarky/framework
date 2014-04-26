@@ -15,7 +15,9 @@ use ErrorException;
 use ReflectionClass;
 use ReflectionFunction;
 use SplDoublyLinkedList;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Exception\HttpExceptionInterface;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\Debug\ErrorHandler as SymfonyErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
@@ -26,12 +28,15 @@ use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
  */
 class ErrorHandler
 {
+	protected $app;
+	protected $logger;
 	protected $handlers;
 	protected $debug = false;
 	protected $rethrow = false;
 
-	public function __construct($debug = false, $rethrow = null)
+	public function __construct(Application $app, $debug = false, $rethrow = null)
 	{
+		$this->app = $app;
 		$this->handlers = new SplDoublyLinkedList;
 
 		if ($rethrow !== null) {
@@ -61,6 +66,22 @@ class ErrorHandler
 	public function getHandlers()
 	{
 		return $this->handlers;
+	}
+
+	public function setLogger($logger)
+	{
+		$this->logger = $logger;
+	}
+
+	public function getLogger()
+	{
+		if ($this->logger === null) return;
+
+		if ($this->logger instanceof \Closure) {
+			return call_user_func($this->logger);
+		}
+
+		return $this->logger;
 	}
 
 	/**
@@ -111,6 +132,8 @@ class ErrorHandler
 	 */
 	public function handle(Exception $exception)
 	{
+		$this->logException($exception);
+
 		if ($this->rethrow) throw $exception;
 
 		foreach ($this->handlers as $handler) {
@@ -124,6 +147,30 @@ class ErrorHandler
 		}
 
 		return $this->defaultHandler($exception);
+	}
+
+	/**
+	 * Log an exception if a logger has been set.
+	 *
+	 * @param  \Exception $exception
+	 *
+	 * @return void
+	 */
+	protected function logException(Exception $exception)
+	{
+		if ($this->logger === null) return;
+
+		$request = $this->app->getRouter()->getCurrentRequest();
+		$route = $this->app->getRouter()->getCurrentRoute();
+		$routeName = ($route && $route->getName()) ? $route->getName() : 'No route';
+
+		$context = [
+			'method' => $request->getMethod(),
+			'uri' => $request->getRequestUri(),
+			'name' => $routeName,
+		];
+
+		$this->getLogger()->error($exception, $context);
 	}
 
 	/**

@@ -23,12 +23,6 @@ class LogServiceProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->bindLogger();
-		$this->registerErrorHandler();
-	}
-
-	public function bindLogger()
-	{
 		$this->app->getContainer()->share('Monolog\Logger', function() {
 			$logger = new Logger($this->app->getEnvironment());
 
@@ -53,23 +47,9 @@ class LogServiceProvider extends ServiceProvider
 
 		$this->app->getContainer()
 			->alias('Psr\Log\LoggerInterface', 'Monolog\Logger');
-	}
 
-	public function registerErrorHandler()
-	{
-		$this->app->getErrorHandler()
-			->prependHandler(function($exception) {
-				$request = $this->app->getRouter()->getCurrentRequest();
-				$route = $this->app->getRouter()->getCurrentRoute();
-				$routeName = ($route && $route->getName()) ? $route->getName() : 'No route';
-				$context = [
-					'method' => $request->getMethod(),
-					'uri' => $request->getRequestUri(),
-					'name' => $routeName,
-				];
-
-				$this->app->getContainer()->resolve('Psr\Log\LoggerInterface')
-					->error($exception, $context);
-			});
+		$this->app->getErrorHandler()->setLogger(function() {
+			return $this->app->resolve('Psr\Log\LoggerInterface');
+		});
 	}
 }

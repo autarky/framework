@@ -11,7 +11,7 @@ class ErrorHandlerTest extends PHPUnit_Framework_TestCase
 {
 	protected function makeHandler()
 	{
-		return new ErrorHandler(true, false);
+		return new ErrorHandler(m::mock('Autarky\Kernel\Application'), true, false);
 	}
 
 	/** @test */
