@@ -27,7 +27,11 @@ class ExtensionsLoader
 
 	public function loadCoreExtensions(array $extensions)
 	{
-		foreach ($extensions as $extension) {
+		$providers = $this->app->getConfig()->get('app.providers');
+
+		foreach ($extensions as $dependency => $extension) {
+			if (is_string($dependency) && !in_array($dependency, $providers)) continue;
+
 			$extension = $this->app->getContainer()->resolve(__NAMESPACE__.'\\'.$extension);
 			$this->twig->addExtension($extension);
 		}

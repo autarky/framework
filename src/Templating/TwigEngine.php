@@ -53,7 +53,9 @@ class TwigEngine implements TemplatingEngineInterface
 		$loader = new ExtensionsLoader($this->twig, $this->app);
 
 		$loader->loadCoreExtensions([
-			'RoutingExtension', 'PartialExtension', 'SessionExtension',
+			'PartialExtension',
+			'Autarky\Routing\RoutingServiceProvider' => 'RoutingExtension',
+			'Autarky\Session\SessionServiceProvider' => 'SessionExtension',
 		]);
 
 		if ($extensions = $this->app->getConfig()->get('twig.extensions')) {
