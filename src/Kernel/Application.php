@@ -274,6 +274,8 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	{
 		$this->console = new ConsoleApplication('Autarky', static::VERSION);
 
+		$this->boot();
+
 		return $this->console;
 	}
 
