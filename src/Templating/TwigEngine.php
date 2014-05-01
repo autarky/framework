@@ -31,6 +31,8 @@ class TwigEngine implements TemplatingEngineInterface
 	 */
 	protected $app;
 
+	protected $contextHandlers = [];
+
 	public function __construct(Application $app, Twig_Environment $env = null)
 	{
 		if ($env === null) {
@@ -68,8 +70,40 @@ class TwigEngine implements TemplatingEngineInterface
 	 */
 	public function render($name, array $data = array())
 	{
+		$data += $this->getContext($name);
 		return $this->twig->loadTemplate($name)
 			->render($data);
+	}
+
+	protected function getContext($template)
+	{
+		if (!array_key_exists($template, $this->contextHandlers)) {
+			return [];
+		}
+
+		$context = [];
+
+		foreach ($this->contextHandlers[$template] as $handler) {
+			$context = array_merge($context, $this->getContextFromHandler($handler));
+		}
+
+		return $context;
+	}
+
+	protected function getContextFromHandler($handler)
+	{
+		if ($handler instanceof \Closure) {
+			return $handler();
+		}
+
+		list($class, $method) = \Autarky\splitclm($handler, 'getContext');
+		$obj = $this->app->resolve($class);
+		return $obj->$method();
+	}
+
+	public function registerContextHandler($template, $handler)
+	{
+		$this->contextHandlers[$template][] = $handler;
 	}
 
 	/**

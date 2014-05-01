@@ -30,4 +30,6 @@ interface TemplatingEngineInterface extends NamespacedResourceResolverInterface
 	 * @return string
 	 */
 	public function render($name, array $params = array());
+
+	public function registerContextHandler($template, $handler);
 }
