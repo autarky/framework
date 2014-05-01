@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
+use Symfony\Component\Console\Application as ConsoleApplication;
 
 use Autarky\Config\ConfigInterface;
 use Autarky\Container\ContainerInterface;
@@ -58,6 +59,11 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 * @var \Autarky\Routing\RouterInterface
 	 */
 	protected $router;
+
+	/**
+	 * @var \Symfony\Component\Console\Application
+	 */
+	protected $console;
 
 	/**
 	 * @var \Closure|string
@@ -260,6 +266,18 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	}
 
 	/**
+	 * Boot a console application.
+	 *
+	 * @return \Symfony\Component\Console\Application
+	 */
+	public function bootConsole()
+	{
+		$this->console = new ConsoleApplication('Autarky', static::VERSION);
+
+		return $this->console;
+	}
+
+	/**
 	 * Boot the application.
 	 *
 	 * @return void
@@ -273,7 +291,12 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		$providers = $this->config->get('app.providers', []);
 
 		foreach ($providers as $provider) {
-			(new $provider($this))->register();
+			$provider = new $provider($this);
+			$provider->register();
+
+			if ($this->console) {
+				$provider->registerConsole($this->console);
+			}
 		}
 
 		foreach ($this->configCallbacks as $callback) {

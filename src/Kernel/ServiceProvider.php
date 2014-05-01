@@ -10,6 +10,8 @@
 
 namespace Autarky\Kernel;
 
+use Symfony\Component\Console\Application as ConsoleApplication;
+
 /**
  * Abstract class for service providers.
  *
@@ -25,4 +27,6 @@ abstract class ServiceProvider
 	}
 
 	abstract public function register();
+
+	public function registerConsole(ConsoleApplication $console) {}
 }

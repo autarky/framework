@@ -10,6 +10,8 @@
 
 namespace Autarky\Events;
 
+use Symfony\Component\Console\Application;
+
 use Autarky\Kernel\ServiceProvider;
 
 /**
@@ -29,5 +31,10 @@ class EventServiceProvider extends ServiceProvider
 		$this->app->getContainer()->alias(
 			'Autarky\Events\EventDispatcher',
 			'Symfony\Component\EventDispatcher\EventDispatcherInterface');
+	}
+
+	public function registerConsole(Application $console)
+	{
+		$console->setDispatcher($this->app->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
 	}
 }
