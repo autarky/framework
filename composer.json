@@ -32,5 +32,10 @@
 			"src/functions.php"
 		]
 	},
+	"extra": {
+		"branch-alias": {
+			"dev-master": "0.2-dev"
+		}
+	},
 	"minimum-stability": "stable"
 }
