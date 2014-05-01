@@ -10,6 +10,7 @@
 
 namespace Autarky\Routing;
 
+use Closure;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -54,9 +55,36 @@ interface RouterInterface
 	public function getCurrentRequest();
 
 	/**
+	 * Get the root URL. Used to generate URLs to assets.
+	 *
+	 * @return string
+	 */
+	public function getRootUrl();
+
+	/**
 	 * Get the route matched to the current request.
 	 *
 	 * @return \Autarky\Routing\Route
 	 */
 	public function getCurrentRoute();
+
+	/**
+	 * Define a filter.
+	 *
+	 * @param  string           $name
+	 * @param  \Closure|string  $handler
+	 *
+	 * @return void
+	 */
+	public function defineFilter($name, $handler);
+
+	/**
+	 * Define a route group.
+	 *
+	 * @param  array    $flags    Valid keys are 'before', 'after', 'prefix'
+	 * @param  \Closure $callback First argument is the router ($this)
+	 *
+	 * @return void
+	 */
+	public function group(array $flags, Closure $callback);
 }

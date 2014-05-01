@@ -113,26 +113,14 @@ class Router implements RouterInterface
 	}
 
 	/**
-	 * Define a filter.
-	 *
-	 * @param  string $name
-	 * @param  mixed  $handler Closure, or 'Class:method' string
-	 *
-	 * @return void
+	 * {@inheritdoc}
 	 */
 	public function defineFilter($name, $handler)
 	{
 		$this->filters[$name] = $handler;
 	}
 
-	/**
-	 * Get a filter's handler by name.
-	 *
-	 * @param  string $name
-	 *
-	 * @return mixed
-	 */
-	public function getFilter($name)
+	protected function getFilter($name)
 	{
 		if (!array_key_exists($name, $this->filters)) {
 			throw new \InvalidArgumentException("Filter with name $name is not defined");
@@ -142,12 +130,7 @@ class Router implements RouterInterface
 	}
 
 	/**
-	 * Define a route group.
-	 *
-	 * @param  array   $flags    Valid keys are 'before', 'after', 'prefix'
-	 * @param  Closure $callback First argument is the router ($this)
-	 *
-	 * @return void
+	 * {@inheritdoc}
 	 */
 	public function group(array $flags, Closure $callback)
 	{
@@ -242,6 +225,9 @@ class Router implements RouterInterface
 		return $root.$path;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getRootUrl()
 	{
 		$host = $this->currentRequest->getSchemeAndHttpHost();
