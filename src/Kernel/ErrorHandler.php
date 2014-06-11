@@ -115,11 +115,14 @@ class ErrorHandler
 	 */
 	public function register()
 	{
+		set_error_handler([$this, 'handleError']);
+
 		if (!$this->rethrow) {
 			ini_set('display_errors', 0);
 			set_exception_handler([$this, 'handleUncaught']);
-			set_error_handler([$this, 'handleError']);
 			register_shutdown_function([$this, 'handleShutdown']);
+		} else {
+			register_shutdown_function([$this, 'throwFatalErrorException']);
 		}
 	}
 
@@ -280,12 +283,38 @@ class ErrorHandler
 	 */
 	public function handleShutdown()
 	{
+		$exception = $this->makeFatalErrorException();
+
+		if ($exception) return $this->handleUncaught($exception);
+	}
+
+	/**
+	 * Throw a FatalErrorException if an error has occured.
+	 *
+	 * @return void
+	 *
+	 * @throws \Symfony\Component\Debug\Exception\FatalErrorException
+	 */
+	public function throwFatalErrorException()
+	{
+		$exception = $this->makeFatalErrorException();
+
+		if ($exception) throw $exception;
+	}
+
+	/**
+	 * Create a FatalErrorException out of the information stored on the last
+	 * PHP error.
+	 *
+	 * @return \Symfony\Component\Debug\Exception\FatalErrorException|null
+	 */
+	public function makeFatalErrorException()
+	{
 		$error = error_get_last();
 
 		if ($error !== null) {
 			extract($error);
-			$exception = new FatalErrorException($message, $type, 0, $file, $line);
-			return $this->handleUncaught($exception);
+			return new FatalErrorException($message, $type, 0, $file, $line);
 		}
 	}
 }
