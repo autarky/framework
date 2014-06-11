@@ -6,7 +6,7 @@ use Mockery as m;
 
 use Autarky\Templating\TwigEngine;
 use Autarky\Kernel\Application;
-use Autarky\Container\IlluminateContainer;
+use Autarky\Container\Container;
 use Autarky\Config\ArrayStore;
 
 class TwigEngineTest extends PHPUnit_Framework_TestCase
@@ -18,7 +18,7 @@ class TwigEngineTest extends PHPUnit_Framework_TestCase
 
 	protected function makeEngine()
 	{
-		$this->app = $app = new Application('testing', new IlluminateContainer, new ArrayStore);
+		$this->app = $app = new Application('testing', new Container, new ArrayStore);
 		$this->twig = m::mock('Twig_Environment');
 		$this->twig->shouldReceive('addExtension');
 		return new TwigEngine($this->app, $this->twig);

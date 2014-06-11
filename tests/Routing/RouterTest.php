@@ -4,14 +4,14 @@ namespace Autarky\Tests\Routing;
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-use Autarky\Container\IlluminateContainer;
+use Autarky\Container\Container;
 use Autarky\Routing\Router;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
 	public function makeRouter($request = null)
 	{
-		$router = new Router(new IlluminateContainer);
+		$router = new Router(new Container);
 		if ($request) $router->setCurrentRequest($request);
 		return $router;
 	}
