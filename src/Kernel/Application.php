@@ -23,6 +23,7 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 
 use Autarky\Config\ConfigInterface;
 use Autarky\Container\ContainerInterface;
+use Autarky\Kernel\Errors\AbstractErrorHandler;
 use Autarky\Routing\RouterInterface;
 
 /**
@@ -96,19 +97,22 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		return new static(
 			$environment,
 			new \Autarky\Container\Container,
-			new \Autarky\Config\PhpFileStore($rootPath.'/config')
+			new \Autarky\Config\PhpFileStore($rootPath.'/config'),
+			new \Autarky\Kernel\Errors\SymfonyErrorHandler
 		);
 	}
 
 	/**
-	 * @param mixed $environment See setEnvironment()
-	 * @param mixed $container   See setContainer()
-	 * @param mixed $config      See setConfig()
+	 * @param mixed $environment  See setEnvironment()
+	 * @param mixed $container    See setContainer()
+	 * @param mixed $config       See setConfig()
+	 * @param mixed $errorHandler See setErrorHandler
 	 */
 	public function __construct(
 		$environment,
 		ContainerInterface $container,
-		ConfigInterface $config
+		ConfigInterface $config,
+		AbstractErrorHandler $errorHandler
 	) {
 		$this->middlewares = new SplPriorityQueue;
 		$this->configCallbacks = new SplStack;
@@ -116,9 +120,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		$this->setEnvironment($environment);
 		$this->setContainer($container);
 		$this->setConfig($config);
-
-		$this->errorHandler = new ErrorHandler($this, $config->get('app.debug', false));
-		$this->errorHandler->register();
+		$this->setErrorHandler($errorHandler);
 	}
 
 	/**
@@ -180,6 +182,13 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	public function getEnvironment()
 	{
 		return $this->environment;
+	}
+
+	public function setErrorHandler(AbstractErrorHandler $errorHandler)
+	{
+		$this->errorHandler = $errorHandler;
+		$this->errorHandler->setApplication($this);
+		$this->errorHandler->setDebug($this->config->get('app.debug', false));
 	}
 
 	public function getErrorHandler()
