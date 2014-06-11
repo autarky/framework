@@ -78,7 +78,7 @@ class ErrorHandler
 		if ($this->logger === null) return;
 
 		if ($this->logger instanceof \Closure) {
-			return call_user_func($this->logger);
+			$this->logger = call_user_func($this->logger);
 		}
 
 		return $this->logger;
