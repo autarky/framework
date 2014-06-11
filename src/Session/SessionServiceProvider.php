@@ -85,7 +85,7 @@ class SessionServiceProvider extends ServiceProvider
 					return new MockArraySessionStorage;
 				}
 
-				$handler = $container['SessionHandlerInterface'];
+				$handler = $container->resolve('SessionHandlerInterface');
 				$options = $this->app->getConfig()->get('session.handler-options');
 
 				return new NativeSessionStorage($options, $handler);
@@ -98,7 +98,7 @@ class SessionServiceProvider extends ServiceProvider
 			'Symfony\Component\HttpFoundation\Session\SessionInterface',
 			function ($container) {
 				$session = new Session(
-					$container['Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface'],
+					$container->resolve('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface'),
 					null,
 					new AutoExpireFlashBag()
 				);

@@ -95,7 +95,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	{
 		return new static(
 			$environment,
-			new \Autarky\Container\IlluminateContainer,
+			new \Autarky\Container\Container,
 			new \Autarky\Config\PhpFileStore($rootPath.'/config')
 		);
 	}
