@@ -4,12 +4,13 @@ namespace Autarky\Tests\Container;
 use PHPUnit_Framework_TestCase;
 
 use Autarky\Container\IlluminateContainer;
+use Autarky\Container\Container;
 
 class ContainerTest extends PHPUnit_Framework_TestCase
 {
 	protected function makeContainer()
 	{
-		return new IlluminateContainer;
+		return new Container;
 	}
 
 	/** @test */
@@ -108,11 +109,27 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$c->alias(__NAMESPACE__.'\\LowerClass', 'foo');
 		$this->assertSame($c->resolve('foo'), $c->resolve(__NAMESPACE__.'\\UpperClass')->cl);
 	}
+
+	/** @test */
+	public function containerAware()
+	{
+		$c = $this->makeContainer();
+		$o = $c->resolve(__NAMESPACE__.'\CA');
+		$this->assertSame($c, $o->container);
+	}
 }
 
 class LowerClass {}
 class UpperClass {
 	public function __construct(LowerClass $cl) {
 		$this->cl = $cl;
+	}
+}
+class CA implements \Autarky\Container\ContainerAwareInterface
+{
+	public $container;
+	public function setContainer(\Autarky\Container\ContainerInterface $container)
+	{
+		$this->container = $container;
 	}
 }

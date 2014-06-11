@@ -11,16 +11,16 @@
 namespace Autarky\Container;
 
 use Closure;
-use Illuminate\Container\Container;
+use Illuminate\Container\Container as CoreContainer;
 
 /**
  * Container utilizing the Laravel (illuminate/container) container.
  */
 class IlluminateContainer implements ContainerInterface
 {
-	public function __construct(Container $container = null)
+	public function __construct(CoreContainer $container = null)
 	{
-		$this->container = $container ?: new Container;
+		$this->container = $container ?: new CoreContainer;
 		$this->container->resolvingAny(function($object, $container) {
 			if ($object instanceof ContainerAwareInterface) {
 				$object->setContainer($this);
