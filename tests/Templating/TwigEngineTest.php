@@ -1,15 +1,15 @@
 <?php
 namespace Autarky\Tests\Templating;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
+use Autarky\Tests\TestCase;
 use Autarky\Templating\TwigEngine;
 use Autarky\Kernel\Application;
 use Autarky\Container\Container;
 use Autarky\Config\ArrayStore;
 
-class TwigEngineTest extends PHPUnit_Framework_TestCase
+class TwigEngineTest extends TestCase
 {
 	public function tearDown()
 	{
@@ -18,7 +18,7 @@ class TwigEngineTest extends PHPUnit_Framework_TestCase
 
 	protected function makeEngine()
 	{
-		$this->app = $app = new Application('testing', new Container, new ArrayStore);
+		$this->app = $this->makeApplication();
 		$this->twig = m::mock('Twig_Environment');
 		$this->twig->shouldReceive('addExtension');
 		return new TwigEngine($this->app, $this->twig);

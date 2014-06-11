@@ -1,21 +1,21 @@
 <?php
 namespace Autarky\Tests\Kernel;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+use Autarky\Tests\TestCase;
 use Autarky\Kernel\Application;
 use Autarky\Config\ArrayStore;
 use Autarky\Container\Container;
 
-class ApplicationTest extends PHPUnit_Framework_TestCase
+class ApplicationTest extends TestCase
 {
 	public function makeApp($response)
 	{
-		$app = new Application('testing', new Container, new ArrayStore);
+		$app = $this->makeApplication();
 		$mockRouter = m::mock('Autarky\Routing\RouterInterface');
 		$mockRouter->shouldReceive('dispatch')->andReturn(new Response($response));
 		$app->setRouter($mockRouter);
