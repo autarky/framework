@@ -336,7 +336,10 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		$this->stack = new StackBuilder;
 
 		foreach ($this->middlewares as $middleware) {
-			call_user_func_array([$this->stack, 'push'], (array) $middleware);
+			if (!is_array($middleware)) {
+				$middleware = [$middleware];
+			}
+			call_user_func_array([$this->stack, 'push'], $middleware);
 		}
 
 		$response = $this->stack->resolve($this)
