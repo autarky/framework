@@ -25,7 +25,7 @@ use Autarky\Kernel\Application;
  * The framework's error handler that takes care of caught and uncaught
  * exceptions as well as fatal PHP errors.
  */
-abstract class AbstractErrorHandler
+abstract class AbstractErrorHandler implements ErrorHandlerInterface
 {
 	protected $app;
 	protected $logger;
@@ -39,9 +39,7 @@ abstract class AbstractErrorHandler
 	}
 
 	/**
-	 * Set the error handler application.
-	 *
-	 * @param \Autarky\Kernel\Application $app
+	 * {@inheritdoc}
 	 */
 	public function setApplication(Application $app)
 	{
@@ -49,9 +47,7 @@ abstract class AbstractErrorHandler
 	}
 
 	/**
-	 * Set whether the error handler is in debug mode or not.
-	 *
-	 * @param bool $debug
+	 * {@inheritdoc}
 	 */
 	public function setDebug($debug)
 	{
@@ -59,9 +55,7 @@ abstract class AbstractErrorHandler
 	}
 
 	/**
-	 * Set whether exceptions should be handled or rethrown.
-	 *
-	 * @param bool $rethrow
+	 * {@inheritdoc}
 	 */
 	public function setRethrow($rethrow)
 	{
@@ -84,6 +78,9 @@ abstract class AbstractErrorHandler
 		return $this->handlers;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function setLogger($logger)
 	{
 		$this->logger = $logger;
@@ -101,11 +98,7 @@ abstract class AbstractErrorHandler
 	}
 
 	/**
-	 * Append a handler to the list of handlers.
-	 *
-	 * @param  callable $handler
-	 *
-	 * @return void
+	 * {@inheritdoc}
 	 */
 	public function appendHandler(callable $handler)
 	{
@@ -113,11 +106,7 @@ abstract class AbstractErrorHandler
 	}
 
 	/**
-	 * Prepend a handler to the list of handlers.
-	 *
-	 * @param  callable $handler
-	 *
-	 * @return void
+	 * {@inheritdoc}
 	 */
 	public function prependHandler(callable $handler)
 	{
@@ -125,9 +114,7 @@ abstract class AbstractErrorHandler
 	}
 
 	/**
-	 * Register the error handler to handle uncaught exceptions and errors.
-	 *
-	 * @return void
+	 * {@inheritdoc}
 	 */
 	public function register()
 	{
@@ -143,11 +130,7 @@ abstract class AbstractErrorHandler
 	}
 
 	/**
-	 * Handle an exception.
-	 *
-	 * @param  \Exception $exception
-	 *
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * {@inheritdoc}
 	 */
 	public function handle(Exception $exception)
 	{

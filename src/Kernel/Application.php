@@ -23,7 +23,7 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 
 use Autarky\Config\ConfigInterface;
 use Autarky\Container\ContainerInterface;
-use Autarky\Kernel\Errors\AbstractErrorHandler;
+use Autarky\Kernel\Errors\ErrorHandlerInterface;
 use Autarky\Routing\RouterInterface;
 
 /**
@@ -112,7 +112,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		$environment,
 		ContainerInterface $container,
 		ConfigInterface $config,
-		AbstractErrorHandler $errorHandler
+		ErrorHandlerInterface $errorHandler
 	) {
 		$this->middlewares = new SplPriorityQueue;
 		$this->configCallbacks = new SplStack;
@@ -184,11 +184,12 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		return $this->environment;
 	}
 
-	public function setErrorHandler(AbstractErrorHandler $errorHandler)
+	public function setErrorHandler(ErrorHandlerInterface $errorHandler)
 	{
 		$this->errorHandler = $errorHandler;
 		$this->errorHandler->setApplication($this);
 		$this->errorHandler->setDebug($this->config->get('app.debug', false));
+		$this->errorHandler->register();
 	}
 
 	public function getErrorHandler()
