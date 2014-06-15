@@ -170,6 +170,14 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException('Autarky\Container\NotInstantiableException');
 		$c->resolve('Iterator');
 	}
+
+	/** @test */
+	public function unresolvableDependencyThrowsException()
+	{
+		$c = $this->makeContainer();
+		$this->setExpectedException('Autarky\Container\UnresolvableDependencyException');
+		$c->resolve(__NAMESPACE__.'\\UnresolvableStub');
+	}
 }
 
 class LowerClass {}
@@ -204,4 +212,7 @@ class AwareStub implements StubAwareInterface
 	{
 		$this->stub = $stub;
 	}
+}
+class UnresolvableStub {
+	public function __construct($value) {}
 }

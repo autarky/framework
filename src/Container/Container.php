@@ -129,10 +129,14 @@ class Container implements ContainerInterface
 
 		foreach ($reflMethod->getParameters() as $reflParam) {
 			if (!$paramClass = $reflParam->getClass()) {
-				break;
-			}
-
-			if ($reflParam->isOptional()) {
+				if ($reflParam->isDefaultValueAvailable()) {
+					$args[] = $reflParam->getDefaultValue();
+				} else {
+					throw new UnresolvableDependencyException('Unresolvable dependency: '
+						.'Argument #'.$reflParam->getPosition().'($'.$reflParam->getName()
+						.') of '.$reflClass->getName().'::__construct');
+				}
+			} else if ($reflParam->isOptional()) {
 				try {
 					$args[] = $this->resolve($paramClass->getName());
 				} catch (ReflectionException $e) {
