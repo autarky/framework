@@ -75,6 +75,15 @@ interface ContainerInterface
 	public function alias($alias, $target);
 
 	/**
+	 * Determine if a class/key is bound onto the container or not.
+	 *
+	 * @param  string  $abstract
+	 *
+	 * @return boolean
+	 */
+	public function isBound($abstract);
+
+	/**
 	 * Resolve an object from the IoC container. Dependencies of the resolved
 	 * object should also be resolved recursively if possible.
 	 *

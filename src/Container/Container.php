@@ -123,4 +123,17 @@ class Container implements ContainerInterface
 	{
 		$this->aliases[$alias] = $target;
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function isBound($abstract)
+	{
+		if (isset($this->aliases[$abstract])) {
+			$abstract = $this->aliases[$abstract];
+		}
+
+		return isset($this->instances[$abstract])
+			|| isset($this->factories[$abstract]);
+	}
 }

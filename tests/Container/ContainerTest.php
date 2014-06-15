@@ -117,6 +117,18 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$o = $c->resolve(__NAMESPACE__.'\CA');
 		$this->assertSame($c, $o->container);
 	}
+
+	/** @test */
+	public function boundReturnsTrueWhenBound()
+	{
+		$c = $this->makeContainer();
+		$this->assertEquals(false, $c->isBound('foo'));
+		$this->assertEquals(false, $c->isBound('bar'));
+		$c->bind('foo', function() { return 'foo'; });
+		$c->share('bar', function() { return 'foo'; });
+		$this->assertEquals(true, $c->isBound('foo'));
+		$this->assertEquals(true, $c->isBound('bar'));
+	}
 }
 
 class LowerClass {}
