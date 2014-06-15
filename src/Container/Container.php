@@ -11,6 +11,8 @@
 namespace Autarky\Container;
 
 use Closure;
+use ReflectionClass;
+use ReflectionException;
 
 /**
  * Default implementation of the IoC container.
@@ -112,7 +114,11 @@ class Container implements ContainerInterface
 
 	protected function build($class)
 	{
-		$reflClass = new \ReflectionClass($class);
+		$reflClass = new ReflectionClass($class);
+
+		if (!$reflClass->isInstantiable()) {
+			throw new NotInstantiableException("Class $class is not instantiable");
+		}
 
 		if (!$reflClass->hasMethod('__construct')) {
 			return $reflClass->newInstance();
@@ -122,10 +128,18 @@ class Container implements ContainerInterface
 		$reflMethod = $reflClass->getMethod('__construct');
 
 		foreach ($reflMethod->getParameters() as $reflParam) {
-			if ($paramClass = $reflParam->getClass()) {
-				$args[] = $this->resolve($paramClass->getName());
-			} else {
+			if (!$paramClass = $reflParam->getClass()) {
 				break;
+			}
+
+			if ($reflParam->isOptional()) {
+				try {
+					$args[] = $this->resolve($paramClass->getName());
+				} catch (ReflectionException $e) {
+					$args[] = null;
+				}
+			} else {
+				$args[] = $this->resolve($paramClass->getName());
 			}
 		}
 

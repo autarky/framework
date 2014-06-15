@@ -102,6 +102,21 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function resolveOptionalDependencies()
+	{
+		$c = $this->makeContainer();
+		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
+		$this->assertNull($obj->opt);
+
+		$c->bind(__NAMESPACE__.'\\OptionalInterface', __NAMESPACE__.'\\OptionalClass');
+		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
+		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $obj->opt);
+
+	}
+
+	/** @test */
 	public function alias()
 	{
 		$c = $this->makeContainer();
@@ -139,12 +154,35 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$o = $c->resolve(__NAMESPACE__.'\AwareStub');
 		$this->assertInstanceOf('StdClass', $o->stub);
 	}
+
+	/** @test */
+	public function nonExistingClassesThrowsException()
+	{
+		$c = $this->makeContainer();
+		$this->setExpectedException('ReflectionException');
+		$c->resolve('thisclassdoesnotexist');
+	}
+
+	/** @test */
+	public function nonInstantiableClassNameThrowsException()
+	{
+		$c = $this->makeContainer();
+		$this->setExpectedException('Autarky\Container\NotInstantiableException');
+		$c->resolve('Iterator');
+	}
 }
 
 class LowerClass {}
 class UpperClass {
 	public function __construct(LowerClass $cl) {
 		$this->cl = $cl;
+	}
+}
+interface OptionalInterface {}
+class OptionalClass implements OptionalInterface {}
+class OptionalDependencyClass {
+	public function __construct(LowerClass $lc, OptionalInterface $opt = null) {
+		$this->lc = $lc; $this->opt = $opt;
 	}
 }
 class CA implements \Autarky\Container\ContainerAwareInterface
