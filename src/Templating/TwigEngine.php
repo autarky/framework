@@ -31,6 +31,9 @@ class TwigEngine implements TemplatingEngineInterface
 	 */
 	protected $app;
 
+	/**
+	 * @var array
+	 */
 	protected $contextHandlers = [];
 
 	public function __construct(Application $app, Twig_Environment $env = null)
@@ -48,6 +51,16 @@ class TwigEngine implements TemplatingEngineInterface
 		$this->app = $app;
 
 		$this->loadExtensions();
+	}
+
+	/**
+	 * Get the Twig environment.
+	 *
+	 * @return \Twig_Environment
+	 */
+	public function getTwig()
+	{
+		return $this->twig;
 	}
 
 	protected function loadExtensions()
@@ -71,6 +84,7 @@ class TwigEngine implements TemplatingEngineInterface
 	public function render($name, array $data = array())
 	{
 		$data += $this->getContext($name);
+
 		return $this->twig->loadTemplate($name)
 			->render($data);
 	}
@@ -98,12 +112,24 @@ class TwigEngine implements TemplatingEngineInterface
 
 		list($class, $method) = \Autarky\splitclm($handler, 'getContext');
 		$obj = $this->app->resolve($class);
+
 		return $obj->$method();
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function registerContextHandler($template, $handler)
 	{
 		$this->contextHandlers[$template][] = $handler;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function addGlobalVariable($name, $value)
+	{
+		$this->twig->addGlobal($name, $value);
 	}
 
 	/**
