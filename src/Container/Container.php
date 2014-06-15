@@ -40,7 +40,7 @@ class Container implements ContainerInterface
 		}
 
 		return function($container) use($concrete) {
-			return $container->build($concrete);
+			return $this->build($concrete);
 		};
 	}
 
@@ -78,8 +78,10 @@ class Container implements ContainerInterface
 		}
 
 		if (isset($this->instances[$abstract])) {
-			$object = $this->instances[$abstract];
-		} else if (isset($this->factories[$abstract])) {
+			return $this->instances[$abstract];
+		}
+
+		if (isset($this->factories[$abstract])) {
 			$object = $this->factories[$abstract]($this);
 		} else {
 			$object = $this->build($abstract);
@@ -92,10 +94,7 @@ class Container implements ContainerInterface
 		return $object;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function build($class)
+	protected function build($class)
 	{
 		$reflClass = new \ReflectionClass($class);
 
