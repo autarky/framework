@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use FastRoute\RouteCollector;
 use FastRoute\RouteParser\Std as RouteParser;
@@ -23,11 +24,12 @@ use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 
 use Autarky\Container\ContainerInterface;
 use Autarky\Container\ContainerAwareInterface;
+use Autarky\Events\EventDispatcherAwareInterface;
 
 /**
  * FastRoute implementation of the router.
  */
-class Router implements RouterInterface
+class Router implements RouterInterface, EventDispatcherAwareInterface
 {
 	/**
 	 * @var \Autarky\Container\ContainerInterface
@@ -73,6 +75,11 @@ class Router implements RouterInterface
 	 */
 	protected $namedRoutes = [];
 
+	/**
+	 * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+	 */
+	protected $eventDispatcher;
+
 	public function __construct(ContainerInterface $container, $cachePath = null)
 	{
 		$this->container = $container;
@@ -94,6 +101,14 @@ class Router implements RouterInterface
 	/**
 	 * {@inheritdoc}
 	 */
+	public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+	{
+		$this->eventDispatcher = $eventDispatcher;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getCurrentRequest()
 	{
 		return $this->currentRequest;
@@ -102,6 +117,11 @@ class Router implements RouterInterface
 	public function setCurrentRequest(Request $request)
 	{
 		$this->currentRequest = $request;
+
+		if (isset($this->eventDispatcher)) {
+			$event = new Events\NewRequestEvent($request);
+			$this->eventDispatcher->dispatch('autarky.request', $event);
+		}
 	}
 
 	/**
@@ -163,7 +183,9 @@ class Router implements RouterInterface
 	{
 		// if dispatchData is set, we're using cached data and routes can no
 		// longer be added.
-		if (isset($this->dispatchData)) return;
+		if (isset($this->dispatchData)) {
+			return;
+		}
 
 		$methods = (array) $methods;
 
@@ -249,7 +271,7 @@ class Router implements RouterInterface
 	 */
 	public function dispatch(Request $request)
 	{
-		$this->currentRequest = $request;
+		$this->setCurrentRequest($request);
 		$this->currentRoute = null;
 
 		$result = $this->getDispatcher()
@@ -277,6 +299,11 @@ class Router implements RouterInterface
 
 	protected function getResult(Request $request, Route $route, array $args)
 	{
+		if (isset($this->eventDispatcher)) {
+			$event = new Events\RouteMatchedEvent($request, $route);
+			$this->eventDispatcher->dispatch('autarky.route-match', $event);
+		}
+
 		$this->currentRoute = $route;
 
 		foreach ($route->getBeforeFilters() as $filter) {

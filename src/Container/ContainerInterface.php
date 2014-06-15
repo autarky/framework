@@ -95,4 +95,22 @@ interface ContainerInterface
 	 * @return mixed
 	 */
 	public function resolve($abstract);
+
+	/**
+	 * Add an "aware" binding to the IoC container.
+	 *
+	 * When objects are resolved from the IoC container, the container should
+	 * check in an array of "aware" interfaces to lazily call setter methods on
+	 * said objects. For example, all object that implement ContainerAwareInterface
+	 * are called with setContainer($this) by the container - this method allows
+	 * you to add your own such interfaces.
+	 *
+	 * @param  string $targetInterface The interface the container checks for
+	 * @param  string $method          The method that should be called
+	 * @param  mixed  $parameters      A single string or array of strings with
+	 * IoC binding keys that should be resolved and passed to the method.
+	 *
+	 * @return void
+	 */
+	public function aware($targetInterface, $method, $parameters);
 }

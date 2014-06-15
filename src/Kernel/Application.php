@@ -57,11 +57,6 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected $container;
 
 	/**
-	 * @var \Autarky\Routing\RouterInterface
-	 */
-	protected $router;
-
-	/**
 	 * @var \Symfony\Component\Console\Application
 	 */
 	protected $console;
@@ -243,25 +238,13 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	}
 
 	/**
-	 * Set the application's router.
-	 *
-	 * @param \Autarky\Routing\RouterInterface $router
-	 */
-	public function setRouter(RouterInterface $router)
-	{
-		$this->router = $router;
-		$this->container->share('Autarky\Routing\RouterInterface', $this->router);
-		$this->container->share(get_class($this->router), $this->router);
-	}
-
-	/**
 	 * Get the application's router.
 	 *
 	 * @return \Autarky\Routing\RouterInterface
 	 */
 	public function getRouter()
 	{
-		return $this->router;
+		return $this->container->resolve('Autarky\Routing\RouterInterface');
 	}
 
 	/**
@@ -354,12 +337,8 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 */
 	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
-		if ($this->router === null) {
-			throw new \Exception('No router set!');
-		}
-
 		try {
-			$response = $this->router->dispatch($request);
+			$response = $this->getRouter()->dispatch($request);
 		} catch (\Exception $exception) {
 			$response = $this->errorHandler->handle($exception);
 		}

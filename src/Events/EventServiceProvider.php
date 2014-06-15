@@ -31,6 +31,12 @@ class EventServiceProvider extends ServiceProvider
 		$this->app->getContainer()->alias(
 			'Autarky\Events\EventDispatcher',
 			'Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+		$this->app->getContainer()->aware(
+			'Autarky\Events\EventDispatcherAwareInterface',
+			'setEventDispatcher',
+			'Autarky\Events\EventDispatcher'
+		);
 	}
 
 	public function registerConsole(Application $console)

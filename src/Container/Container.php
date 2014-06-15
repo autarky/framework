@@ -20,6 +20,7 @@ class Container implements ContainerInterface
 	protected $instances = [];
 	protected $factories = [];
 	protected $aliases = [];
+	protected $aware = [];
 
 	/**
 	 * {@inheritdoc}
@@ -64,6 +65,7 @@ class Container implements ContainerInterface
 				return $result;
 			};
 		} else {
+			$this->checkAwareInterfaces($concrete);
 			$this->instances[$abstract] = $concrete;
 		}
 	}
@@ -87,11 +89,25 @@ class Container implements ContainerInterface
 			$object = $this->build($abstract);
 		}
 
+		$this->checkAwareInterfaces($object);
+
+		return $object;
+	}
+
+	protected function checkAwareInterfaces($object)
+	{
 		if ($object instanceof ContainerAwareInterface) {
 			$object->setContainer($this);
 		}
 
-		return $object;
+		foreach ($this->aware as $aware) {
+			if ($object instanceof $aware[0]) {
+				$params = array_map(function($param) {
+					return $this->resolve($param);
+				}, $aware[2]);
+				call_user_func_array([$object, $aware[1]], $params);
+			}
+		}
 	}
 
 	protected function build($class)
@@ -135,5 +151,10 @@ class Container implements ContainerInterface
 
 		return isset($this->instances[$abstract])
 			|| isset($this->factories[$abstract]);
+	}
+
+	public function aware($interface, $method, $parameters)
+	{
+		$this->aware[] = [$interface, $method, (array) $parameters];
 	}
 }

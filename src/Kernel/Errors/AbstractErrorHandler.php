@@ -167,8 +167,8 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 		$routeName = ($route && $route->getName()) ? $route->getName() : 'No route';
 
 		$context = [
-			'method' => $request->getMethod(),
-			'uri' => $request->getRequestUri(),
+			'method' => $request ? $request->getMethod() : null,
+			'uri' => $request ? $request->getRequestUri() : null,
 			'name' => $routeName,
 		];
 

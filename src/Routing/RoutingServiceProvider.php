@@ -19,9 +19,14 @@ class RoutingServiceProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->setRouter(new Router(
-			$this->app->getContainer(),
-			$this->app->getConfig()->get('path.route-cache')
-		));
+		$this->app->getContainer()->share('Autarky\Routing\RouterInterface', function($container) {
+			return new Router(
+				$container,
+				$this->app->getConfig()->get('path.route-cache')
+			);
+		});
+
+		// $this->app->getContainer()->alias('Autarky\Routing\RouterInterface',
+			// 'Autarky\Routing\Router');
 	}
 }

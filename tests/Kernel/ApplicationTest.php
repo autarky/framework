@@ -18,7 +18,7 @@ class ApplicationTest extends TestCase
 		$app = $this->makeApplication();
 		$mockRouter = m::mock('Autarky\Routing\RouterInterface');
 		$mockRouter->shouldReceive('dispatch')->andReturn(new Response($response));
-		$app->setRouter($mockRouter);
+		$app->getContainer()->share('Autarky\Routing\RouterInterface', $mockRouter);
 		return $app;
 	}
 

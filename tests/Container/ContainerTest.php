@@ -129,6 +129,16 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(true, $c->isBound('foo'));
 		$this->assertEquals(true, $c->isBound('bar'));
 	}
+
+	/** @test */
+	public function awareInterfacesAreBound()
+	{
+		$c = $this->makeContainer();
+		$c->bind('foo', function() { return new \StdClass; });
+		$c->aware(__NAMESPACE__.'\StubAwareInterface', 'setStub', 'foo');
+		$o = $c->resolve(__NAMESPACE__.'\AwareStub');
+		$this->assertInstanceOf('StdClass', $o->stub);
+	}
 }
 
 class LowerClass {}
@@ -143,5 +153,17 @@ class CA implements \Autarky\Container\ContainerAwareInterface
 	public function setContainer(\Autarky\Container\ContainerInterface $container)
 	{
 		$this->container = $container;
+	}
+}
+interface StubAwareInterface
+{
+	public function setStub($stub);
+}
+class AwareStub implements StubAwareInterface
+{
+	public $stub;
+	public function setStub($stub)
+	{
+		$this->stub = $stub;
 	}
 }

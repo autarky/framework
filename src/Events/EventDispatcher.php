@@ -38,8 +38,8 @@ class EventDispatcher extends SymfonyEventDispatcher
 	public function addListener($name, $listener, $priority = 0)
 	{
 		if (is_string($listener)) {
-			$listener = function($event) use($listener) {
-				list($class, $method) = \Autarky\splitclm($listener, 'handle');
+			list($class, $method) = \Autarky\splitclm($listener, 'handle');
+			$listener = function($event) use($class, $method) {
 				return $this->container->resolve($class)
 					->$method($event);
 			};
