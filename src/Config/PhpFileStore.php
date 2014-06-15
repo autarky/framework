@@ -62,10 +62,7 @@ class PhpFileStore implements ConfigInterface
 	}
 
 	/**
-	 * Add a namespace to the config loader.
-	 *
-	 * @param string $namespace
-	 * @param string $location  Path to config files.
+	 * {@inheritdoc}
 	 */
 	public function addNamespace($namespace, $location)
 	{

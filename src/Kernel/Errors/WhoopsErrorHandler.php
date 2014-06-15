@@ -14,18 +14,10 @@ use Exception;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 
-/**
- * The framework's error handler that takes care of caught and uncaught
- * exceptions as well as fatal PHP errors.
- */
 class WhoopsErrorHandler extends AbstractErrorHandler
 {
 	/**
-	 * Create a default error response.
-	 *
-	 * @param  \Exception $exception
-	 *
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * {@inheritdoc}
 	 */
 	protected function defaultHandler(Exception $exception)
 	{

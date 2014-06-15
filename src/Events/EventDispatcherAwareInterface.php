@@ -12,6 +12,10 @@ namespace Autarky\Events;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Classes that implement this interface indicate that the event dispatcher can
+ * be set onto it.
+ */
 interface EventDispatcherAwareInterface
 {
 	public function setEventDispatcher(EventDispatcherInterface $eventDispatcher);

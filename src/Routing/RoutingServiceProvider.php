@@ -26,7 +26,7 @@ class RoutingServiceProvider extends ServiceProvider
 			);
 		});
 
-		// $this->app->getContainer()->alias('Autarky\Routing\RouterInterface',
-			// 'Autarky\Routing\Router');
+		$this->app->getContainer()->alias('Autarky\Routing\RouterInterface',
+			'Autarky\Routing\Router');
 	}
 }

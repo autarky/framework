@@ -5,13 +5,13 @@ use PHPUnit_Framework_TestCase;
 use Mockery as m;
 use Exception;
 
-use Autarky\Kernel\ErrorHandler;
+use Autarky\Kernel\Errors\SymfonyErrorHandler;
 
 class ErrorHandlerTest extends PHPUnit_Framework_TestCase
 {
 	protected function makeHandler()
 	{
-		return new ErrorHandler(m::mock('Autarky\Kernel\Application'), true, false);
+		return new SymfonyErrorHandler(m::mock('Autarky\Kernel\Application'), true, false);
 	}
 
 	/** @test */
