@@ -20,7 +20,7 @@ class MultiPdoContainer
 
 	protected $defaultConnection;
 
-	protected $connections;
+	protected $instances;
 
 	protected $defaultPdoOptions = [
 		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
