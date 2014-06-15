@@ -19,12 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
-use Symfony\Component\Console\Application as ConsoleApplication;
 
 use Autarky\Config\ConfigInterface;
 use Autarky\Container\ContainerInterface;
 use Autarky\Kernel\Errors\ErrorHandlerInterface;
 use Autarky\Routing\RouterInterface;
+use Autarky\Console\Application as ConsoleApplication;
 
 /**
  * The main application of the framework.
@@ -34,7 +34,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	/**
 	 * The framework version.
 	 */
-	const VERSION = '0.2.0';
+	const VERSION = '0.2.3';
 
 	/**
 	 * @var \SplPriorityQueue
