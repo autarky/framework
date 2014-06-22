@@ -47,12 +47,14 @@ class SessionServiceProvider extends ServiceProvider
 
 					case 'file':
 						$path = $this->app->getConfig()->get('path.session');
-
 						return new NativeFileSessionHandler($path);
 
 					case 'pdo':
-						return new PdoSessionHandler($container->resolve('PDO'),
-							$this->app->getConfig()->get('session.handler-options'));
+						$connection = $this->app->getConfig()->get('session.connection');
+						$pdo = $container->resolve('Autarky\Database\MultiPdoContainer')
+							->getPdo($connection);
+						$options = $this->app->getConfig()->get('session.handler-options');
+						return new PdoSessionHandler($pdo, $options);
 
 					case 'mongo':
 						return new MongoDbSessionHandler($container->resolve('MongoClient'),
