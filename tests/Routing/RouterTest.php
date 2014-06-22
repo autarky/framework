@@ -82,7 +82,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$router->group(['prefix' => 'foo'], function($router) use(&$route) {
 			$route = $router->addRoute('get', '/bar', function() {});
 		});
-		$this->assertEquals('foo/bar', $route->getPath([]));
+		$this->assertEquals('/foo/bar', $route->getPath([]));
 	}
 
 	/** @test */
@@ -107,5 +107,25 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$response = $router->dispatch(Request::create('/foo'));
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
 		$this->assertEquals('baz', $response->getContent());
+	}
+
+	/**
+	 * @test
+	 * @dataProvider getPrefixPathData
+	 */
+	public function prefixesCannotMessUpUris($prefix, $path, $expectedPath)
+	{
+		$router = $this->makeRouter();
+		$router->group(['prefix' => $prefix], function($router) use($path, &$route) {
+			$route = $router->addRoute(['get'], $path, function() { return; });
+		});
+		$this->assertEquals($expectedPath, $route->getPath());
+	}
+
+	public function getPrefixPathData()
+	{
+		return array_map(function($prefix, $path) {
+			return [$prefix, $path, '/foo/bar'];
+		}, ['foo', '/foo', 'foo/', '/foo/'], ['bar', '/bar', 'bar/', '/bar/']);
 	}
 }

@@ -66,9 +66,9 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	/**
 	 * The URL prefix that is currently applied to every route being added.
 	 *
-	 * @var null|string
+	 * @var string
 	 */
-	protected $currentPrefix;
+	protected $currentPrefix = '';
 
 	/**
 	 * @var array
@@ -166,8 +166,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		}
 
 		if (array_key_exists('prefix', $flags)) {
-			$this->currentPrefix = ($this->currentPrefix === null) ? $flags['prefix']
-				: rtrim($this->currentPrefix, '/') .'/'. ltrim($flags['prefix'], '/');
+			$this->currentPrefix .= '/' . trim($flags['prefix'], '/');
 		}
 
 		$callback($this);
@@ -220,6 +219,8 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		if ($this->currentPrefix !== null) {
 			$url = rtrim($this->currentPrefix, '/') .'/'. ltrim($url, '/');
 		}
+
+		$url = rtrim($url, '/');
 
 		$route = new Route($methods, $url, $handler, $name);
 
