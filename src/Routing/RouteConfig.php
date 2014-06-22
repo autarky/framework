@@ -21,19 +21,19 @@ class RouteConfig
 		$this->routes = $routes;
 	}
 
-	public function override($path, array $routeData)
+	public function override($name, array $routeData)
 	{
-		if (!isset($this->routes[$path])) {
-			throw new \InvalidArgumentException("No route for path $path defined");
+		if (!isset($this->routes[$name])) {
+			throw new \InvalidArgumentException("No route for name $name defined");
 		}
 
-		$this->routes[$path] = $routeData + $this->routes[$path];
+		$this->routes[$name] = $routeData + $this->routes[$name];
 	}
 
 	public function merge(array $routes)
 	{
-		foreach ($routes as $path => $route) {
-			$this->override($path, $route);
+		foreach ($routes as $name => $route) {
+			$this->override($name, $route);
 		}
 	}
 
@@ -50,21 +50,16 @@ class RouteConfig
 
 	protected function registerRoutes()
 	{
-		foreach ($this->routes as $path => $route) {
+		foreach ($this->routes as $name => $route) {
+			$path = $route['path'];
+			$handler = $route['handler'];
+
 			if (isset($route['methods'])) {
 				$methods = (array) $route['methods'];
 			} else if (isset($route['method'])) {
 				$methods = (array) $route['method'];
 			} else {
 				$methods = ['GET'];
-			}
-
-			$handler = $route['handler'];
-
-			if (isset($route['name'])) {
-				$name = $route['name'];
-			} else {
-				$name = null;
 			}
 
 			$this->router->addRoute($methods, $path, $handler, $name);
