@@ -13,6 +13,11 @@ use Autarky\Container\Container;
 
 class ApplicationTest extends TestCase
 {
+	public function tearDown()
+	{
+		m::close();
+	}
+
 	public function makeApp($response)
 	{
 		$app = $this->makeApplication();

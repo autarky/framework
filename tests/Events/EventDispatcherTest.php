@@ -9,6 +9,11 @@ use Autarky\Container\Container;
 
 class EventDispatcherTest extends PHPUnit_Framework_TestCase
 {
+	public function tearDown()
+	{
+		m::close();
+	}
+
 	protected function mockEvent()
 	{
 		return m::mock('Symfony\Component\EventDispatcher\Event')

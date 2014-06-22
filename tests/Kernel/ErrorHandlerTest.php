@@ -9,6 +9,11 @@ use Autarky\Kernel\Errors\SymfonyErrorHandler;
 
 class ErrorHandlerTest extends PHPUnit_Framework_TestCase
 {
+	public function tearDown()
+	{
+		m::close();
+	}
+
 	protected function makeHandler()
 	{
 		return new SymfonyErrorHandler(m::mock('Autarky\Kernel\Application'), true, false);

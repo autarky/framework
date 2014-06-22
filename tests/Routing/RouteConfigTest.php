@@ -6,6 +6,11 @@ use Mockery as m;
 
 class RouteConfigTest extends PHPUnit_Framework_TestCase
 {
+	public function tearDown()
+	{
+		m::close();
+	}
+
 	/** @test */
 	public function routesAreRegistered()
 	{
@@ -22,7 +27,7 @@ class RouteConfigTest extends PHPUnit_Framework_TestCase
 		$router = $this->mockRouter();
 		$data = $this->getRouteData();
 		$config = $this->makeRouteConfig($router, $data);
-		$config->override('/path', ['methods' => ['get', 'post']]);
+		$config->override('foobar', ['methods' => ['get', 'post']]);
 		$router->shouldReceive('addRoute')->once()->with(['get', 'post'], '/path', 'foo:bar', 'foobar');
 		$config->mount();
 	}
@@ -35,10 +40,10 @@ class RouteConfigTest extends PHPUnit_Framework_TestCase
 	protected function getRouteData()
 	{
 		return [
-			'/path' => [
+			'foobar' => [
 				'methods' => ['get'],
 				'handler' => 'foo:bar',
-				'name' => 'foobar',
+				'path' => '/path',
 			],
 		];
 	}
