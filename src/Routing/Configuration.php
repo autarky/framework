@@ -10,15 +10,20 @@
 
 namespace Autarky\Routing;
 
-class RouteConfig
+class Configuration
 {
 	protected $router;
 	protected $routes = array();
+	protected $namespace;
 
-	public function __construct(RouterInterface $router, array $routes = array())
+	public function __construct(RouterInterface $router, array $routes, $namespace = null)
 	{
 		$this->router = $router;
 		$this->routes = $routes;
+
+		if ($namespace) {
+			$this->namespace = $namespace;
+		}
 	}
 
 	public function override($name, array $routeData)
@@ -51,6 +56,10 @@ class RouteConfig
 	protected function registerRoutes()
 	{
 		foreach ($this->routes as $name => $route) {
+			if ($this->namespace) {
+				$name = $this->namespace . ':' . $name;
+			}
+
 			$path = $route['path'];
 			$handler = $route['handler'];
 

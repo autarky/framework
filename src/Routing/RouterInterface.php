@@ -32,7 +32,7 @@ interface RouterInterface
 	 *
 	 * @param string|array $methods HTTP methods the route should respond to
 	 * @param string       $url     Relative URL the route should respond to. Parameters wrapped in {}
-	 * @param mixed        $handler Closure or a string of "class:method"
+	 * @param string       $handler string of "class:method" or "global_function"
 	 * @param string       $name    Route name (optional)
 	 */
 	public function addRoute($method, $path, $handler, $name = null);

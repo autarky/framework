@@ -28,5 +28,13 @@ class RoutingServiceProvider extends ServiceProvider
 
 		$this->app->getContainer()->alias('Autarky\Routing\Router',
 			'Autarky\Routing\RouterInterface');
+
+		$this->app->config(function() {
+			if ($routes = $this->app->getConfig()->get('routes')) {
+				$router = $this->app->getContainer()
+					->resolve('Autarky\Routing\RouterInterface');
+				(new Configuration($router, $routes))->mount();
+			}
+		});
 	}
 }
