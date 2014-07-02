@@ -23,10 +23,33 @@ use Autarky\Kernel\Application;
 
 abstract class AbstractErrorHandler implements ErrorHandlerInterface
 {
+	/**
+	 * @var \Autarky\Kernel\Application
+	 */
 	protected $app;
+
+	/**
+	 * @var \Psr\Log\LoggerInterface
+	 */
 	protected $logger;
+
+	/**
+	 * @var \SplDoublyLinkedList
+	 */
 	protected $handlers;
+
+	/**
+	 * Debug mode.
+	 *
+	 * @var boolean
+	 */
 	protected $debug = false;
+
+	/**
+	 * Re-throw exceptions rather than handling them.
+	 *
+	 * @var boolean
+	 */
 	protected $rethrow = false;
 
 	public function __construct()

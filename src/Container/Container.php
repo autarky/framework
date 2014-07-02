@@ -19,9 +19,32 @@ use ReflectionException;
  */
 class Container implements ContainerInterface
 {
+	/**
+	 * Resolved instances.
+	 *
+	 * @var array
+	 */
 	protected $instances = [];
+
+	/**
+	 * Factories.
+	 *
+	 * @var \Closure[]
+	 */
 	protected $factories = [];
+
+	/**
+	 * Aliases.
+	 *
+	 * @var array
+	 */
 	protected $aliases = [];
+
+	/**
+	 * "Aware interfaces". See ContainerInterface::aware()
+	 *
+	 * @var array
+	 */
 	protected $aware = [];
 
 	/**
@@ -171,6 +194,9 @@ class Container implements ContainerInterface
 			|| isset($this->factories[$abstract]);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function aware($interface, $method, $parameters)
 	{
 		$this->aware[] = [$interface, $method, (array) $parameters];

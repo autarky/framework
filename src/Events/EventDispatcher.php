@@ -22,6 +22,9 @@ use Autarky\Container\ContainerInterface;
  */
 class EventDispatcher extends SymfonyEventDispatcher
 {
+	/**
+	 * @var \Autarky\Container\ContainerInterface
+	 */
 	protected $container;
 
 	public function __construct(ContainerInterface $container)
