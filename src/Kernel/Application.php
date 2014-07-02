@@ -176,6 +176,10 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 */
 	public function getEnvironment()
 	{
+		if (!$this->environment || $this->environment instanceof Closure) {
+			throw new \RuntimeException('Environment has not yet been resolved');
+		}
+
 		return $this->environment;
 	}
 
