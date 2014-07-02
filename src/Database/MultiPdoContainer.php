@@ -14,14 +14,35 @@ use Pdo;
 
 use Autarky\Config\ConfigInterface;
 
+/**
+ * Container that manages multiple PDO instances.
+ */
 class MultiPdoContainer
 {
+	/**
+	 * @var \Autarky\Config\ConfigInterface
+	 */
 	protected $config;
 
+	/**
+	 * The default connection to use
+	 *
+	 * @var string
+	 */
 	protected $defaultConnection;
 
+	/**
+	 * PDO instances.
+	 *
+	 * @var \PDO[]
+	 */
 	protected $instances;
 
+	/**
+	 * The default PDO options.
+	 *
+	 * @var array
+	 */
 	protected $defaultPdoOptions = [
 		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
 		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_CLASS,
@@ -37,6 +58,15 @@ class MultiPdoContainer
 		$this->defaultConnection = $defaultConnection ?: $config->get('database.connection');
 	}
 
+	/**
+	 * Get a PDO instance.
+	 *
+	 * @param  string|null $connection Null fetches the default connection.
+	 *
+	 * @return PDO
+	 *
+	 * @throws \InvalidArgumentException if connection is not configured
+	 */
 	public function getPdo($connection = null)
 	{
 		if ($connection === null) {
@@ -52,13 +82,13 @@ class MultiPdoContainer
 
 	protected function makePdo($connection)
 	{
-		$dsn = $this->config->get("database.connections.{$connection}.dsn");
-		$username = $this->config->get("database.connections.{$connection}.username");
-		$password = $this->config->get("database.connections.{$connection}.password");
+		$config = $this->config->get("database.connections.$connection");
 
-		$options = $this->config->get("database.connections.{$connection}.options", [])
-			+ $this->defaultPdoOptions;
+		if (!$config) {
+			throw new \InvalidArgumentException("Connection $connection not defined");
+		}
 
-		return new PDO($dsn, $username, $password, $options);
+		return new PDO($config['dsn'], $config['username'], $config['password'],
+			($config['options'] ?: []) + $this->defaultPdoOptions);
 	}
 }
