@@ -18,13 +18,43 @@ class ApplicationTest extends TestCase
 		m::close();
 	}
 
-	public function makeApp($response)
+	public function makeApp($response = null)
 	{
 		$app = $this->makeApplication();
-		$mockRouter = m::mock('Autarky\Routing\RouterInterface');
-		$mockRouter->shouldReceive('dispatch')->andReturn(new Response($response));
-		$app->getContainer()->share('Autarky\Routing\RouterInterface', $mockRouter);
+		if ($response) {
+			$mockRouter = m::mock('Autarky\Routing\RouterInterface');
+			$mockRouter->shouldReceive('dispatch')->andReturn(new Response($response));
+			$app->getContainer()->share('Autarky\Routing\RouterInterface', $mockRouter);
+		}
 		return $app;
+	}
+
+	/** @test */
+	public function environmentClosureIsResolvedOnBoot()
+	{
+		$app = $this->makeApp();
+		$app->setEnvironment(function() { return 'testenv'; });
+		$app->boot();
+		$this->assertEquals('testenv', $app->getEnvironment());
+	}
+
+	/** @test */
+	public function environmentCannotBeSetAfterBoot()
+	{
+		$app = $this->makeApp();
+		$app->setEnvironment(function() { return 'testenv'; });
+		$app->boot();
+		$this->setExpectedException('RuntimeException');
+		$app->setEnvironment(function() { return 'testenv2'; });
+	}
+
+	/** @test */
+	public function prematureGettingOfEnvironmentThrowsException()
+	{
+		$app = $this->makeApp();
+		$app->setEnvironment(function() { return 'testenv'; });
+		$this->setExpectedException('RuntimeException');
+		$app->getEnvironment();
 	}
 
 	/** @test */
@@ -62,6 +92,36 @@ class ApplicationTest extends TestCase
 		$app->addMiddleware(__NAMESPACE__.'\MiddlewareB', -1);
 		$response = $app->run(Request::create(''), false);
 		$this->assertEquals('fooba', $response->getContent());
+	}
+
+	/** @test */
+	public function configCallbackIsCalledOnBoot()
+	{
+		$app = $this->makeApp();
+		$booted = false;
+		$app->config(function() use(&$booted) { $booted = true; });
+		$this->assertEquals(false, $booted);
+		$app->boot();
+		$this->assertEquals(true, $booted);
+	}
+
+	/** @test */
+	public function configCallbackIsCalledImmediatelyIfBooted()
+	{
+		$app = $this->makeApp();
+		$booted = false;
+		$app->boot();
+		$app->config(function() use(&$booted) { $booted = true; });
+		$this->assertEquals(true, $booted);
+	}
+
+	/** @test */
+	public function serviceProvidersAreCalled()
+	{
+		$app = $this->makeApp();
+		$app->getConfig()->set('app.providers', [__NAMESPACE__.'\\StubServiceProvider']);
+		$app->boot();
+		$this->assertTrue(StubServiceProvider::$called);
 	}
 }
 
@@ -112,5 +172,14 @@ class MiddlewareC extends AbstractMiddleware
 	{
 		$affix = 'b' . $this->affix;
 		$response->setContent($response->getContent().$affix);
+	}
+}
+
+class StubServiceProvider extends \Autarky\Kernel\ServiceProvider
+{
+	public static $called = false;
+	public function register()
+	{
+		static::$called = true;
 	}
 }

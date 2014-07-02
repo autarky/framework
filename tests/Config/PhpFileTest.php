@@ -58,4 +58,20 @@ class PhpFileTest extends PHPUnit_Framework_TestCase
 		$config->setEnvironment('override');
 		$this->assertEquals('baz', $config->get('testfile.foo'));
 	}
+
+	/** @test */
+	public function addNamespace()
+	{
+		$config = $this->makeConfig();
+		$config->addNamespace('test-ns', __DIR__.'/files/namespace');
+		$this->assertEquals('bar', $config->get('test-ns:testfile.foo'));
+	}
+
+	/** @test */
+	public function notArrayThrowsException()
+	{
+		$this->setExpectedException('InvalidArgumentException');
+		$config = $this->makeConfig();
+		$config->get('notarray.foo');
+	}
 }

@@ -17,9 +17,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function shareClosure()
 	{
 		$c = $this->makeContainer();
-		$c->share('foo', function() {
-			return new \StdClass;
-		});
+		$c->share('foo', function() { return new \StdClass; });
 		$this->assertSame($c->resolve('foo'), $c->resolve('foo'));
 	}
 
@@ -122,6 +120,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$c = $this->makeContainer();
 		$c->share('foo', function() { return new LowerClass; });
 		$c->alias(__NAMESPACE__.'\\LowerClass', 'foo');
+		$this->assertTrue($c->isBound(__NAMESPACE__.'\\LowerClass'));
 		$this->assertSame($c->resolve('foo'), $c->resolve(__NAMESPACE__.'\\UpperClass')->cl);
 	}
 
@@ -137,10 +136,13 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function boundReturnsTrueWhenBound()
 	{
 		$c = $this->makeContainer();
+		$this->assertEquals(false, $c->isBound('StdClass'));
 		$this->assertEquals(false, $c->isBound('foo'));
 		$this->assertEquals(false, $c->isBound('bar'));
+		$c->bind('StdClass');
 		$c->bind('foo', function() { return 'foo'; });
 		$c->share('bar', function() { return 'foo'; });
+		$this->assertEquals(true, $c->isBound('StdClass'));
 		$this->assertEquals(true, $c->isBound('foo'));
 		$this->assertEquals(true, $c->isBound('bar'));
 	}
@@ -177,6 +179,14 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$c = $this->makeContainer();
 		$this->setExpectedException('Autarky\Container\UnresolvableDependencyException');
 		$c->resolve(__NAMESPACE__.'\\UnresolvableStub');
+	}
+
+	/** @test */
+	public function canResolveWithDependencyDefaultValue()
+	{
+		$c = $this->makeContainer();
+		$obj = $c->resolve(__NAMESPACE__.'\\DefaultValueStub');
+		$this->assertEquals('foo', $obj->value);
 	}
 }
 
@@ -215,4 +225,11 @@ class AwareStub implements StubAwareInterface
 }
 class UnresolvableStub {
 	public function __construct($value) {}
+}
+class DefaultValueStub {
+	public $value;
+	public function __construct($value = 'foo')
+	{
+		$this->value = $value;
+	}
 }
