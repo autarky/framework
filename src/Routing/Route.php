@@ -22,13 +22,39 @@ use Autarky\Container\ContainerInterface;
  */
 class Route
 {
+	/**
+	 * @var \Autarky\Routing\Router
+	 */
 	protected static $router;
 
+	/**
+	 * @var array
+	 */
 	protected $methods;
+
+	/**
+	 * @var string
+	 */
 	protected $pattern;
+
+	/**
+	 * @var string|\Closure
+	 */
 	protected $handler;
+
+	/**
+	 * @var null|string
+	 */
 	protected $name;
+
+	/**
+	 * @var array
+	 */
 	protected $beforeFilters = [];
+
+	/**
+	 * @var array
+	 */
 	protected $afterFilters = [];
 
 	/**

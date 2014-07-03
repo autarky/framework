@@ -30,14 +30,14 @@ interface ErrorHandlerInterface
 	/**
 	 * Set whether the error handler is in debug mode or not.
 	 *
-	 * @param bool $debug
+	 * @param bool $toggle
 	 */
 	public function setDebug($toggle);
 
 	/**
 	 * Set whether exceptions should be handled or rethrown.
 	 *
-	 * @param bool $rethrow
+	 * @param bool $toggle
 	 */
 	public function setRethrow($toggle);
 

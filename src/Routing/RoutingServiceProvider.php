@@ -10,6 +10,7 @@
 
 namespace Autarky\Routing;
 
+use Autarky\Container\ContainerInterface;
 use Autarky\Kernel\ServiceProvider;
 
 /**
@@ -19,7 +20,7 @@ class RoutingServiceProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->getContainer()->share('Autarky\Routing\RouterInterface', function($container) {
+		$this->app->getContainer()->share('Autarky\Routing\RouterInterface', function(ContainerInterface $container) {
 			return new Router(
 				$container,
 				$this->app->getConfig()->get('path.route-cache')

@@ -67,7 +67,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	{
 		$router = $this->makeRouter();
 		$router->defineFilter('foo', function() { return 'from filter'; });
-		$router->group(['before' => 'foo'], function($router) use(&$route) {
+		$router->group(['before' => 'foo'], function(Router $router) use(&$route) {
 			$route = $router->addRoute('get', '/foo', function() {});
 		});
 		$response = $router->dispatch(Request::create('/foo'));
@@ -79,7 +79,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	public function routeGroupPrefix()
 	{
 		$router = $this->makeRouter();
-		$router->group(['prefix' => 'foo'], function($router) use(&$route) {
+		$router->group(['prefix' => 'foo'], function(Router $router) use(&$route) {
 			$route = $router->addRoute('get', '/bar', function() {});
 		});
 		$this->assertEquals('/foo/bar', $route->getPath([]));
@@ -116,7 +116,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	public function prefixesCannotMessUpUris($prefix, $path, $expectedPath)
 	{
 		$router = $this->makeRouter();
-		$router->group(['prefix' => $prefix], function($router) use($path, &$route) {
+		$router->group(['prefix' => $prefix], function(Router $router) use($path, &$route) {
 			$route = $router->addRoute(['get'], $path, function() { return; });
 		});
 		$this->assertEquals($expectedPath, $route->getPath());

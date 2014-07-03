@@ -58,7 +58,7 @@ class PhpFileStore implements ConfigInterface
 
 		$dataKey = $namespace === null ? $group : $namespace .':'. $group;
 		
-		return Arr::set($this->data, $fullKey, $value);
+		Arr::set($this->data, $fullKey, $value);
 	}
 
 	/**

@@ -18,6 +18,9 @@ namespace Autarky\Container;
  */
 abstract class ContainerAware implements ContainerAwareInterface
 {
+	/**
+	 * @var \Autarky\Container\ContainerInterface
+	 */
 	protected $container;
 
 	public function setContainer(ContainerInterface $container)

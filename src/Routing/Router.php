@@ -73,6 +73,11 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	/**
 	 * @var array
 	 */
+	protected $filters = [];
+
+	/**
+	 * @var array
+	 */
 	protected $namedRoutes = [];
 
 	/**
@@ -183,7 +188,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		// if dispatchData is set, we're using cached data and routes can no
 		// longer be added.
 		if (isset($this->dispatchData)) {
-			return;
+			return null;
 		}
 
 		$methods = (array) $methods;
@@ -258,6 +263,11 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		return rtrim($host.$base, '/');
 	}
 
+	/**
+	 * @param  string $name
+	 *
+	 * @return \Autarky\Routing\Route
+	 */
 	protected function getRoute($name)
 	{
 		if (!array_key_exists($name, $this->namedRoutes)) {
@@ -335,7 +345,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 			return call_user_func_array($filter, $args);
 		}
 
-		list($class, $method) = \Autarky\splitclm($filter);
+		list($class, $method) = \Autarky\splitclm($filter, 'filter');
 
 		$obj = $this->container->resolve($class);
 

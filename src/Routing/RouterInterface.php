@@ -50,7 +50,7 @@ interface RouterInterface
 	/**
 	 * Get the current request the router is handling.
 	 *
-	 * @return \Symfoy\Component\HttpFoundation\Request
+	 * @return \Symfony\Component\HttpFoundation\Request
 	 */
 	public function getCurrentRequest();
 

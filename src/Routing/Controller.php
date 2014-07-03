@@ -10,6 +10,7 @@
 
 namespace Autarky\Routing;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -54,11 +55,11 @@ abstract class Controller extends ContainerAware
 	/**
 	 * Get the session manager.
 	 *
-	 * @return \Symfony\Component\HttpFoundation\Session\SessionInterface
+	 * @return \Symfony\Component\HttpFoundation\Session\Session
 	 */
 	protected function getSession()
 	{
-		return $this->container->resolve('Symfony\Component\HttpFoundation\Session\SessionInterface');
+		return $this->container->resolve('Symfony\Component\HttpFoundation\Session\Session');
 	}
 
 	/**
@@ -126,11 +127,11 @@ abstract class Controller extends ContainerAware
 	/**
 	 * Get the event dispatcher instance.
 	 *
-	 * @return \Symfony\Symfony\Component\EventDispatcher\EventDispatcherInterface
+	 * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
 	 */
 	protected function getEventDispatcher()
 	{
-		return $this->container->resolve('Symfony\Symfony\Component\EventDispatcher\EventDispatcherInterface');
+		return $this->container->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 	}
 
 	/**

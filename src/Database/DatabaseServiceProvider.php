@@ -10,6 +10,7 @@
 
 namespace Autarky\Database;
 
+use Autarky\Container\ContainerInterface;
 use Autarky\Kernel\ServiceProvider;
 
 /**
@@ -20,11 +21,11 @@ class DatabaseServiceProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->getContainer()->share('Autarky\Database\MultiPdoContainer', function($container) {
+		$this->app->getContainer()->share('Autarky\Database\MultiPdoContainer', function() {
 			return new MultiPdoContainer($this->app->getConfig());
 		});
 
-		$this->app->getContainer()->share('PDO', function($container) {
+		$this->app->getContainer()->share('PDO', function(ContainerInterface $container) {
 			return $container->resolve('Autarky\Database\MultiPdoContainer')->getPdo();
 		});
 	}

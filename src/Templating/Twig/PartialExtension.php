@@ -44,9 +44,9 @@ class PartialExtension extends Twig_Extension
 	 */
 	public function getPartial($name, array $params = array())
 	{
-		list($class, $method) = \Autarky\splitclm($listener, 'handle');
+		list($class, $method) = \Autarky\splitclm($name, 'handle');
 		$obj = $this->container->resolve($class);
-		return call_user_func_array([$obj, $method], $parameters);
+		return call_user_func_array([$obj, $method], $params);
 	}
 
 	public function getName()

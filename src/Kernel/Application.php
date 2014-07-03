@@ -57,6 +57,11 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected $container;
 
 	/**
+	 * @var \Autarky\Kernel\Errors\ErrorHandlerInterface
+	 */
+	protected $errorHandler;
+
+	/**
 	 * @var \Symfony\Component\Console\Application
 	 */
 	protected $console;
@@ -291,11 +296,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 
 		foreach ($providers as $provider) {
 			$provider = new $provider($this);
-			$provider->register();
-
-			if ($this->console) {
-				$provider->registerConsole($this->console);
-			}
+			$this->registerProvider($provider);
 		}
 
 		foreach ($this->configCallbacks as $callback) {
@@ -303,6 +304,15 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		}
 
 		$this->booted = true;
+	}
+
+	protected function registerProvider(ServiceProvider $provider)
+	{
+		$provider->register();
+
+		if ($this->console) {
+			$provider->registerConsole($this->console);
+		}
 	}
 
 	/**

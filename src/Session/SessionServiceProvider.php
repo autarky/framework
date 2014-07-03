@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 
 use Autarky\Kernel\ServiceProvider;
+use Autarky\Container\ContainerInterface;
 
 /**
  * Service provider for symfony's session classes.
@@ -40,7 +41,7 @@ class SessionServiceProvider extends ServiceProvider
 	{
 		$this->app->getContainer()->share(
 			'SessionHandlerInterface',
-			function ($container) {
+			function (ContainerInterface $container) {
 				switch ($this->app->getConfig()->get('session.handler')) {
 					case 'native':
 						return new \SessionHandler;
@@ -82,7 +83,7 @@ class SessionServiceProvider extends ServiceProvider
 	{
 		$this->app->getContainer()->share(
 			'Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface',
-			function ($container) {
+			function (ContainerInterface $container) {
 				if ($this->app->getConfig()->get('session.mock')) {
 					return new MockArraySessionStorage;
 				}
@@ -98,7 +99,7 @@ class SessionServiceProvider extends ServiceProvider
 	{
 		$this->app->getContainer()->share(
 			'Symfony\Component\HttpFoundation\Session\SessionInterface',
-			function ($container) {
+			function (ContainerInterface $container) {
 				$session = new Session(
 					$container->resolve('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface'),
 					null,

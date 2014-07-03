@@ -11,6 +11,16 @@ use Autarky\Config\ArrayStore;
 
 class TwigEngineTest extends TestCase
 {
+	/**
+	 * @var \Autarky\Kernel\Application
+	 */
+	protected $app;
+
+	/**
+	 * @var \Autarky\Templating\TwigEngine|\Mockery\Mock
+	 */
+	protected $twig;
+
 	public function tearDown()
 	{
 		m::close();

@@ -20,6 +20,9 @@ use Autarky\Kernel\Application;
  */
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
+	protected $app;
+	protected $client;
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -45,7 +48,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 	 * Usually this will simply be a require of your app/start.php file. Make
 	 * sure that this file does return $app; at the end.
 	 *
-	 * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+	 * @return \Autarky\Kernel\Application
 	 */
 	abstract protected function createApplication();
 

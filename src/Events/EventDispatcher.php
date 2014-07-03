@@ -48,6 +48,6 @@ class EventDispatcher extends SymfonyEventDispatcher
 			};
 		}
 
-		return parent::addListener($name, $listener, $priority);
+		parent::addListener($name, $listener, $priority);
 	}
 }

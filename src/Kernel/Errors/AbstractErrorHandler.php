@@ -12,12 +12,11 @@ namespace Autarky\Kernel\Errors;
 
 use Exception;
 use ErrorException;
-use ReflectionClass;
 use ReflectionFunction;
 use SplDoublyLinkedList;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Exception\HttpExceptionInterface;
 use Symfony\Component\Debug\Exception\FatalErrorException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 use Autarky\Kernel\Application;
 
@@ -299,7 +298,9 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	{
 		$exception = $this->makeFatalErrorException();
 
-		if ($exception) return $this->handleUncaught($exception);
+		if ($exception) {
+			$this->handleUncaught($exception);
+		}
 	}
 
 	/**

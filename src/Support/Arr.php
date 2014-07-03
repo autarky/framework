@@ -36,7 +36,7 @@ class Arr
 			}
 
 			if (!is_array($data)) {
-				return $defatult;
+				return $default;
 			}
 
 			$data = $data[$segment];

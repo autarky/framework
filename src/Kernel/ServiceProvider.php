@@ -21,6 +21,11 @@ use Symfony\Component\Console\Application as ConsoleApplication;
  */
 abstract class ServiceProvider
 {
+	/**
+	 * @var \Autarky\Kernel\Application
+	 */
+	protected $app;
+
 	public function __construct($app)
 	{
 		$this->app = $app;
