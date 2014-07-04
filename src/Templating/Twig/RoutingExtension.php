@@ -67,6 +67,7 @@ class RoutingExtension extends Twig_Extension
 			$base = $this->router
 				->getCurrentRequest()
 				->getBaseUrl();
+
 			return $base.$path;
 		}
 
