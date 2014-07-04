@@ -33,7 +33,7 @@
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"Autarky\\Tests\\": "tests/"
+			"Autarky\\Tests\\": "tests/src/"
 		}
 	},
 	"extra": {

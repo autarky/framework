@@ -7,9 +7,14 @@ use Autarky\Config\PhpFileStore;
 
 class PhpFileTest extends PHPUnit_Framework_TestCase
 {
-	public function makeConfig()
+	protected function getConfigPath()
 	{
-		return new PhpFileStore(__DIR__.'/files');
+		return TESTS_RSC_DIR.'/config';
+	}
+
+	protected function makeConfig()
+	{
+		return new PhpFileStore($this->getConfigPath());
 	}
 
 	/** @test */
@@ -63,7 +68,7 @@ class PhpFileTest extends PHPUnit_Framework_TestCase
 	public function addNamespace()
 	{
 		$config = $this->makeConfig();
-		$config->addNamespace('test-ns', __DIR__.'/files/namespace');
+		$config->addNamespace('test-ns', $this->getConfigPath().'/namespace');
 		$this->assertEquals('bar', $config->get('test-ns:testfile.foo'));
 	}
 
