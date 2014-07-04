@@ -14,4 +14,4 @@ before_script:
   - composer install --dev
 
 script:
-  - ./vendor/bin/phpunit
+  - ./vendor/bin/phpunit -c phpunit.dist.xml
