@@ -264,6 +264,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	{
 		$host = $this->currentRequest->getSchemeAndHttpHost();
 		$base = $this->currentRequest->getBaseUrl();
+
 		return rtrim($host.$base, '/');
 	}
 
