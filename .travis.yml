@@ -11,7 +11,8 @@ matrix:
     - php: hhvm
 
 before_script:
-  - composer install --dev
+  - composer self-update
+  - composer install --dev --no-interaction
 
 script:
   - ./vendor/bin/phpunit -c phpunit.dist.xml
