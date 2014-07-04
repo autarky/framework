@@ -30,7 +30,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	{
 		$router = $this->makeRouter(Request::create('/'));
 		$router->addRoute('get', '/foo/{v}', function() {}, 'name');
-		$this->assertEquals('http://localhost/foo/bar', $router->getRouteUrl('name', ['bar']));
+		$this->assertEquals('//localhost/foo/bar', $router->getRouteUrl('name', ['bar']));
 		$this->assertEquals('/foo/bar', $router->getRouteUrl('name', ['bar'], true));
 	}
 
@@ -41,7 +41,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$router->addRoute('get', 'foo/{v}', function() { return 'test'; }, 'name');
 		$response = $router->dispatch(Request::create('/foo/foo'));
 		$this->assertEquals('test', $response->getContent());
-		$this->assertEquals('http://localhost/foo/bar', $router->getRouteUrl('name', ['bar']));
+		$this->assertEquals('//localhost/foo/bar', $router->getRouteUrl('name', ['bar']));
 		$this->assertEquals('/foo/bar', $router->getRouteUrl('name', ['bar'], true));
 	}
 

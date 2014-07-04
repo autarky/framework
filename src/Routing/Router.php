@@ -262,10 +262,10 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	 */
 	public function getRootUrl()
 	{
-		$host = $this->currentRequest->getSchemeAndHttpHost();
+		$host = $this->currentRequest->getHttpHost();
 		$base = $this->currentRequest->getBaseUrl();
 
-		return rtrim($host.$base, '/');
+		return rtrim("//$host/$base", '/');
 	}
 
 	/**
