@@ -142,6 +142,10 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	 */
 	public function defineFilter($name, $handler)
 	{
+		if (isset($this->filters[$name])) {
+			throw new \LogicException("Filter with name $name already defined");
+		}
+
 		$this->filters[$name] = $handler;
 	}
 
