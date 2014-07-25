@@ -32,10 +32,25 @@ abstract class Controller extends ContainerAware
 	 *
 	 * @return string
 	 */
-	protected function view($name, array $data = array())
+	protected function render($name, array $data = array())
 	{
 		return $this->container->resolve('Autarky\Templating\TemplatingEngineInterface')
 			->render($name, $data);
+	}
+
+	/**
+	 * Render a template.
+	 *
+	 * @param  string $name Name of the view.
+	 * @param  array  $data Data to pass to the view.
+	 *
+	 * @return string
+	 *
+	 * @deprecated Deprecated in favour of render()
+	 */
+	protected function view($name, array $data = array())
+	{
+		# code...
 	}
 
 	/**
