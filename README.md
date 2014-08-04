@@ -5,9 +5,10 @@ Read the [wiki](https://github.com/autarky/framework/wiki) for more information.
 Try the framework out by creating a skeleton project using composer:
 
 ```
-curl -sS https://getcomposer.org/installer | php -- --install-dir=bin
-composer.phar create-project autarky/skeleton --prefer-dist ./autarky
-php -S localhost:8000 -t ./autarky/public # visit "localhost:8000" in your browser
+mkdir myproject && cd myproject
+curl -sS https://getcomposer.org/installer | php
+./composer.phar create-project autarky/skeleton:dev-master --prefer-dist .
+php -S localhost:8000 -t ./public # visit "localhost:8000" in your browser
 ```
 
 The contents of this repository is released under the [MIT license](http://opensource.org/licenses/MIT).
