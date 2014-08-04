@@ -50,7 +50,7 @@ abstract class Controller extends ContainerAware
 	 */
 	protected function view($name, array $data = array())
 	{
-		# code...
+		return $this->render($name, $data);
 	}
 
 	/**
