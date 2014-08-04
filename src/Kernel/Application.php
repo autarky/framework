@@ -192,7 +192,6 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	{
 		$this->errorHandler = $errorHandler;
 		$this->errorHandler->setApplication($this);
-		$this->errorHandler->setDebug($this->config->get('app.debug', false));
 		$this->errorHandler->register();
 	}
 
