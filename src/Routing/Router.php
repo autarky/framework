@@ -299,12 +299,12 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 				break;
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
-				throw new NotFoundHttpException('No route match for URL '.$request->getUri());
+				throw new NotFoundHttpException('No route match for path '.$request->getPathInfo() ?: '/');
 				break;
 
 			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				throw new MethodNotAllowedHttpException($result[1], 'Method '.$request->getMethod()
-					.' not allowed for URL '.$request->getUri());
+					.' not allowed for path '.$request->getPathInfo() ?: '/');
 				break;
 
 			default:
