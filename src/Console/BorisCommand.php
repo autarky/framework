@@ -29,7 +29,14 @@ class BorisCommand extends Command
 			throw new \RuntimeException('Install d11wtq/boris via composer to use this command.');
 		}
 
-		restore_error_handler(); restore_exception_handler();
-		(new \Boris\Boris('> '))->start();
+		// prevent the error handler from outputting any information
+		$this->app->getErrorHandler()->prependHandler(function($e) { return ''; });
+
+		$boris = new \Boris\Boris('> ');
+
+		// make the $app variable available
+		$boris->setLocal(['app' => $this->app]);
+
+		$boris->start();
 	}
 }
