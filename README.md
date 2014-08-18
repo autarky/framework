@@ -7,7 +7,7 @@ Try the framework out by creating a skeleton project using composer:
 ```
 mkdir myproject && cd myproject
 curl -sS https://getcomposer.org/installer | php
-./composer.phar create-project autarky/skeleton:dev-master --prefer-dist .
+./composer.phar create-project -s dev autarky/skeleton --prefer-dist .
 php -S localhost:8000 -t ./public # visit "localhost:8000" in your browser
 ```
 
