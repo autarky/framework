@@ -148,16 +148,6 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function awareInterfacesAreBound()
-	{
-		$c = $this->makeContainer();
-		$c->bind('foo', function() { return new \StdClass; });
-		$c->aware(__NAMESPACE__.'\StubAwareInterface', 'setStub', 'foo');
-		$o = $c->resolve(__NAMESPACE__.'\AwareStub');
-		$this->assertInstanceOf('StdClass', $o->stub);
-	}
-
-	/** @test */
 	public function nonExistingClassesThrowsException()
 	{
 		$c = $this->makeContainer();
@@ -209,18 +199,6 @@ class CA implements \Autarky\Container\ContainerAwareInterface
 	public function setContainer(\Autarky\Container\ContainerInterface $container)
 	{
 		$this->container = $container;
-	}
-}
-interface StubAwareInterface
-{
-	public function setStub($stub);
-}
-class AwareStub implements StubAwareInterface
-{
-	public $stub;
-	public function setStub($stub)
-	{
-		$this->stub = $stub;
 	}
 }
 class UnresolvableStub {

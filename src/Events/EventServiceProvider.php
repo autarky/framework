@@ -22,25 +22,28 @@ class EventServiceProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->getContainer()->share(
+		$dic = $this->app->getContainer();
+
+		$dic->share(
 			'Symfony\Component\EventDispatcher\EventDispatcherInterface',
-			function() {
-				return new EventDispatcher($this->app->getContainer());
+			function($dic) {
+				return new EventDispatcher($dic);
 			});
 
-		$this->app->getContainer()->alias(
-			'Autarky\Events\EventDispatcher',
+		$dic->alias('Autarky\Events\EventDispatcher',
 			'Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-		$this->app->getContainer()->aware(
-			'Autarky\Events\EventDispatcherAwareInterface',
-			'setEventDispatcher',
-			'Autarky\Events\EventDispatcher'
-		);
+		$dic->resolvingAny(function($obj, $dic) {
+			if ($obj instanceof EventDispatcherAwareInterface) {
+				$obj->setEventDispatcher($dic->resolve('Autarky\Events\EventDispatcher'));
+			}
+		});
 	}
 
 	public function registerConsole(Application $console)
 	{
-		$console->setDispatcher($this->app->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface'));
+		$eventDispatcher = $this->app->getContainer()
+			->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+		$console->setDispatcher($eventDispatcher);
 	}
 }

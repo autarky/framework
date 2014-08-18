@@ -41,11 +41,12 @@ class Container implements ContainerInterface
 	protected $aliases = [];
 
 	/**
-	 * "Aware interfaces". See ContainerInterface::aware()
+	 * Resolving callbacks.
 	 *
 	 * @var array
 	 */
-	protected $aware = [];
+	protected $resolvingCallbacks = [];
+	protected $resolvingAnyCallbacks = [];
 
 	/**
 	 * {@inheritdoc}
@@ -90,7 +91,7 @@ class Container implements ContainerInterface
 				return $result;
 			};
 		} else {
-			$this->checkAwareInterfaces($concrete);
+			$this->callResolvingCallbacks($abstract, $concrete);
 			$this->instances[$abstract] = $concrete;
 		}
 	}
@@ -114,23 +115,24 @@ class Container implements ContainerInterface
 			$object = $this->build($abstract);
 		}
 
-		$this->checkAwareInterfaces($object);
-
-		return $object;
-	}
-
-	protected function checkAwareInterfaces($object)
-	{
 		if ($object instanceof ContainerAwareInterface) {
 			$object->setContainer($this);
 		}
 
-		foreach ($this->aware as $aware) {
-			if ($object instanceof $aware[0]) {
-				$params = array_map(function($param) {
-					return $this->resolve($param);
-				}, $aware[2]);
-				call_user_func_array([$object, $aware[1]], $params);
+		$this->callResolvingCallbacks($abstract, $object);
+
+		return $object;
+	}
+
+	protected function callResolvingCallbacks($key, $object)
+	{
+		foreach ($this->resolvingAnyCallbacks as $callback) {
+			$callback($object, $this);
+		}
+
+		if (isset($this->resolvingCallbacks[$key])) {
+			foreach ($this->resolvingCallbacks[$key] as $callback) {
+				$callback($object, $this);
 			}
 		}
 	}
@@ -197,8 +199,16 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function aware($interface, $method, $parameters)
+	public function resolving($key, callable $callback)
 	{
-		$this->aware[] = [$interface, $method, (array) $parameters];
+		$this->resolvingCallbacks[$key][] = $callback;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function resolvingAny(callable $callback)
+	{
+		$this->resolvingAnyCallbacks[] = $callback;
 	}
 }
