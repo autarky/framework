@@ -47,11 +47,6 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	protected $dispatchData;
 
 	/**
-	 * @var \Symfony\Component\HttpFoundation\Request
-	 */
-	protected $currentRequest;
-
-	/**
 	 * @var \Autarky\Routing\Route
 	 */
 	protected $currentRoute;
@@ -109,24 +104,6 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
 	{
 		$this->eventDispatcher = $eventDispatcher;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getCurrentRequest()
-	{
-		return $this->currentRequest;
-	}
-
-	public function setCurrentRequest(Request $request)
-	{
-		$this->currentRequest = $request;
-
-		if (isset($this->eventDispatcher)) {
-			$event = new Events\NewRequestEvent($request);
-			$this->eventDispatcher->dispatch('autarky.request', $event);
-		}
 	}
 
 	/**
@@ -243,40 +220,10 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getRouteUrl($name, array $params = array(), $relative = false)
-	{
-		$path = $this->getRoute($name)
-			->getPath($params);
-
-		if ($relative) {
-			$root = $this->currentRequest->getBaseUrl();
-		} else {
-			$root = $this->getRootUrl();
-		}
-
-		return $root.$path;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getRootUrl()
-	{
-		$host = $this->currentRequest->getHttpHost();
-		$base = $this->currentRequest->getBaseUrl();
-
-		return rtrim("//$host/$base", '/');
-	}
-
-	/**
-	 * @param  string $name
-	 *
-	 * @return \Autarky\Routing\Route
-	 */
-	protected function getRoute($name)
+	public function getRoute($name)
 	{
 		if (!array_key_exists($name, $this->namedRoutes)) {
-			throw new \RuntimeException("Route with name $name not found.");
+			throw new \InvalidArgumentException("Route with name $name not found.");
 		}
 
 		return $this->namedRoutes[$name];
@@ -287,7 +234,6 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	 */
 	public function dispatch(Request $request)
 	{
-		$this->setCurrentRequest($request);
 		$this->currentRoute = null;
 
 		$result = $this->getDispatcher()

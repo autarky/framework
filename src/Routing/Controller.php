@@ -63,7 +63,7 @@ abstract class Controller extends ContainerAware
 	 */
 	protected function url($name, array $params = array())
 	{
-		return $this->container->resolve('Autarky\Routing\RouterInterface')
+		return $this->container->resolve('Autarky\Routing\UrlGenerator')
 			->getRouteUrl($name, $params);
 	}
 
@@ -120,7 +120,7 @@ abstract class Controller extends ContainerAware
 	{
 		if ($request === null) {
 			$request = $this->container
-				->resolve('Autarky\Routing\RouterInterface')
+				->resolve('Symfony\Component\HttpFoundation\RequestStack')
 				->getCurrentRequest();
 		}
 

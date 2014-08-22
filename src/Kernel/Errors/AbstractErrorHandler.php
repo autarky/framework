@@ -178,7 +178,7 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	{
 		if ($this->logger === null) return;
 
-		$request = $this->app->getRouter()->getCurrentRequest();
+		$request = $this->app->getRequestStack()->getCurrentRequest();
 		$route = $this->app->getRouter()->getCurrentRoute();
 		$routeName = ($route && $route->getName()) ? $route->getName() : 'No route';
 

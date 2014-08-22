@@ -38,7 +38,7 @@ class TwigEngineTest extends TestCase
 	public function urlGeneration()
 	{
 		$twig = $this->makeTwigEngine(['Autarky\Routing\RoutingServiceProvider']);
-		$this->app->getRouter()->setCurrentRequest(Request::create('/'));
+		$this->app->getRequestStack()->push(Request::create('/'));
 		$this->app->getRouter()
 			->addRoute('GET', '/test/route/{param}', function() {}, 'test.route');
 		$result = $twig->render('urlgeneration.twig');
@@ -59,7 +59,7 @@ class TwigEngineTest extends TestCase
 	public function assetUrl()
 	{
 		$twig = $this->makeTwigEngine(['Autarky\Routing\RoutingServiceProvider']);
-		$this->app->getRouter()->setCurrentRequest(Request::create('/index.php/foo/bar'));
+		$this->app->getRequestStack()->push(Request::create('/index.php/foo/bar'));
 		$result = $twig->render('asseturl.twig');
 		$this->assertEquals('//localhost/asset/test.css.js', $result);
 	}

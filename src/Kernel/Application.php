@@ -16,6 +16,7 @@ use ArrayAccess;
 use SplPriorityQueue;
 use Stack\Builder as StackBuilder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
@@ -82,6 +83,11 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected $configCallbacks;
 
 	/**
+	 * @var \Symfony\Component\HttpFoundation\RequestStack
+	 */
+	protected $requests;
+
+	/**
 	 * Bootstrap the application instance with the default container and config
 	 * loader for convenience.
 	 *
@@ -116,6 +122,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	) {
 		$this->middlewares = new SplPriorityQueue;
 		$this->configCallbacks = new SplStack;
+		$this->requests = new RequestStack;
 
 		$this->setEnvironment($environment);
 		$this->setContainer($container);
@@ -256,6 +263,16 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	}
 
 	/**
+	 * Get the application's request stack.
+	 *
+	 * @return \Symfony\Component\HttpFoundation\RequestStack
+	 */
+	public function getRequestStack()
+	{
+		return $this->requests;
+	}
+
+	/**
 	 * Add a middleware to the application.
 	 *
 	 * @param \Closure|string|array $middleware
@@ -352,6 +369,8 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 */
 	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
+		$this->requests->push($request);
+
 		try {
 			$response = $this->getRouter()->dispatch($request);
 		} catch (\Exception $exception) {
@@ -363,6 +382,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		}
 
 		$response->prepare($request);
+		$this->requests->pop();
 
 		return $response;
 	}

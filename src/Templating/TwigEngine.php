@@ -69,7 +69,7 @@ class TwigEngine implements TemplatingEngineInterface
 
 		$loader->loadCoreExtensions([
 			'PartialExtension',
-			'Autarky\Routing\RoutingServiceProvider' => 'RoutingExtension',
+			'Autarky\Routing\RoutingServiceProvider' => 'UrlGenerationExtension',
 			'Autarky\Session\SessionServiceProvider' => 'SessionExtension',
 		]);
 

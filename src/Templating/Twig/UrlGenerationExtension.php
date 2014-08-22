@@ -13,31 +13,21 @@ namespace Autarky\Templating\Twig;
 use Twig_Extension;
 use Twig_SimpleFunction;
 
-use Autarky\Routing\RouterInterface;
+use Autarky\Routing\UrlGenerator;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Extension for routing functionality in templates.
+ * Extension for url generating functionality in templates.
  *
  * Parts shamelessly stolen from Symfony 2.
  */
-class RoutingExtension extends Twig_Extension
+class UrlGenerationExtension extends Twig_Extension
 {
-	protected $router;
-	protected $assetRoot;
+	protected $urlGenerator;
 
-	public function __construct(RouterInterface $router)
+	public function __construct(UrlGenerator $urlGenerator)
 	{
-		$this->router = $router;
-	}
-
-	/**
-	 * Set the root URL for assets. Useful if you're using CDNs.
-	 *
-	 * @param string $assetRoot
-	 */
-	public function setAssetRoot($assetRoot)
-	{
-		$this->assetRoot = ltrim($assetRoot, '/');
+		$this->urlGenerator = $urlGenerator;
 	}
 
 	public function getFunctions()
@@ -50,28 +40,12 @@ class RoutingExtension extends Twig_Extension
 
 	public function getUrl($name, $parameters = array(), $relative = false)
 	{
-		return $this->router->getRouteUrl($name, $parameters, $relative);
+		return $this->urlGenerator->getRouteUrl($name, $parameters, $relative);
 	}
 
 	public function getAsset($path, $relative = false)
 	{
-		if (substr($path, 0, 1) !== '/') {
-			$path = '/'.$path;
-		}
-
-		if ($this->assetRoot) {
-			return $this->assetRoot.$path;
-		}
-
-		if ($relative) {
-			$base = $this->router
-				->getCurrentRequest()
-				->getBaseUrl();
-
-			return $base.$path;
-		}
-
-		return $this->router->getRootUrl().$path;
+		return $this->urlGenerator->getAssetUrl($path, $relative);
 	}
 
 	/**

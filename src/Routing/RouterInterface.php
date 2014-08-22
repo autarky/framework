@@ -38,28 +38,15 @@ interface RouterInterface
 	public function addRoute($method, $path, $handler, $name = null);
 
 	/**
-	 * Get the URL to a named route.
+	 * Given a route name, get the route object.
 	 *
 	 * @param  string $name
-	 * @param  array  $params
 	 *
-	 * @return string
-	 */
-	public function getRouteUrl($name, array $params = array());
-
-	/**
-	 * Get the current request the router is handling.
+	 * @return \Autarky\Routing\Route
 	 *
-	 * @return \Symfony\Component\HttpFoundation\Request
+	 * @throws \InvalidArgumentException if route with the name does not exist
 	 */
-	public function getCurrentRequest();
-
-	/**
-	 * Get the root URL. Used to generate URLs to assets.
-	 *
-	 * @return string
-	 */
-	public function getRootUrl();
+	public function getRoute($name);
 
 	/**
 	 * Get the route matched to the current request.

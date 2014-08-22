@@ -3,17 +3,16 @@ namespace Autarky\Tests\Routing;
 
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 use Autarky\Container\Container;
 use Autarky\Routing\Router;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
-	public function makeRouter($request = null)
+	public function makeRouter()
 	{
-		$router = new Router(new Container);
-		if ($request) $router->setCurrentRequest($request);
-		return $router;
+		return new Router(new Container);
 	}
 
 	/** @test */
@@ -23,26 +22,6 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$router->addRoute('get', '/foo/{v}', function($v) { return 'v:'.$v; });
 		$response = $router->dispatch(Request::create('/foo/bar'));
 		$this->assertEquals('v:bar', $response->getContent());
-	}
-
-	/** @test */
-	public function urlGeneration()
-	{
-		$router = $this->makeRouter(Request::create('/'));
-		$router->addRoute('get', '/foo/{v}', function() {}, 'name');
-		$this->assertEquals('//localhost/foo/bar', $router->getRouteUrl('name', ['bar']));
-		$this->assertEquals('/foo/bar', $router->getRouteUrl('name', ['bar'], true));
-	}
-
-	/** @test */
-	public function canAddRoutesWithoutLeadingSlash()
-	{
-		$router = $this->makeRouter();
-		$router->addRoute('get', 'foo/{v}', function() { return 'test'; }, 'name');
-		$response = $router->dispatch(Request::create('/foo/foo'));
-		$this->assertEquals('test', $response->getContent());
-		$this->assertEquals('//localhost/foo/bar', $router->getRouteUrl('name', ['bar']));
-		$this->assertEquals('/foo/bar', $router->getRouteUrl('name', ['bar'], true));
 	}
 
 	/** @test */
