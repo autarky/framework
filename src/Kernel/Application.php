@@ -355,6 +355,10 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		try {
 			$response = $this->getRouter()->dispatch($request);
 		} catch (\Exception $exception) {
+			if (!$catch) {
+				throw $e;
+			}
+
 			$response = $this->errorHandler->handle($exception);
 		}
 
