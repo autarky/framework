@@ -15,8 +15,8 @@
 		"symfony/browser-kit": "2.5.*",
 		"symfony/console": "2.5.*",
 		"stack/builder": "1.0.*",
-		"nikic/fast-route": "0.1.*",
-		"twig/twig": "1.15.*",
+		"nikic/fast-route": "0.2.*",
+		"twig/twig": "1.16.*",
 		"monolog/monolog": "1.10.*"
 	},
 	"require-dev": {
