@@ -10,7 +10,6 @@
 
 namespace Autarky\Container;
 
-class UnresolvableDependencyException extends \ReflectionException
+class UnresolvableDependencyException extends ContainerException
 {
-	
 }

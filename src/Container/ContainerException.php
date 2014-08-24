@@ -10,7 +10,8 @@
 
 namespace Autarky\Container;
 
-class NotInstantiableException extends ContainerException
+use ReflectionException;
+
+class ContainerException extends ReflectionException
 {
-	
 }

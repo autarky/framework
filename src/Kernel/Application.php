@@ -20,8 +20,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event as KernelEvent;
+use Symfony\Component\EventDispatcher\Event;
 
 use Autarky\Config\ConfigInterface;
+use Autarky\Container\ContainerException;
 use Autarky\Container\ContainerInterface;
 use Autarky\Kernel\Errors\ErrorHandlerInterface;
 use Autarky\Routing\RouterInterface;
@@ -263,6 +267,20 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	}
 
 	/**
+	 * Get the application's event dispatcher.
+	 *
+	 * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface|null
+	 */
+	public function getEventDispatcher()
+	{
+		try {
+			return $this->container->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+		} catch (ContainerException $e) {
+			return null;
+		}
+	}
+
+	/**
 	 * Get the application's request stack.
 	 *
 	 * @return \Symfony\Component\HttpFoundation\RequestStack
@@ -371,18 +389,37 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	{
 		$this->requests->push($request);
 
+		$event = new KernelEvent\GetResponseEvent($this, $request, $type);
+		$this->dispatchEvent(KernelEvents::REQUEST, $event);
+
+		$response = $event->getResponse() ?: $this->dispatchRequest($request, $type, $catch);
+
+		$event = new KernelEvent\FilterResponseEvent($this, $request, $type, $response);
+		$this->dispatchEvent(KernelEvents::RESPONSE, $event);
+
+		$response->prepare($request);
+		$this->requests->pop();
+
+		$event = new KernelEvent\FinishRequestEvent($this, $request, $type, $response);
+		$this->dispatchEvent(KernelEvents::FINISH_REQUEST, $event);
+
+		return $response;
+	}
+
+	protected function dispatchRequest(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+	{
 		try {
 			$response = $this->getRouter()->dispatch($request);
 		} catch (\Exception $exception) {
 			if (!$catch) {
-				throw $e;
+				throw $exception;
 			}
 
-			$response = $this->errorHandler->handle($exception);
-		}
+			$event = new KernelEvent\GetResponseForExceptionEvent($this, $request, $type, $exception);
+			$this->dispatchEvent(KernelEvents::EXCEPTION, $event);
 
-		$response->prepare($request);
-		$this->requests->pop();
+			$response = $event->getResponse() ?: $this->errorHandler->handle($exception);
+		}
 
 		return $response;
 	}
@@ -392,7 +429,17 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 */
 	public function terminate(Request $request, Response $response)
 	{
-		//
+		$event = new \Symfony\Component\HttpKernel\Event\PostResponseEvent($this, $request, $response);
+		$this->dispatchEvent(KernelEvents::TERMINATE, $event);
+	}
+
+	protected function dispatchEvent($name, Event $event)
+	{
+		if (!$dispatcher = $this->getEventDispatcher()) {
+			return;
+		}
+
+		return $dispatcher->dispatch($name, $event);
 	}
 
 	/**
