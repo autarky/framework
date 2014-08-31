@@ -37,7 +37,7 @@ class SessionServiceProvider extends ServiceProvider
 		$this->registerMiddleware();
 	}
 
-	public function registerSessionHandler()
+	protected function registerSessionHandler()
 	{
 		$this->app->getContainer()->share(
 			'SessionHandlerInterface',
@@ -79,7 +79,7 @@ class SessionServiceProvider extends ServiceProvider
 			});
 	}
 
-	public function registerSessionStorage()
+	protected function registerSessionStorage()
 	{
 		$this->app->getContainer()->share(
 			'Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface',
@@ -95,7 +95,7 @@ class SessionServiceProvider extends ServiceProvider
 			});
 	}
 
-	public function registerSession()
+	protected function registerSession()
 	{
 		$this->app->getContainer()->share(
 			'Symfony\Component\HttpFoundation\Session\SessionInterface',
@@ -115,7 +115,7 @@ class SessionServiceProvider extends ServiceProvider
 		);
 	}
 
-	public function registerMiddleware()
+	protected function registerMiddleware()
 	{
 		$this->app->addMiddleware(__NAMESPACE__.'\Middleware');
 	}

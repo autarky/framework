@@ -178,17 +178,25 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	{
 		if ($this->logger === null) return;
 
+		$this->getLogger()->error($exception, $this->getContext());
+	}
+
+	/**
+	 * Get an array of context data for the application.
+	 *
+	 * @return array
+	 */
+	protected function getContext()
+	{
 		$request = $this->app->getRequestStack()->getCurrentRequest();
 		$route = $this->app->getRouter()->getCurrentRoute();
 		$routeName = ($route && $route->getName()) ? $route->getName() : 'No route';
 
-		$context = [
+		return [
 			'method' => $request ? $request->getMethod() : null,
 			'uri' => $request ? $request->getRequestUri() : null,
 			'name' => $routeName,
 		];
-
-		$this->getLogger()->error($exception, $context);
 	}
 
 	/**

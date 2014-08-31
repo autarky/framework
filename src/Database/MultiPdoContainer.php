@@ -73,7 +73,7 @@ class MultiPdoContainer
 			$connection = $this->defaultConnection;
 		}
 
-		if (isset($this->instances[$connection])) {
+		if (array_key_exists($connection, $this->instances)) {
 			return $this->instances[$connection];
 		}
 

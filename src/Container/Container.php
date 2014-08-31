@@ -13,6 +13,7 @@ namespace Autarky\Container;
 use Closure;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 
 /**
  * Default implementation of the IoC container.
@@ -101,15 +102,15 @@ class Container implements ContainerInterface
 	 */
 	public function resolve($abstract)
 	{
-		if (isset($this->aliases[$abstract])) {
+		if (array_key_exists($abstract, $this->aliases)) {
 			$abstract = $this->aliases[$abstract];
 		}
 
-		if (isset($this->instances[$abstract])) {
+		if (array_key_exists($abstract, $this->instances)) {
 			return $this->instances[$abstract];
 		}
 
-		if (isset($this->factories[$abstract])) {
+		if (array_key_exists($abstract, $this->factories)) {
 			$object = $this->factories[$abstract]($this);
 		} else {
 			$object = $this->build($abstract);
@@ -130,7 +131,7 @@ class Container implements ContainerInterface
 			$callback($object, $this);
 		}
 
-		if (isset($this->resolvingCallbacks[$key])) {
+		if (array_key_exists($key, $this->resolvingCallbacks)) {
 			foreach ($this->resolvingCallbacks[$key] as $callback) {
 				$callback($object, $this);
 			}
@@ -149,30 +150,42 @@ class Container implements ContainerInterface
 			return $reflClass->newInstance();
 		}
 
-		$args = [];
-		$reflMethod = $reflClass->getMethod('__construct');
+		$args = $this->getMethodArguments($reflClass->getMethod('__construct'));
 
-		foreach ($reflMethod->getParameters() as $reflParam) {
-			if (!$paramClass = $reflParam->getClass()) {
-				if ($reflParam->isDefaultValueAvailable()) {
-					$args[] = $reflParam->getDefaultValue();
-				} else {
-					throw new UnresolvableDependencyException('Unresolvable dependency: '
-						.'Argument #'.$reflParam->getPosition().'($'.$reflParam->getName()
-						.') of '.$reflClass->getName().'::__construct');
-				}
-			} else if ($reflParam->isOptional()) {
+		return $reflClass->newInstanceArgs($args);
+	}
+
+	protected function getMethodArguments(ReflectionMethod $method)
+	{
+		$args = [];
+
+		foreach ($method->getParameters() as $param) {
+			// the type-hint of the parameter if typehinted against a class.
+			// otherwise null/false
+			$class = $param->getClass();
+
+			if ($class) {
 				try {
-					$args[] = $this->resolve($paramClass->getName());
-				} catch (ReflectionException $e) {
-					$args[] = null;
+					$args[] = $this->resolve($class->getName());
+				} catch (ReflectionException $exception) {
+					if ($param->isOptional()) {
+						$args[] = null;
+					} else {
+						throw $exception;
+					}
 				}
 			} else {
-				$args[] = $this->resolve($paramClass->getName());
+				if ($param->isDefaultValueAvailable()) {
+					$args[] = $param->getDefaultValue();
+				} else {
+					throw new UnresolvableDependencyException('Unresolvable dependency: '
+						.'Argument #'.$param->getPosition().' ($'.$param->getName()
+						.') of '.$method->getName());
+				}
 			}
 		}
 
-		return $reflClass->newInstanceArgs($args);
+		return $args;
 	}
 
 	/**
@@ -188,12 +201,12 @@ class Container implements ContainerInterface
 	 */
 	public function isBound($abstract)
 	{
-		if (isset($this->aliases[$abstract])) {
+		if (array_key_exists($abstract, $this->aliases)) {
 			$abstract = $this->aliases[$abstract];
 		}
 
-		return isset($this->instances[$abstract])
-			|| isset($this->factories[$abstract]);
+		return array_key_exists($abstract, $this->instances)
+			|| array_key_exists($abstract, $this->factories);
 	}
 
 	/**

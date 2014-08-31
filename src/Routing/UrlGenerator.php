@@ -71,7 +71,7 @@ class UrlGenerator
 			$path = '/'.$path;
 		}
 
-		if (isset($this->assetRoot)) {
+		if ($this->assetRoot !== null) {
 			$base = $this->assetRoot;
 		} else if ($relative) {
 			$base = $this->requests

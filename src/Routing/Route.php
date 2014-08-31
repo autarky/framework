@@ -140,7 +140,6 @@ class Route
 		return $this->afterFilters;
 	}
 
-
 	/**
 	 * Run the route.
 	 *
@@ -217,7 +216,7 @@ class Route
 		$route = new static($data['methods'], $data['pattern'], $data['handler'], $data['name']);
 		$route->beforeFilters = $data['beforeFilters'];
 		$route->afterFilters = $data['afterFilters'];
-		if (isset(static::$router) && $data['name']) {
+		if (static::$router !== null && array_key_exists('name', $data) && $data['name']) {
 			static::$router->addNamedRoute($data['name'], $route);
 		}
 		return $route;

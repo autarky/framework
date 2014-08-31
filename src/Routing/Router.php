@@ -47,6 +47,11 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	protected $dispatchData;
 
 	/**
+	 * @var string|null
+	 */
+	protected $cachePath;
+
+	/**
 	 * @var \Autarky\Routing\Route
 	 */
 	protected $currentRoute;
@@ -119,7 +124,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	 */
 	public function defineFilter($name, $handler)
 	{
-		if (isset($this->filters[$name])) {
+		if (array_key_exists($name, $this->filters)) {
 			throw new \LogicException("Filter with name $name already defined");
 		}
 
@@ -168,7 +173,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	{
 		// if dispatchData is set, we're using cached data and routes can no
 		// longer be added.
-		if (isset($this->dispatchData)) {
+		if ($this->dispatchData !== null) {
 			return null;
 		}
 
@@ -261,7 +266,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 	protected function getResult(Request $request, Route $route, array $args)
 	{
-		if (isset($this->eventDispatcher)) {
+		if ($this->eventDispatcher !== null) {
 			$event = new Events\RouteMatchedEvent($request, $route);
 			$this->eventDispatcher->dispatch('autarky.route-match', $event);
 		}
@@ -305,9 +310,9 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 	protected function getDispatcher()
 	{
-		if (isset($this->dispatchData)) {
+		if ($this->dispatchData !== null) {
 			$dispatchData = $this->dispatchData;
-		} else if (isset($this->routeCollector)) {
+		} else if ($this->routeCollector !== null) {
 			$dispatchData = $this->generateDispatchData();
 		} else {
 			throw new \RuntimeException('No dipsatch data or route collector set');
@@ -320,7 +325,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	{
 		$data = $this->routeCollector->getData();
 
-		if (isset($this->cachePath)) {
+		if ($this->cachePath !== null) {
 			file_put_contents(
 				$this->cachePath,
 				'<?php return ' . var_export($data, true) . ';'

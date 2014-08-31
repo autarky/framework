@@ -28,7 +28,7 @@ class Configuration
 
 	public function override($name, array $routeData)
 	{
-		if (!isset($this->routes[$name])) {
+		if (!array_key_exists($name, $this->routes)) {
 			throw new \InvalidArgumentException("No route for name $name defined");
 		}
 
@@ -63,9 +63,9 @@ class Configuration
 			$path = $route['path'];
 			$handler = $route['handler'];
 
-			if (isset($route['methods'])) {
+			if (array_key_exists('methods', $route)) {
 				$methods = (array) $route['methods'];
-			} else if (isset($route['method'])) {
+			} else if (array_key_exists('method', $route)) {
 				$methods = (array) $route['method'];
 			} else {
 				$methods = ['GET'];

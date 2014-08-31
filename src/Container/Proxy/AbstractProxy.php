@@ -37,7 +37,7 @@ abstract class AbstractProxy
 	{
 		$key = static::getProxyIocKey();
 
-		if (!isset(static::$instances[$key])) {
+		if (!array_key_exists($key, static::$instances)) {
 			static::$instances[$key] = static::resolveProxyInstance();
 		}
 
