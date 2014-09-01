@@ -2,13 +2,20 @@
 
 Read the [wiki](https://github.com/autarky/framework/wiki) for more information.
 
-Try the framework out by creating a skeleton project using composer:
+Try the framework out by creating a skeleton project using composer.
+
+If you don't have composer installed already:
 
 ```
-mkdir myproject && cd myproject
 curl -sS https://getcomposer.org/installer | php
-./composer.phar create-project -s dev autarky/skeleton --prefer-dist .
-php -S localhost:8000 -t ./public # visit "localhost:8000" in your browser
+chmod +x composer.phar && mv composer.phar /usr/local/bin/composer
+```
+
+Create the skeleton project using composer:
+
+```
+composer create-project -s dev autarky/skeleton --prefer-dist ./myproject
+cd myproject && php -S localhost:8000 -t ./public
 ```
 
 The contents of this repository is released under the [MIT license](http://opensource.org/licenses/MIT).
