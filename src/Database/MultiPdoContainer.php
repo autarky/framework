@@ -88,7 +88,9 @@ class MultiPdoContainer
 			throw new \InvalidArgumentException("Connection $connection not defined");
 		}
 
+		$configOptions = array_key_exists('options', $config) ? $config['options'] : [];
+
 		return new PDO($config['dsn'], $config['username'], $config['password'],
-			($config['options'] ?: []) + $this->defaultPdoOptions);
+			$configOptions + $this->defaultPdoOptions);
 	}
 }
