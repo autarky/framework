@@ -10,26 +10,26 @@
 
 namespace Autarky\Kernel;
 
-use Closure;
-use SplStack;
 use ArrayAccess;
+use Closure;
 use SplPriorityQueue;
+use SplStack;
 use Stack\Builder as StackBuilder;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\TerminableInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event as KernelEvent;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\TerminableInterface;
 
 use Autarky\Config\ConfigInterface;
+use Autarky\Console\Application as ConsoleApplication;
 use Autarky\Container\ContainerException;
 use Autarky\Container\ContainerInterface;
 use Autarky\Kernel\Errors\ErrorHandlerInterface;
 use Autarky\Routing\RouterInterface;
-use Autarky\Console\Application as ConsoleApplication;
 
 /**
  * The main application of the framework.
