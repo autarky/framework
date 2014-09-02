@@ -20,15 +20,47 @@ class TwigServiceProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->getContainer()->share(
-			'Autarky\Templating\TemplatingEngineInterface',
-			function() {
-				return new TwigEngine($this->app);
-			});
+		$dic = $this->app->getContainer();
 
-		$this->app->getContainer()->alias(
-			'Autarky\Templating\TwigEngine',
+		$dic->share('Twig_Environment', [$this, 'makeTwigEnvironment']);
+
+		$dic->share('Autarky\Templating\TemplatingEngineInterface',
+			[$this, 'makeTwigEngine']);
+
+		$dic->alias('Autarky\Templating\TwigEngine',
 			'Autarky\Templating\TemplatingEngineInterface'
 		);
+	}
+
+	public function makeTwigEnvironment()
+	{
+		$config = $this->app->getConfig();
+		$loader = new Twig\FileLoader($config->get('path.templates'));
+
+		return new \Twig_Environment($loader, [
+			'cache' => $config->get('path.templates-cache'),
+			'debug' => $config->get('app.debug'),
+		]);
+	}
+
+	public function makeTwigEngine($dic)
+	{
+		$env = $dic->resolve('Twig_Environment');
+
+		$engine = new TwigEngine($env);
+
+		$loader = new Twig\ExtensionsLoader($env, $this->app);
+
+		$loader->loadCoreExtensions([
+			'PartialExtension',
+			'Autarky\Routing\RoutingServiceProvider' => 'UrlGenerationExtension',
+			'Autarky\Session\SessionServiceProvider' => 'SessionExtension',
+		]);
+
+		if ($extensions = $this->app->getConfig()->get('twig.extensions')) {
+			$loader->loadUserExtensions($extensions);
+		}
+
+		return $engine;
 	}
 }

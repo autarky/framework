@@ -63,7 +63,7 @@ class Container implements ContainerInterface
 
 	protected function getFactory($concrete)
 	{
-		if ($concrete instanceof Closure) {
+		if (is_callable($concrete)) {
 			return $concrete;
 		}
 
@@ -85,7 +85,7 @@ class Container implements ContainerInterface
 			$concrete = $this->getFactory($concrete);
 		}
 
-		if ($concrete instanceof Closure) {
+		if (is_callable($concrete)) {
 			$this->factories[$abstract] = function($container) use($abstract, $concrete) {
 				$result = $concrete($container);
 				$this->instances[$abstract] = $result;

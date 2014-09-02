@@ -34,7 +34,7 @@ abstract class Controller extends ContainerAware
 	 */
 	protected function render($name, array $data = array())
 	{
-		return $this->container->resolve('Autarky\Templating\TemplatingEngineInterface')
+		return $this->container->resolve('Autarky\Templating\TemplateManager')
 			->render($name, $data);
 	}
 
