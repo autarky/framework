@@ -178,6 +178,23 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$obj = $c->resolve(__NAMESPACE__.'\\DefaultValueStub');
 		$this->assertEquals('foo', $obj->value);
 	}
+
+	/** @test */
+	public function resolvingCallbacksAreCalled()
+	{
+		$c = $this->makeContainer();
+		$c->bind('foo', function() { return new \StdClass; });
+		$c->resolving('foo', function($o, $c) { $o->bar = 'baz'; });
+		$this->assertEquals('baz', $c->resolve('foo')->bar);
+	}
+
+	/** @test */
+	public function resolvingAnyCallbacksAreCalled()
+	{
+		$c = $this->makeContainer();
+		$c->resolvingAny(function($o, $c) { $o->bar = 'baz'; });
+		$this->assertEquals('baz', $c->resolve('StdClass')->bar);
+	}
 }
 
 class LowerClass {}

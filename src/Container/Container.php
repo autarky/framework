@@ -128,12 +128,12 @@ class Container implements ContainerInterface
 	protected function callResolvingCallbacks($key, $object)
 	{
 		foreach ($this->resolvingAnyCallbacks as $callback) {
-			$callback($object, $this);
+			call_user_func($callback, $object, $this);
 		}
 
 		if (array_key_exists($key, $this->resolvingCallbacks)) {
 			foreach ($this->resolvingCallbacks[$key] as $callback) {
-				$callback($object, $this);
+				call_user_func($callback, $object, $this);
 			}
 		}
 	}
