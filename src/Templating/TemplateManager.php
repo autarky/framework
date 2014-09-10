@@ -11,8 +11,10 @@
 namespace Autarky\Templating;
 
 use Autarky\Kernel\Application;
+use Autarky\Events\EventDispatcherAwareInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class TemplateManager
+class TemplateManager implements EventDispatcherAwareInterface
 {
 	/**
 	 * @var \Autarky\Kernel\Application
@@ -24,10 +26,7 @@ class TemplateManager
 	 */
 	protected $engine;
 
-	/**
-	 * @var array
-	 */
-	protected $contextHandlers = [];
+	protected $eventDispatcher;
 
 	public function __construct(Application $app, TemplatingEngineInterface $engine)
 	{
@@ -35,45 +34,55 @@ class TemplateManager
 		$this->engine = $engine;
 	}
 
+	public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+	{
+		$this->eventDispatcher = $dispatcher;
+	}
+
 	public function render($name, array $context = array())
 	{
 		$template = $this->getTemplate($name, $context);
 
-		$this->callContextHandlers($template);
+		if ($this->eventDispatcher !== null) {
+			$this->eventDispatcher->dispatch(
+				'autarky.template.rendering: '.$template->getName(),
+				new Events\RenderingTemplateEvent($template)
+			);
+		}
 
 		return $this->engine->render($template);
 	}
 
 	protected function getTemplate($name, array $context)
 	{
-		return new Template($name, $context);
-	}
+		$template = new Template($name, $context);
 
-	protected function callContextHandlers($template)
-	{
-		if (!array_key_exists($template->getName(), $this->contextHandlers)) {
-			return;
+		if ($this->eventDispatcher !== null) {
+			$this->eventDispatcher->dispatch(
+				'autarky.template.creating: '.$template->getName(),
+				new Events\CreatingTemplateEvent($template)
+			);
 		}
 
-		foreach ($this->contextHandlers[$template->getName()] as $handler) {
-			$this->callContextHandler($handler, $template);
-		}
+		return $template;
 	}
 
-	protected function callContextHandler($handler, $template)
+	public function creating($name, $handler, $priority = 0)
 	{
-		if ($handler instanceof \Closure) {
-			return $handler($template);
-		}
-
-		list($class, $method) = \Autarky\splitclm($handler, 'getContext');
-		$obj = $this->app->resolve($class);
-
-		return $obj->$method($template);
+		$this->addEventListener('creating', $name, $handler, $priority = 0);
 	}
 
-	public function registerContextHandler($template, $handler)
+	public function rendering($name, $handler, $priority = 0)
 	{
-		$this->contextHandlers[$template][] = $handler;
+		$this->addEventListener('rendering', $name, $handler, $priority = 0);
+	}
+
+	protected function addEventListener($event, $name, $handler, $priority = 0)
+	{
+		if ($this->eventDispatcher === null) {
+			throw new \RuntimeException('Cannot register templating event listeners without first setting the EventDispatcher on the TemplateManager.');
+		}
+
+		$this->eventDispatcher->addListener("autarky.template.$event: $name", $handler, $priority);
 	}
 }

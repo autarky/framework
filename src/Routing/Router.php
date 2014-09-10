@@ -268,7 +268,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	{
 		if ($this->eventDispatcher !== null) {
 			$event = new Events\RouteMatchedEvent($request, $route);
-			$this->eventDispatcher->dispatch('autarky.route-match', $event);
+			$this->eventDispatcher->dispatch('autarky.router.match', $event);
 		}
 
 		$this->currentRoute = $route;
