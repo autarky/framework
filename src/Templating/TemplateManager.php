@@ -17,20 +17,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class TemplateManager implements EventDispatcherAwareInterface
 {
 	/**
-	 * @var \Autarky\Kernel\Application
-	 */
-	protected $app;
-
-	/**
 	 * @var \Autarky\Templating\TemplatingEngineInterface
 	 */
 	protected $engine;
 
+	/**
+	 * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+	 */
 	protected $eventDispatcher;
 
-	public function __construct(Application $app, TemplatingEngineInterface $engine)
+	public function __construct(TemplatingEngineInterface $engine)
 	{
-		$this->app = $app;
 		$this->engine = $engine;
 	}
 
