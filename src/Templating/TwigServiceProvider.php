@@ -22,14 +22,15 @@ class TwigServiceProvider extends ServiceProvider
 	{
 		$dic = $this->app->getContainer();
 
+		$dic->share('Autarky\Templating\TemplateManager');
+
 		$dic->share('Twig_Environment', [$this, 'makeTwigEnvironment']);
 
 		$dic->share('Autarky\Templating\TemplatingEngineInterface',
 			[$this, 'makeTwigEngine']);
 
 		$dic->alias('Autarky\Templating\TwigEngine',
-			'Autarky\Templating\TemplatingEngineInterface'
-		);
+			'Autarky\Templating\TemplatingEngineInterface');
 	}
 
 	public function makeTwigEnvironment()

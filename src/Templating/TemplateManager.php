@@ -31,11 +31,22 @@ class TemplateManager implements EventDispatcherAwareInterface
 		$this->engine = $engine;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function setEventDispatcher(EventDispatcherInterface $dispatcher)
 	{
 		$this->eventDispatcher = $dispatcher;
 	}
 
+	/**
+	 * Render a template.
+	 *
+	 * @param  string $name
+	 * @param  array  $context
+	 *
+	 * @return string
+	 */
 	public function render($name, array $context = array())
 	{
 		$template = $this->getTemplate($name, $context);

@@ -12,7 +12,18 @@ namespace Autarky\Templating;
 
 class Template
 {
+	/**
+	 * The name of the template - usually its file path.
+	 *
+	 * @var string
+	 */
 	protected $name;
+
+	/**
+	 * The context of the template.
+	 *
+	 * @var TemplateContext
+	 */
 	protected $context;
 
 	public function __construct($name, array $context = array())
@@ -21,11 +32,21 @@ class Template
 		$this->context = new TemplateContext($context);
 	}
 
+	/**
+	 * Get the name of the template.
+	 *
+	 * @return string
+	 */
 	public function getName()
 	{
 		return $this->name;
 	}
 
+	/**
+	 * Get the template's context.
+	 *
+	 * @return TemplateContext
+	 */
 	public function getContext()
 	{
 		return $this->context;
