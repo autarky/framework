@@ -9,10 +9,14 @@ use Autarky\Kernel\Errors\SymfonyErrorHandler;
 
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
-	protected function makeApplication()
+	protected function makeApplication($providers = array())
 	{
 		$errorHandler = $this->makeErrorHandler();
-		return new Application('testing', new Container, new ArrayStore, $errorHandler);
+		$app = new Application('testing', new Container, new ArrayStore, $errorHandler);
+		if ($providers) {
+			$app->getConfig()->set('app.providers', (array) $providers);
+		}
+		return $app;
 	}
 
 	protected function makeErrorHandler()

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TwigEngineTest extends TestCase
 {
-	protected function makeApplication(array $providers = array())
+	protected function makeApplication($providers = array())
 	{
 		$app = parent::makeApplication();
 		$app->getConfig()->set('path.templates', TESTS_RSC_DIR.'/templates');
