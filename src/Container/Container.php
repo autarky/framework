@@ -140,6 +140,10 @@ class Container implements ContainerInterface
 
 	protected function build($class)
 	{
+		if (!class_exists($class)) {
+			throw new NotInstantiableException("Class $class does not exist");
+		}
+
 		$reflClass = new ReflectionClass($class);
 
 		if (!$reflClass->isInstantiable()) {
