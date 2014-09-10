@@ -39,7 +39,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	/**
 	 * The framework version.
 	 */
-	const VERSION = '0.3.x';
+	const VERSION = '0.3.0';
 
 	/**
 	 * @var \SplPriorityQueue
