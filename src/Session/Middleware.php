@@ -22,12 +22,14 @@ use Autarky\Kernel\Application;
  */
 class Middleware implements HttpKernelInterface
 {
+	protected $kernel;
 	protected $app;
 	protected $session;
 	protected $forceStart;
 
-	public function __construct(Application $app)
+	public function __construct(HttpKernelInterface $kernel, Application $app)
 	{
+		$this->kernel = $kernel;
 		$this->app = $app;
 		$this->session = $app->getContainer()
 			->resolve('Symfony\Component\HttpFoundation\Session\SessionInterface');
@@ -55,7 +57,7 @@ class Middleware implements HttpKernelInterface
 			$this->session->start();
 		}
 
-		$response = $this->app->handle($request, $type, $catch);
+		$response = $this->kernel->handle($request, $type, $catch);
 
 		if ($this->session->isStarted()) {
 			$this->session->save();

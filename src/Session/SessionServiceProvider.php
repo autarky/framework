@@ -117,6 +117,6 @@ class SessionServiceProvider extends ServiceProvider
 
 	protected function registerMiddleware()
 	{
-		$this->app->addMiddleware(__NAMESPACE__.'\Middleware');
+		$this->app->addMiddleware([__NAMESPACE__.'\Middleware', $this->app]);
 	}
 }
