@@ -13,8 +13,11 @@ namespace Autarky\Templating\Events;
 use Symfony\Component\EventDispatcher\Event;
 use Autarky\Templating\Template;
 
-abstract class AbstractTemplateEvent extends Event
+class TemplateEvent extends Event
 {
+	/**
+	 * @var Template
+	 */
 	protected $template;
 
 	public function __construct(Template $template)
@@ -22,11 +25,21 @@ abstract class AbstractTemplateEvent extends Event
 		$this->template = $template;
 	}
 
+	/**
+	 * Get the template instance.
+	 *
+	 * @return Template
+	 */
 	public function getTemplate()
 	{
 		return $this->template;
 	}
 
+	/**
+	 * Get the template's context instance.
+	 *
+	 * @return \Autarky\Templating\TemplateContext
+	 */
 	public function getContext()
 	{
 		return $this->template->getContext();

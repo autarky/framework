@@ -49,37 +49,48 @@ class TemplateManager implements EventDispatcherAwareInterface
 	 */
 	public function render($name, array $context = array())
 	{
-		$template = $this->getTemplate($name, $context);
+		$template = new Template($name, $context);
+		$event = new Events\TemplateEvent($template);
 
 		if ($this->eventDispatcher !== null) {
-			$this->eventDispatcher->dispatch(
-				'autarky.template.rendering: '.$template->getName(),
-				new Events\RenderingTemplateEvent($template)
-			);
+			$this->dispatchTemplateEvents($template);
 		}
 
 		return $this->engine->render($template);
 	}
 
-	protected function getTemplate($name, array $context)
+	protected function dispatchTemplateEvents($template)
 	{
-		$template = new Template($name, $context);
+		$event = new Events\TemplateEvent($template);
 
-		if ($this->eventDispatcher !== null) {
-			$this->eventDispatcher->dispatch(
-				'autarky.template.creating: '.$template->getName(),
-				new Events\CreatingTemplateEvent($template)
-			);
-		}
+		$this->eventDispatcher->dispatch('autarky.template.creating: '.$template->getName(), $event);
 
-		return $template;
+		$this->eventDispatcher->dispatch('autarky.template.rendering: '.$template->getName(), $event);
 	}
 
+	/**
+	 * Register an event listener for when a template is being created.
+	 *
+	 * @param  string           $name
+	 * @param  \Closure|string  $handler
+	 * @param  integer          $priority
+	 *
+	 * @return void
+	 */
 	public function creating($name, $handler, $priority = 0)
 	{
 		$this->addEventListener('creating', $name, $handler, $priority = 0);
 	}
 
+	/**
+	 * Register an event listener for when a template is being rendered.
+	 *
+	 * @param  string           $name
+	 * @param  \Closure|string  $handler
+	 * @param  integer          $priority
+	 *
+	 * @return void
+	 */
 	public function rendering($name, $handler, $priority = 0)
 	{
 		$this->addEventListener('rendering', $name, $handler, $priority = 0);
