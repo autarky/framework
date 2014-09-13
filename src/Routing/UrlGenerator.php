@@ -14,8 +14,21 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class UrlGenerator
 {
+	/**
+	 * @var RouterInterface
+	 */
 	protected $router;
+
+	/**
+	 * @var RequestStack
+	 */
 	protected $requests;
+
+	/**
+	 * The root URL to use for assets, if any.
+	 *
+	 * @var null|string
+	 */
 	protected $assetRoot;
 
 	public function __construct(RouterInterface $router, RequestStack $requests)

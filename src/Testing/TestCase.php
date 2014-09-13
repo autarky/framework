@@ -20,7 +20,18 @@ use Autarky\Kernel\Application;
  */
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
+	/**
+	 * The application instance.
+	 *
+	 * @var \Autarky\Kernel\Application
+	 */
 	protected $app;
+
+	/**
+	 * The browserkit client instance.
+	 *
+	 * @var \Autarky\Testing\Client
+	 */
 	protected $client;
 
 	/**
