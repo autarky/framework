@@ -104,4 +104,17 @@ class TemplateManager implements EventDispatcherAwareInterface
 
 		$this->eventDispatcher->addListener("autarky.template.$event: $name", $handler, $priority);
 	}
+
+	/**
+	 * Add a global variable.
+	 *
+	 * @param  string $name
+	 * @param  mixed  $value
+	 *
+	 * @return void
+	 */
+	public function addGlobalVariable($name, $value)
+	{
+		$this->engine->addGlobal($name, $value);
+	}
 }
