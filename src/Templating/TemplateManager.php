@@ -50,7 +50,6 @@ class TemplateManager implements EventDispatcherAwareInterface
 	public function render($name, array $context = array())
 	{
 		$template = new Template($name, $context);
-		$event = new Events\TemplateEvent($template);
 
 		if ($this->eventDispatcher !== null) {
 			$this->dispatchTemplateEvents($template);
