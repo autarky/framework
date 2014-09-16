@@ -107,7 +107,7 @@ trait NamespacedResourceResolver
 			return $path .'/'. $namespace;
 		}, $this->getDefaultLocations());
 
-		return $this->locations[$namespace] + $overrides;
+		return array_merge($this->locations[$namespace], $overrides);
 	}
 
 	/**

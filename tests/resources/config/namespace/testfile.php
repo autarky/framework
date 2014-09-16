@@ -1,2 +1,4 @@
 <?php
-return ['foo' => 'bar'];
+return [
+	'one' => 'ONE',
+];
