@@ -46,6 +46,14 @@ class RouteTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException('InvalidArgumentException');
 		$route->getPath(['v1']);
 	}
+
+	/** @test */
+	public function extraParamsAreAddedAsQueryString()
+	{
+		$route = new Route(['get'], '/{v1}', function() { return 'OK'; });
+		$path = $route->getPath(['v1', 'foo' => 'bar']);
+		$this->assertEquals('/v1?foo=bar', $path);
+	}
 }
 
 class RouteHandlerStub

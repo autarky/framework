@@ -91,6 +91,11 @@ class Route
 
 		$path = preg_replace_callback('/\{\w+\}/', $callback, $this->pattern);
 
+		if (count($params) > 0) {
+			$path .= '?';
+			$path .= http_build_query($params);
+		}
+
 		return $path;
 	}
 
