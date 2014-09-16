@@ -4,10 +4,10 @@ namespace Autarky\Tests\Config;
 use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
-use Autarky\Config\ConfigStore;
+use Autarky\Config\FileStore;
 use Autarky\Config\LoaderFactory;
 
-class PhpFileTest extends PHPUnit_Framework_TestCase
+class FileStoreTest extends PHPUnit_Framework_TestCase
 {
 	protected function getConfigPath()
 	{
@@ -18,7 +18,7 @@ class PhpFileTest extends PHPUnit_Framework_TestCase
 	{
 		$loaderFactory = new LoaderFactory(new \Autarky\Container\Container);
 		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
-		return new ConfigStore($loaderFactory, $this->getConfigPath());
+		return new FileStore($loaderFactory, $this->getConfigPath());
 	}
 
 	/** @test */

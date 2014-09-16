@@ -13,26 +13,25 @@ namespace Autarky\Config;
 use Autarky\Support\NamespacedResourceResolver;
 use Autarky\Support\Arr;
 
-/**
- * Config store using .php files. Said .php files should return an array of
- * config values. Example:
- *
- * config/foo.php
- * return ['bar' => 'baz'];
- * PhpFileStore::get('foo.bar') == 'baz'
- */
-class PhpFileStore implements ConfigInterface
+class FileStore implements ConfigInterface
 {
 	use NamespacedResourceResolver;
 
+	protected $loaderFactory;
 	protected $data = [];
 
 	/**
 	 * @param string $path Path to config files in the global namespace.
 	 */
-	public function __construct($path)
+	public function __construct(LoaderFactory $loaderFactory, $path)
 	{
+		$this->loaderFactory = $loaderFactory;
 		$this->setLocation($path);
+	}
+
+	public function getLoaderFactory()
+	{
+		return $this->loaderFactory;
 	}
 
 	/**
@@ -89,21 +88,29 @@ class PhpFileStore implements ConfigInterface
 	protected function loadData($namespace, $group, $dataKey)
 	{
 		$locations = $this->getLocations($namespace);
+		$extensions = $this->loaderFactory->getExtensions();
 		$data = [];
 
 		// iterate through possible locations and merge the data array.
 		// locations are sorted so that overrrides come last.
 		foreach ($locations as $location) {
-			$path = $location .'/'. $group .'.php';
-			if (file_exists($path)) {
-				$fileData = require $path;
-				if (!is_array($fileData)) {
-					throw new \InvalidArgumentException("Config file $path must return an array");
+			foreach ($extensions as $extension) {
+				$path = "{$location}/{$group}.{$extension}";
+				if (file_exists($path)) {
+					$fileData = $this->getDataFromFile($path);
+					$data = array_merge($data, $fileData);
+					break;
 				}
-				$data = array_merge($data, $fileData);
 			}
 		}
 
 		$this->data[$dataKey] = $data;
+	}
+
+	public function getDataFromFile($path)
+	{
+		$loader = $this->loaderFactory->getForPath($path);
+
+		return $loader->load($path);
 	}
 }

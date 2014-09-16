@@ -113,7 +113,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 
 		$loaderFactory = new \Autarky\Config\LoaderFactory($container);
 		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
-		$config = new \Autarky\Config\ConfigStore($loaderFactory);
+		$config = new \Autarky\Config\FileStore($loaderFactory);
 
 		$errorHandler = new \Autarky\Kernel\Errors\SymfonyErrorHandler;
 
