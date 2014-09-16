@@ -80,13 +80,18 @@ class Route
 	 */
 	public function getPath(array $params = array())
 	{
-		if (empty($params)) return $this->pattern;
-
 		// for each regex match in $this->pattern, get the first param in
 		// $params and replace the match with that
-		return preg_replace_callback('/\{\w+\}/', function ($match) use (&$params) {
+		$callback = function ($match) use (&$params, &$matches) {
+			if (count($params) < 1) {
+				throw new \InvalidArgumentException('Too few parameters given');
+			}
 			return array_shift($params);
-		}, $this->pattern);
+		};
+
+		$path = preg_replace_callback('/\{\w+\}/', $callback, $this->pattern);
+
+		return $path;
 	}
 
 	/**

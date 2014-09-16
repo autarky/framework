@@ -38,6 +38,14 @@ class RouteTest extends PHPUnit_Framework_TestCase
 		$route = new Route(['get'], '/request/{v}', __NAMESPACE__.'\RouteHandlerStub:handleRequest');
 		$this->assertEquals('foo', $route->run(Request::create('/'), ['foo']));
 	}
+
+	/** @test */
+	public function tooFewParamsThrowsException()
+	{
+		$route = new Route(['get'], '/{v1}/{v2}', function() { return 'OK'; });
+		$this->setExpectedException('InvalidArgumentException');
+		$route->getPath(['v1']);
+	}
 }
 
 class RouteHandlerStub
