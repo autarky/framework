@@ -10,11 +10,11 @@
 
 namespace Autarky\Templating\Twig\Extension;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig_Extension;
 use Twig_SimpleFunction;
 
 use Autarky\Routing\UrlGenerator;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Extension for url generating functionality in templates.

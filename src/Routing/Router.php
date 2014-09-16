@@ -25,12 +25,15 @@ use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 use Autarky\Container\ContainerInterface;
 use Autarky\Container\ContainerAwareInterface;
 use Autarky\Events\EventDispatcherAwareInterface;
+use Autarky\Events\EventDispatcherAwareTrait;
 
 /**
  * FastRoute implementation of the router.
  */
 class Router implements RouterInterface, EventDispatcherAwareInterface
 {
+	use EventDispatcherAwareTrait;
+
 	/**
 	 * @var \Autarky\Container\ContainerInterface
 	 */
@@ -80,11 +83,6 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	 */
 	protected $namedRoutes = [];
 
-	/**
-	 * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-	 */
-	protected $eventDispatcher;
-
 	public function __construct(ContainerInterface $container, $cachePath = null)
 	{
 		$this->container = $container;
@@ -101,14 +99,6 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		$this->routeCollector = new RouteCollector(
 			new RouteParser, new DataGenerator
 		);
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
-	{
-		$this->eventDispatcher = $eventDispatcher;
 	}
 
 	/**
@@ -268,7 +258,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	{
 		if ($this->eventDispatcher !== null) {
 			$event = new Events\RouteMatchedEvent($request, $route);
-			$this->eventDispatcher->dispatch('autarky.router.match', $event);
+			$this->eventDispatcher->dispatch('route.match', $event);
 		}
 
 		$this->currentRoute = $route;

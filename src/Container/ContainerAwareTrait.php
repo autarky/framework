@@ -11,18 +11,22 @@
 namespace Autarky\Container;
 
 /**
- * Simple implementation of ContainerAwareInterface that other classes can
- * extend from.
+ * Simple implementation of ContainerAwareInterface that other classes can use..
  *
  * @see ContainerAwareInterface
  */
-abstract class ContainerAware implements ContainerAwareInterface
+trait ContainerAwareTrait
 {
 	/**
-	 * @var \Autarky\Container\ContainerInterface
+	 * @var ContainerInterface
 	 */
 	protected $container;
 
+	/**
+	 * Set the container instance.
+	 *
+	 * @param ContainerInterface $container
+	 */
 	public function setContainer(ContainerInterface $container)
 	{
 		$this->container = $container;

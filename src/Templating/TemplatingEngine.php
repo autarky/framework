@@ -10,9 +10,9 @@
 
 namespace Autarky\Templating;
 
-use Autarky\Kernel\Application;
-use Autarky\Events\EventDispatcherAwareInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Autarky\Events\EventDispatcherAwareInterface;
 
 class TemplatingEngine implements EventDispatcherAwareInterface
 {
@@ -78,7 +78,7 @@ class TemplatingEngine implements EventDispatcherAwareInterface
 			throw new \RuntimeException('Cannot register templating event listeners without first setting the EventDispatcher on the TemplateManager.');
 		}
 
-		$this->eventDispatcher->addListener("autarky.template.$event: $name", $handler, $priority);
+		$this->eventDispatcher->addListener("template.$event: $name", $handler, $priority);
 	}
 
 	/**
@@ -95,7 +95,12 @@ class TemplatingEngine implements EventDispatcherAwareInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * Register a template namespace.
+	 *
+	 * @param  string $namespace
+	 * @param  string $location
+	 *
+	 * @return void
 	 */
 	public function addNamespace($namespace, $location)
 	{

@@ -99,13 +99,13 @@ class TwigEngineIntegrationTest extends TestCase
 		$eng->rendering('template.twig', $callback);
 		$eng->creating('layout.twig', $callback);
 		$eng->rendering('layout.twig', $callback);
-		$eng->render('template.twig');
 		$expected = [
-			'autarky.template.creating: template.twig',
-			'autarky.template.creating: layout.twig',
-			'autarky.template.rendering: template.twig',
-			'autarky.template.rendering: layout.twig',
+			'template.creating: template.twig',
+			'template.creating: layout.twig',
+			'template.rendering: template.twig',
+			'template.rendering: layout.twig',
 		];
+		$eng->render('template.twig');
 		$this->assertEquals($expected, $events);
 	}
 }

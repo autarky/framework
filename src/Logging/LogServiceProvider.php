@@ -10,10 +10,11 @@
 
 namespace Autarky\Logging;
 
-use Autarky\Kernel\ServiceProvider;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Formatter\LineFormatter;
+
+use Autarky\Kernel\ServiceProvider;
 
 /**
  * Simple service provider that binds a Monolog instance onto the container and

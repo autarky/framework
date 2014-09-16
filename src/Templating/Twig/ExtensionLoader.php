@@ -11,6 +11,7 @@
 namespace Autarky\Templating\Twig;
 
 use Twig_Environment;
+
 use Autarky\Kernel\Application;
 
 /**

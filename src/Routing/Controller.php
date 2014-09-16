@@ -15,15 +15,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use Autarky\Container\ContainerAware;
+use Autarky\Container\ContainerAwareInterface;
+use Autarky\Container\ContainerAwareTrait;
 
 /**
  * Base web controller class to get newcomers started. It is recommended that
  * people write their own base-controllers instead, but this can be a good
  * starting point.
  */
-abstract class Controller extends ContainerAware
+abstract class Controller implements ContainerAwareInterface
 {
+	use ContainerAwareTrait;
+
 	/**
 	 * Render a template.
 	 *
