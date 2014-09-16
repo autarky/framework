@@ -109,12 +109,15 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 */
 	public static function bootstrap($rootPath, $environment)
 	{
-		return new static(
-			$environment,
-			new \Autarky\Container\Container,
-			new \Autarky\Config\PhpFileStore($rootPath.'/config'),
-			new \Autarky\Kernel\Errors\SymfonyErrorHandler
-		);
+		$container = new \Autarky\Container\Container;
+
+		$loaderFactory = new \Autarky\Config\LoaderFactory($container);
+		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
+		$config = new \Autarky\Config\ConfigStore($loaderFactory);
+
+		$errorHandler = new \Autarky\Kernel\Errors\SymfonyErrorHandler;
+
+		return new static($environment, $container, $config, $errorHandler);
 	}
 
 	/**
@@ -337,9 +340,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 
 		$this->resolveEnvironment();
 
-		$providers = $this->config->get('app.providers', []);
-
-		foreach ($providers as $provider) {
+		foreach ($this->getProviders() as $provider) {
 			$provider = new $provider($this);
 			$this->registerProvider($provider);
 		}
@@ -349,6 +350,15 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		}
 
 		$this->booted = true;
+	}
+
+	protected function getProviders()
+	{
+		if ($this->config !== null) {
+			return $this->config->get('app.providers', []);
+		}
+
+		return [];
 	}
 
 	protected function registerProvider(ServiceProvider $provider)

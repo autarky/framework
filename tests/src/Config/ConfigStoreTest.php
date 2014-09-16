@@ -2,8 +2,10 @@
 namespace Autarky\Tests\Config;
 
 use PHPUnit_Framework_TestCase;
+use Mockery as m;
 
-use Autarky\Config\PhpFileStore;
+use Autarky\Config\ConfigStore;
+use Autarky\Config\LoaderFactory;
 
 class PhpFileTest extends PHPUnit_Framework_TestCase
 {
@@ -14,7 +16,9 @@ class PhpFileTest extends PHPUnit_Framework_TestCase
 
 	protected function makeConfig()
 	{
-		return new PhpFileStore($this->getConfigPath());
+		$loaderFactory = new LoaderFactory(new \Autarky\Container\Container);
+		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
+		return new ConfigStore($loaderFactory, $this->getConfigPath());
 	}
 
 	/** @test */
@@ -95,5 +99,14 @@ class PhpFileTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException('InvalidArgumentException');
 		$config = $this->makeConfig();
 		$config->get('notarray.foo');
+	}
+
+	/** @test */
+	public function customLoaderIsCalled()
+	{
+		$config = $this->makeConfig();
+		$config->getLoaderFactory()->addLoader('mock', m::mock(['load' => ['foo' => 'bar']]));
+		$this->assertEquals('bar', $config->get('mockedfile.foo'));
+		$this->assertEquals(null, $config->get('mockedfile.bar'));
 	}
 }
