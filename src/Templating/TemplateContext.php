@@ -21,6 +21,30 @@ class TemplateContext
 		}
 	}
 
+	/**
+	 * Add data to the context, replacing existing data.
+	 *
+	 * @param  array  $data
+	 *
+	 * @return void
+	 */
+	public function replace(array $data)
+	{
+		$this->data = array_replace($this->data, $data);
+	}
+
+	/**
+	 * Add data to the context without replacing existing data.
+	 *
+	 * @param  array $data
+	 *
+	 * @return void
+	 */
+	public function add(array $data)
+	{
+		$this->data += $data;
+	}
+
 	public function &__get($key)
 	{
 		if (!array_key_exists($key, $this->data)) {

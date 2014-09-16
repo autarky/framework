@@ -1,4 +1,13 @@
 <?php
+/**
+ * This file is part of the Autarky package.
+ *
+ * (c) Andreas Lutro <anlutro@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Autarky\Templating\Twig;
 
 use Autarky\Templating\TemplateEvent;
@@ -22,10 +31,7 @@ abstract class Template extends \Twig_Template
 
 	public function display(array $context, array $blocks = array())
 	{
-		$context = $this->template->getContext();
-		foreach ($context as $key => $value) {
-			$context->$key = $value;
-		}
+		$this->template->getContext()->replace($context);
 
 		$this->eventDispatcher->dispatch(
 			'autarky.template.rendering: '.$this->template->getName(),
