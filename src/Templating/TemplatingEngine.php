@@ -14,29 +14,20 @@ use Autarky\Kernel\Application;
 use Autarky\Events\EventDispatcherAwareInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class TemplateManager implements EventDispatcherAwareInterface
+class TemplatingEngine implements EventDispatcherAwareInterface
 {
-	/**
-	 * @var \Autarky\Templating\TemplatingEngineInterface
-	 */
-	protected $engine;
-
-	/**
-	 * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-	 */
+	protected $twig;
 	protected $eventDispatcher;
 
-	public function __construct(TemplatingEngineInterface $engine)
+	public function __construct(Twig\Environment $twig)
 	{
-		$this->engine = $engine;
+		$this->twig = $twig;
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+	public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
 	{
-		$this->eventDispatcher = $dispatcher;
+		$this->eventDispatcher = $eventDispatcher;
+		$this->twig->setEventDispatcher($eventDispatcher);
 	}
 
 	/**
@@ -49,22 +40,8 @@ class TemplateManager implements EventDispatcherAwareInterface
 	 */
 	public function render($name, array $context = array())
 	{
-		$template = new Template($name, $context);
-
-		if ($this->eventDispatcher !== null) {
-			$this->dispatchTemplateEvents($template);
-		}
-
-		return $this->engine->render($template);
-	}
-
-	protected function dispatchTemplateEvents($template)
-	{
-		$event = new Events\TemplateEvent($template);
-
-		$this->eventDispatcher->dispatch('autarky.template.creating: '.$template->getName(), $event);
-
-		$this->eventDispatcher->dispatch('autarky.template.rendering: '.$template->getName(), $event);
+		return $this->twig->loadTemplate($name)
+			->render($context);
 	}
 
 	/**
@@ -112,8 +89,17 @@ class TemplateManager implements EventDispatcherAwareInterface
 	 *
 	 * @return void
 	 */
-	public function addGlobalVariable($name, $value)
+	public function addGlobal($name, $value)
 	{
-		$this->engine->addGlobal($name, $value);
+		$this->twig->addGlobal($name, $value);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function addNamespace($namespace, $location)
+	{
+		$this->twig->getLoader()
+			->addPath($location, $namespace);
 	}
 }

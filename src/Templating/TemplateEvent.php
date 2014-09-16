@@ -8,10 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Templating\Events;
+namespace Autarky\Templating;
 
 use Symfony\Component\EventDispatcher\Event;
-use Autarky\Templating\Template;
 
 class TemplateEvent extends Event
 {

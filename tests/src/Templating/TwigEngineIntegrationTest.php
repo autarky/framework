@@ -7,7 +7,7 @@ use Autarky\Templating\TwigEngine;
 use Autarky\Templating\Template;
 use Symfony\Component\HttpFoundation\Request;
 
-class TwigEngineTest extends TestCase
+class TwigEngineIntegrationTest extends TestCase
 {
 	protected function makeApplication($providers = array())
 	{
@@ -17,7 +17,8 @@ class TwigEngineTest extends TestCase
 		$app->getConfig()->set('session.driver', 'null');
 		$app->getConfig()->set('session.mock', true);
 		$app->getConfig()->set('app.debug', true);
-		$providers[] = 'Autarky\Templating\TwigServiceProvider';
+		$providers[] = 'Autarky\Events\EventServiceProvider';
+		$providers[] = 'Autarky\Templating\TwigTemplatingProvider';
 		$app->getConfig()->set('app.providers', $providers);
 		return $app;
 	}
@@ -26,64 +27,85 @@ class TwigEngineTest extends TestCase
 	{
 		$this->app = $this->makeApplication($providers);
 		$this->app->boot();
-		return $this->app->resolve('Autarky\Templating\TwigEngine');
+		return $this->app->resolve('Autarky\Templating\TemplatingEngine');
 	}
 
 	/** @test */
 	public function extendLayout()
 	{
-		$twig = $this->makeEngine();
-		$result = $twig->render(new Template('template.twig'));
+		$eng = $this->makeEngine();
+		$result = $eng->render('template.twig');
 		$this->assertEquals('OK', $result);
 	}
 
 	/** @test */
 	public function urlGeneration()
 	{
-		$twig = $this->makeEngine(['Autarky\Routing\RoutingServiceProvider']);
+		$eng = $this->makeEngine(['Autarky\Routing\RoutingServiceProvider']);
 		$this->app->getRequestStack()->push(Request::create('/'));
 		$this->app->getRouter()
 			->addRoute('GET', '/test/route/{param}', function() {}, 'test.route');
-		$result = $twig->render(new Template('urlgeneration.twig'));
+		$result = $eng->render('urlgeneration.twig');
 		$this->assertEquals('//localhost/test/route/param1', $result);
 	}
 
 	/** @test */
 	public function partial()
 	{
-		$twig = $this->makeEngine();
+		$eng = $this->makeEngine();
 		$mock = m::mock(['bar' => 'baz']);
 		$this->app->share('foo', $mock);
-		$result = $twig->render(new Template('partial.twig'));
+		$result = $eng->render('partial.twig');
 		$this->assertEquals('baz', $result);
 	}
 
 	/** @test */
 	public function assetUrl()
 	{
-		$twig = $this->makeEngine(['Autarky\Routing\RoutingServiceProvider']);
+		$eng = $this->makeEngine(['Autarky\Routing\RoutingServiceProvider']);
 		$this->app->getRequestStack()->push(Request::create('/index.php/foo/bar'));
-		$result = $twig->render(new Template('asseturl.twig'));
+		$result = $eng->render('asseturl.twig');
 		$this->assertEquals('//localhost/asset/test.css.js', $result);
 	}
 
 	/** @test */
 	public function sessionMessages()
 	{
-		$twig = $this->makeEngine(['Autarky\Session\SessionServiceProvider']);
+		$eng = $this->makeEngine(['Autarky\Session\SessionServiceProvider']);
 		$session = $this->app->resolve('Symfony\Component\HttpFoundation\Session\Session');
 		$data = ['new' => ['_messages' => ['foo', 'bar']]];
 		$session->getFlashBag()->initialize($data);
-		$result = $twig->render(new Template('sessionmsg.twig'));
+		$result = $eng->render('sessionmsg.twig');
 		$this->assertEquals("foo\nbar\n", $result);
 	}
 
 	/** @test */
 	public function namespacedTemplate()
 	{
-		$twig = $this->makeEngine();
-		$twig->addNamespace('foo', TESTS_RSC_DIR.'/templates/namespace');
-		$result = $twig->render(new Template('foo:template.twig'));
+		$eng = $this->makeEngine();
+		$eng->addNamespace('foo', TESTS_RSC_DIR.'/templates/namespace');
+		$result = $eng->render('foo:template.twig');
 		$this->assertEquals('OK', $result);
+	}
+
+	/** @test */
+	public function eventsAreFired()
+	{
+		$eng = $this->makeEngine();
+		$eng->setEventDispatcher($dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher);
+		$events = [];
+		$callback = function($event) use(&$events) { $events[] = $event->getName(); };
+		$eng->creating('template.twig', $callback);
+		$eng->rendering('template.twig', $callback);
+		$eng->creating('layout.twig', $callback);
+		$eng->rendering('layout.twig', $callback);
+		$eng->render('template.twig');
+		$expected = [
+			'autarky.template.creating: template.twig',
+			'autarky.template.creating: layout.twig',
+			'autarky.template.rendering: template.twig',
+			'autarky.template.rendering: layout.twig',
+		];
+		$this->assertEquals($expected, $events);
 	}
 }

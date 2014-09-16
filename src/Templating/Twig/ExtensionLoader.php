@@ -17,7 +17,7 @@ use Autarky\Kernel\Application;
  * Class responsible for adding Twig extensions, both user-defined ones and
  * those that are part of the core framework.
  */
-class ExtensionsLoader
+class ExtensionLoader
 {
 	public function __construct(Twig_Environment $twig, Application $app)
 	{
@@ -32,7 +32,8 @@ class ExtensionsLoader
 		foreach ($extensions as $dependency => $extension) {
 			if (is_string($dependency) && !in_array($dependency, $providers)) continue;
 
-			$extension = $this->app->getContainer()->resolve(__NAMESPACE__.'\\'.$extension);
+			$extension = $this->app->getContainer()
+				->resolve(__NAMESPACE__.'\\Extension\\'.$extension);
 			$this->twig->addExtension($extension);
 		}
 	}
