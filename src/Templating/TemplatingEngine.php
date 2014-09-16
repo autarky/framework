@@ -17,7 +17,18 @@ use Autarky\Support\NamespacedResourceResolverInterface;
 
 class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResourceResolverInterface
 {
+	/**
+	 * The Twig environment instance.
+	 *
+	 * @var Twig\Environment
+	 */
 	protected $twig;
+
+	/**
+	 * The event dispatcher instance.
+	 *
+	 * @var EventDispatcherInterface
+	 */
 	protected $eventDispatcher;
 
 	public function __construct(Twig\Environment $twig)
@@ -25,6 +36,11 @@ class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResou
 		$this->twig = $twig;
 	}
 
+	/**
+	 * Set the event dispatcher instance.
+	 *
+	 * @param EventDispatcherInterface $eventDispatcher
+	 */
 	public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
 	{
 		$this->eventDispatcher = $eventDispatcher;

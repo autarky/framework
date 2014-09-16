@@ -23,7 +23,7 @@ use Autarky\Container\ContainerInterface;
 class Route
 {
 	/**
-	 * @var \Autarky\Routing\Router
+	 * @var \Autarky\Routing\RouterInterface
 	 */
 	protected static $router;
 

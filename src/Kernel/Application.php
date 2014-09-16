@@ -67,7 +67,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected $errorHandler;
 
 	/**
-	 * @var \Symfony\Component\EventDispatcher\DispatcherInterface
+	 * @var \Symfony\Component\EventDispatcher\DispatcherInterface|false
 	 */
 	protected $eventDispatcher;
 

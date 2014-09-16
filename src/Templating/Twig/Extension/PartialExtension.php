@@ -21,6 +21,11 @@ use Autarky\Container\ContainerInterface;
  */
 class PartialExtension extends Twig_Extension
 {
+	/**
+	 * @var ContainerInterface
+	 */
+	protected $container;
+
 	public function __construct(ContainerInterface $container)
 	{
 		$this->container = $container;

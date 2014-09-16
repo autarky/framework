@@ -28,7 +28,7 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	protected $app;
 
 	/**
-	 * @var \Psr\Log\LoggerInterface
+	 * @var \Closure|\Psr\Log\LoggerInterface
 	 */
 	protected $logger;
 
@@ -336,8 +336,8 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 		$error = error_get_last();
 
 		if ($error !== null) {
-			extract($error);
-			return new FatalErrorException($message, $type, 0, $file, $line);
+			return new FatalErrorException($error['message'],
+				$error['type'], 0, $error['file'], $error['line']);
 		}
 	}
 }

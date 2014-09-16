@@ -20,6 +20,16 @@ use Autarky\Kernel\Application;
  */
 class ExtensionLoader
 {
+	/**
+	 * @var Twig_Environment
+	 */
+	protected $twig;
+
+	/**
+	 * @var Application
+	 */
+	protected $app;
+
 	public function __construct(Twig_Environment $twig, Application $app)
 	{
 		$this->twig = $twig;
