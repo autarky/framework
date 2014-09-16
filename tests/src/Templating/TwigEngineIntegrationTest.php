@@ -18,7 +18,7 @@ class TwigEngineIntegrationTest extends TestCase
 		$app->getConfig()->set('session.mock', true);
 		$app->getConfig()->set('app.debug', true);
 		$providers[] = 'Autarky\Events\EventServiceProvider';
-		$providers[] = 'Autarky\Templating\TwigTemplatingProvider';
+		$providers[] = 'Autarky\Templating\TwigServiceProvider';
 		$app->getConfig()->set('app.providers', $providers);
 		return $app;
 	}

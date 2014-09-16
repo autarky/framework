@@ -8,7 +8,7 @@ class ServiceProviderTest extends TestCase
 {
 	protected function assertSingleton($class)
 	{
-		$app = $this->makeApplication('Autarky\Templating\TwigTemplatingProvider');
+		$app = $this->makeApplication('Autarky\Templating\TwigServiceProvider');
 		$app->boot();
 		$object = $app->getContainer()->resolve($class);
 		$this->assertInstanceOf($class, $object);
@@ -26,7 +26,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function engineInterfaceCanBeResolved()
 	{
-		$app = $this->makeApplication('Autarky\Templating\TwigTemplatingProvider');
+		$app = $this->makeApplication('Autarky\Templating\TwigServiceProvider');
 		$app->boot();
 		$this->assertSame(
 			$app->resolve('Autarky\Templating\Twig\Environment'),
