@@ -31,10 +31,12 @@ abstract class Template extends \Twig_Template implements EventDispatcherAwareIn
 	{
 		$this->template->getContext()->replace($context);
 
-		$this->eventDispatcher->dispatch(
-			'template.rendering: '.$this->template->getName(),
-			new TemplateEvent($this->template)
-		);
+		if ($this->eventDispatcher !== null) {
+			$this->eventDispatcher->dispatch(
+				'template.rendering: '.$this->template->getName(),
+				new TemplateEvent($this->template)
+			);
+		}
 
 		return parent::display($this->template->getContext()->toArray(), $blocks);
 	}

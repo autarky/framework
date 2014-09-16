@@ -95,15 +95,15 @@ class TwigEngineIntegrationTest extends TestCase
 		$eng->setEventDispatcher($dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher);
 		$events = [];
 		$callback = function($event) use(&$events) { $events[] = $event->getName(); };
-		$eng->creating('template.twig', $callback);
-		$eng->rendering('template.twig', $callback);
-		$eng->creating('layout.twig', $callback);
-		$eng->rendering('layout.twig', $callback);
+		$eng->creating('template', $callback);
+		$eng->rendering('template', $callback);
+		$eng->creating('layout', $callback);
+		$eng->rendering('layout', $callback);
 		$expected = [
-			'template.creating: template.twig',
-			'template.creating: layout.twig',
-			'template.rendering: template.twig',
-			'template.rendering: layout.twig',
+			'template.creating: template',
+			'template.creating: layout',
+			'template.rendering: template',
+			'template.rendering: layout',
 		];
 		$eng->render('template.twig');
 		$this->assertEquals($expected, $events);

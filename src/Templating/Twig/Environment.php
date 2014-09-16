@@ -24,17 +24,30 @@ class Environment extends \Twig_Environment implements EventDispatcherAwareInter
 	public function __construct(Twig_LoaderInterface $loader = null, $options = array())
 	{
 		$options['base_template_class'] = 'Autarky\Templating\Twig\Template';
+
 		parent::__construct($loader, $options);
 	}
 
-	public function loadTemplate($name, $index = null)
+	public function loadTemplate($path, $index = null)
 	{
+		$name = $this->normalizeName($path);
+
 		$template = new \Autarky\Templating\Template($name);
-		$this->eventDispatcher->dispatch('template.creating: '.$name,
-			new TemplateEvent($template));
-		$twigTemplate = parent::loadTemplate($name, $index);
+
+		if ($this->eventDispatcher !== null) {
+			$this->eventDispatcher->dispatch('template.creating: '.$name,
+				new TemplateEvent($template));
+		}
+
+		$twigTemplate = parent::loadTemplate($path, $index);
 		$twigTemplate->setTemplate($template);
 		$twigTemplate->setEventDispatcher($this->eventDispatcher);
+
 		return $twigTemplate;
+	}
+
+	protected function normalizeName($path)
+	{
+		return str_replace(['.html.twig', '.twig'], '', $path);
 	}
 }
