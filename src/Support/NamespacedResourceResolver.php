@@ -103,11 +103,11 @@ trait NamespacedResourceResolver
 			throw new \InvalidArgumentException("No locations registered for $namespace");
 		}
 
-		// return the defined namespace location as well as any possible
-		// override locations at the end.
-		return $this->locations[$namespace] + array_map(function($path) use($namespace) {
+		$overrides = array_map(function($path) use($namespace) {
 			return $path .'/'. $namespace;
 		}, $this->getDefaultLocations());
+
+		return $this->locations[$namespace] + $overrides;
 	}
 
 	/**

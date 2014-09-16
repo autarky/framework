@@ -60,7 +60,7 @@ class PhpFileTest extends PHPUnit_Framework_TestCase
 	public function environmentOverrides()
 	{
 		$config = $this->makeConfig();
-		$config->setEnvironment('override');
+		$config->setEnvironment('dummyenv');
 		$this->assertEquals('baz', $config->get('testfile.foo'));
 	}
 
@@ -68,8 +68,26 @@ class PhpFileTest extends PHPUnit_Framework_TestCase
 	public function addNamespace()
 	{
 		$config = $this->makeConfig();
-		$config->addNamespace('test-ns', $this->getConfigPath().'/namespace');
-		$this->assertEquals('bar', $config->get('test-ns:testfile.foo'));
+		$config->addNamespace('namespace', $this->getConfigPath().'/namespace');
+		$this->assertEquals('bar', $config->get('namespace:testfile.foo'));
+	}
+
+	/** @test */
+	public function namespaceInEnvironment()
+	{
+		$config = $this->makeConfig();
+		$config->setEnvironment('dummyenv');
+		$config->addNamespace('namespace', $this->getConfigPath().'/namespace');
+		$this->assertEquals('foo', $config->get('namespace:testfile.foo'));
+	}
+
+	/** @test */
+	public function overrideNamespace()
+	{
+		$config = $this->makeConfig();
+		$config->addNamespace('namespace', $this->getConfigPath().'/namespace');
+		$config->addNamespace('namespace', $this->getConfigPath().'/namespace-override');
+		$this->assertEquals('baz', $config->get('namespace:testfile.foo'));
 	}
 
 	/** @test */

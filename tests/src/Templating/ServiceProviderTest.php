@@ -6,9 +6,17 @@ use Mockery as m;
 
 class ServiceProviderTest extends TestCase
 {
+	protected function makeApplication($providers = array())
+	{
+		$providers[] = 'Autarky\Templating\TwigServiceProvider';
+		$app = parent::makeApplication($providers);
+		$app->getConfig()->set('path.templates', TESTS_RSC_DIR.'/templates');
+		return $app;
+	}
+
 	protected function assertSingleton($class)
 	{
-		$app = $this->makeApplication('Autarky\Templating\TwigServiceProvider');
+		$app = $this->makeApplication();
 		$app->boot();
 		$object = $app->getContainer()->resolve($class);
 		$this->assertInstanceOf($class, $object);
@@ -26,7 +34,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function engineInterfaceCanBeResolved()
 	{
-		$app = $this->makeApplication('Autarky\Templating\TwigServiceProvider');
+		$app = $this->makeApplication();
 		$app->boot();
 		$this->assertSame(
 			$app->resolve('Autarky\Templating\Twig\Environment'),

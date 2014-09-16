@@ -13,8 +13,9 @@ namespace Autarky\Templating;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Autarky\Events\EventDispatcherAwareInterface;
+use Autarky\Support\NamespacedResourceResolverInterface;
 
-class TemplatingEngine implements EventDispatcherAwareInterface
+class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResourceResolverInterface
 {
 	protected $twig;
 	protected $eventDispatcher;
@@ -105,6 +106,6 @@ class TemplatingEngine implements EventDispatcherAwareInterface
 	public function addNamespace($namespace, $location)
 	{
 		$this->twig->getLoader()
-			->addPath($location, $namespace);
+			->addNamespace($namespace, $location);
 	}
 }

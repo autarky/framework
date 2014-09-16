@@ -83,9 +83,18 @@ class TwigEngineIntegrationTest extends TestCase
 	public function namespacedTemplate()
 	{
 		$eng = $this->makeEngine();
-		$eng->addNamespace('foo', TESTS_RSC_DIR.'/templates/namespace');
-		$result = $eng->render('foo:template.twig');
+		$eng->addNamespace('namespace', TESTS_RSC_DIR.'/templates/vendor/namespace');
+		$result = $eng->render('namespace:template1.twig');
 		$this->assertEquals('OK', $result);
+	}
+
+	/** @test */
+	public function namespacedTemplateOverriding()
+	{
+		$eng = $this->makeEngine();
+		$eng->addNamespace('namespace', TESTS_RSC_DIR.'/templates/vendor/namespace');
+		$result = $eng->render('namespace:template2.twig');
+		$this->assertEquals('Overridden', $result);
 	}
 
 	/** @test */
