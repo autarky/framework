@@ -9,11 +9,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TwigEngineIntegrationTest extends TestCase
 {
-	protected function makeApplication($providers = array())
+	protected function makeApplication($providers = array(), $env = 'testing')
 	{
 		$providers[] = 'Autarky\Events\EventDispatcherProvider';
 		$providers[] = 'Autarky\Templating\TwigTemplatingProvider';
-		$app = parent::makeApplication((array) $providers);
+		$app = parent::makeApplication((array) $providers, $env);
 		$app->getConfig()->set('path.templates', TESTS_RSC_DIR.'/templates');
 		$app->getConfig()->set('path.templates-cache', TESTS_RSC_DIR.'/template-cache');
 		$app->getConfig()->set('session.driver', 'null');

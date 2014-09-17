@@ -6,10 +6,10 @@ use Mockery as m;
 
 class ServiceProviderTest extends TestCase
 {
-	protected function makeApplication($providers = array())
+	protected function makeApplication($providers = array(), $env = 'testing')
 	{
 		$providers[] = 'Autarky\Templating\TwigTemplatingProvider';
-		$app = parent::makeApplication($providers);
+		$app = parent::makeApplication($providers, $env);
 		$app->getConfig()->set('path.templates', TESTS_RSC_DIR.'/templates');
 		return $app;
 	}
