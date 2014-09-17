@@ -30,5 +30,10 @@ namespace Autarky\Container;
  */
 interface ContainerAwareInterface
 {
+	/**
+	 * Set the container instance.
+	 *
+	 * @param ContainerInterface $container
+	 */
 	public function setContainer(ContainerInterface $container);
 }

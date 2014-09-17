@@ -28,27 +28,15 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function environmentClosureIsResolvedOnBoot()
 	{
-		$app = $this->makeApplication();
-		$app->setEnvironment(function() { return 'testenv'; });
+		$app = new Application(function() { return 'testenv'; }, []);
 		$app->boot();
 		$this->assertEquals('testenv', $app->getEnvironment());
 	}
 
 	/** @test */
-	public function environmentCannotBeSetAfterBoot()
-	{
-		$app = $this->makeApplication();
-		$app->setEnvironment(function() { return 'testenv'; });
-		$app->boot();
-		$this->setExpectedException('RuntimeException');
-		$app->setEnvironment(function() { return 'testenv2'; });
-	}
-
-	/** @test */
 	public function prematureGettingOfEnvironmentThrowsException()
 	{
-		$app = $this->makeApplication();
-		$app->setEnvironment(function() { return 'testenv'; });
+		$app = new Application(function() { return 'testenv'; }, []);
 		$this->setExpectedException('RuntimeException');
 		$app->getEnvironment();
 	}

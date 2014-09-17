@@ -105,19 +105,22 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected $requests;
 
 	/**
-	 * @param mixed $environment  See setEnvironment()
-	 * @param mixed $container    See setContainer()
-	 * @param mixed $config       See setConfig()
-	 * @param mixed $errorHandler See setErrorHandler
+	 * Construct a new application instance.
+	 *
+	 * @param \Closure|string   $environment
+	 * @param ServiceProvider[] $providers
 	 */
 	public function __construct($environment, array $providers)
 	{
 		$this->middlewares = new SplPriorityQueue;
 		$this->configCallbacks = new SplStack;
 		$this->requests = new RequestStack;
-
-		$this->setEnvironment($environment);
-		$this->setProviders($providers);
+		$this->environment = $environment;
+		
+		foreach ($providers as $provider) {
+			$class = is_object($provider) ? get_class($provider) : (string) $provider;
+			$this->providers[$class] = $provider;
+		}
 	}
 
 	/**
@@ -139,21 +142,6 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	}
 
 	/**
-	 * Set the application environment.
-	 *
-	 * @param \Closure|string $env If a closure, it will be invoked upon the
-	 * application initializing.
-	 */
-	public function setEnvironment($environment)
-	{
-		if ($this->booted) {
-			throw new \RuntimeException('Cannot set environment after booting');
-		}
-
-		$this->environment = $environment;
-	}
-
-	/**
 	 * Resolve the environment.
 	 *
 	 * @return void
@@ -165,9 +153,11 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 			$this->environment = $environment();
 		}
 
-		if ($this->config !== null && $this->errorHandler !== null) {
+		if ($this->config !== null) {
 			$this->config->setEnvironment($this->environment);
-			$this->errorHandler->setDebug($this->config->get('app.debug'));
+			if ($this->errorHandler !== null) {
+				$this->errorHandler->setDebug($this->config->get('app.debug'));
+			}
 		}
 	}
 
@@ -185,14 +175,11 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		return $this->environment;
 	}
 
-	public function setProviders(array $providers)
-	{
-		foreach ($providers as $provider) {
-			$class = is_object($provider) ? get_class($provider) : (string) $provider;
-			$this->providers[$class] = $provider;
-		}
-	}
-
+	/**
+	 * Get the application's providers.
+	 *
+	 * @return string[] array of provider class names
+	 */
 	public function getProviders()
 	{
 		return array_keys($this->providers);

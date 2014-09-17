@@ -12,5 +12,4 @@ namespace Autarky\Container;
 
 class NotInstantiableException extends ContainerException
 {
-	
 }

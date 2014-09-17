@@ -47,6 +47,12 @@ class Container implements ContainerInterface
 	 * @var array
 	 */
 	protected $resolvingCallbacks = [];
+
+	/**
+	 * More resolving callbacks.
+	 *
+	 * @var array
+	 */
 	protected $resolvingAnyCallbacks = [];
 
 	/**

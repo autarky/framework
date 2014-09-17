@@ -18,5 +18,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 interface EventDispatcherAwareInterface
 {
+	/**
+	 * Set the event dispatcher instance.
+	 *
+	 * @param EventDispatcherInterface $eventDispatcher
+	 */
 	public function setEventDispatcher(EventDispatcherInterface $eventDispatcher);
 }

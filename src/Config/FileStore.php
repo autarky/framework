@@ -17,7 +17,18 @@ class FileStore implements ConfigInterface
 {
 	use NamespacedResourceResolver;
 
+	/**
+	 * The loader factory instance.
+	 *
+	 * @var LoaderFactory
+	 */
 	protected $loaderFactory;
+
+	/**
+	 * The loaded config data.
+	 *
+	 * @var array
+	 */
 	protected $data = [];
 
 	/**
@@ -29,6 +40,11 @@ class FileStore implements ConfigInterface
 		$this->setLocation($path);
 	}
 
+	/**
+	 * Get the loader factory instance.
+	 *
+	 * @return LoaderFactory
+	 */
 	public function getLoaderFactory()
 	{
 		return $this->loaderFactory;
@@ -107,7 +123,7 @@ class FileStore implements ConfigInterface
 		$this->data[$dataKey] = $data;
 	}
 
-	public function getDataFromFile($path)
+	protected function getDataFromFile($path)
 	{
 		$loader = $this->loaderFactory->getForPath($path);
 

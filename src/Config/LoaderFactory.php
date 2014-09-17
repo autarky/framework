@@ -14,9 +14,32 @@ use Autarky\Container\ContainerInterface;
 
 class LoaderFactory
 {
+	/**
+	 * The container instance.
+	 *
+	 * @var ContainerInterface
+	 */
 	protected $container;
+
+	/**
+	 * The loader classes.
+	 *
+	 * @var string[]
+	 */
 	protected $loaderClasses = [];
+
+	/**
+	 * The loader class instances.
+	 *
+	 * @var LoaderInterface[]
+	 */
 	protected $loaders = [];
+
+	/**
+	 * The registered extensions.
+	 *
+	 * @var string[]
+	 */
 	protected $extensions = [];
 
 	public function __construct(ContainerInterface $container)
@@ -24,6 +47,14 @@ class LoaderFactory
 		$this->container = $container;
 	}
 
+	/**
+	 * Add a loader.
+	 *
+	 * @param  string $extensions
+	 * @param  string $loaderClass
+	 *
+	 * @return void
+	 */
 	public function addLoader($extensions, $loaderClass)
 	{
 		foreach ((array) $extensions as $extension) {
@@ -36,6 +67,11 @@ class LoaderFactory
 		}
 	}
 
+	/**
+	 * Get the available extensions.
+	 *
+	 * @return array
+	 */
 	public function getExtensions()
 	{
 		if ($this->extensions === null) {
@@ -47,6 +83,13 @@ class LoaderFactory
 		return $this->extensions;
 	}
 
+	/**
+	 * Get the loader for a given path.
+	 *
+	 * @param  string $path
+	 *
+	 * @return LoaderInterface
+	 */
 	public function getForPath($path)
 	{
 		$extension = $this->getExtension($path);
@@ -58,7 +101,7 @@ class LoaderFactory
 		return $this->loaders[$extension];
 	}
 
-	public function resolveLoader($extension)
+	protected function resolveLoader($extension)
 	{
 		if (!isset($this->loaderClasses[$extension])) {
 			throw new \RuntimeException("Invalid extension: $extension");
@@ -68,7 +111,7 @@ class LoaderFactory
 			->resolve($this->loaderClasses[$extension]);
 	}
 
-	public function getExtension($path)
+	protected function getExtension($path)
 	{
 		return substr($path, strrpos($path, '.') + 1);
 	}

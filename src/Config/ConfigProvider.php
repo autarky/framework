@@ -21,10 +21,12 @@ class ConfigProvider extends ServiceProvider
 
 	public function register()
 	{
-		$loaderFactory = new \Autarky\Config\LoaderFactory($this->app->getContainer());
-		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
-		$config = new \Autarky\Config\FileStore($loaderFactory, $this->configPath);
+		$dic = $this->app->getContainer();
 
-		$this->app->setConfig($config);
+		$loaderFactory = new LoaderFactory($dic);
+		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
+		$dic->share(get_class($loaderFactory), $loaderFactory);
+
+		$this->app->setConfig(new FileStore($loaderFactory, $this->configPath));
 	}
 }
