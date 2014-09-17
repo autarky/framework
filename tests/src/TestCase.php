@@ -11,18 +11,9 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 {
 	protected function makeApplication($providers = array())
 	{
-		$errorHandler = $this->makeErrorHandler();
-		$app = new Application('testing', new Container, new ArrayStore, $errorHandler);
-		if ($providers) {
-			$app->getConfig()->set('app.providers', (array) $providers);
-		}
+		$app = new Application('testing', (array) $providers);
+		$app->setContainer(new Container);
+		$app->setConfig(new ArrayStore);
 		return $app;
-	}
-
-	protected function makeErrorHandler()
-	{
-		$errorHandler = new SymfonyErrorHandler;
-		$errorHandler->setRethrow(true);
-		return $errorHandler;
 	}
 }

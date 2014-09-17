@@ -26,7 +26,7 @@ abstract class ServiceProvider
 	 */
 	protected $app;
 
-	public function __construct($app)
+	public function setApplication(Application $app)
 	{
 		$this->app = $app;
 	}

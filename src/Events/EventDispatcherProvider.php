@@ -18,7 +18,7 @@ use Autarky\Kernel\ServiceProvider;
  * Simple service provider that binds a share instance of symfony's event
  * dispatcher onto the container.
  */
-class EventServiceProvider extends ServiceProvider
+class EventDispatcherProvider extends ServiceProvider
 {
 	public function register()
 	{

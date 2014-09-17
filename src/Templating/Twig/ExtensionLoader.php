@@ -38,7 +38,7 @@ class ExtensionLoader
 
 	public function loadCoreExtensions(array $extensions)
 	{
-		$providers = $this->app->getConfig()->get('app.providers', []);
+		$providers = $this->app->getProviders();
 
 		foreach ($extensions as $dependency => $extension) {
 			if (is_string($dependency) && !in_array($dependency, $providers)) continue;

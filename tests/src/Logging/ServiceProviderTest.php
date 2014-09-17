@@ -23,7 +23,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function canResolve()
 	{
-		$app = $this->makeApplication('Autarky\Logging\LogServiceProvider');
+		$app = $this->makeApplication('Autarky\Logging\LoggingProvider');
 		$app->boot();
 		$object = $app->getContainer()->resolve('Monolog\Logger');
 		$this->assertInstanceOf('Monolog\Logger', $object);
@@ -33,7 +33,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function canResolveInterface()
 	{
-		$app = $this->makeApplication('Autarky\Logging\LogServiceProvider');
+		$app = $this->makeApplication('Autarky\Logging\LoggingProvider');
 		$app->boot();
 		$object = $app->getContainer()->resolve('Psr\Log\LoggerInterface');
 		$this->assertInstanceOf('Psr\Log\LoggerInterface', $object);
@@ -42,7 +42,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function writesToLogPath()
 	{
-		$app = $this->makeApplication('Autarky\Logging\LogServiceProvider');
+		$app = $this->makeApplication('Autarky\Logging\LoggingProvider');
 		$app->getConfig()->set('path.logs', $logdir = $this->getLogDir());
 		$app->boot();
 		$logger = $app->getContainer()->resolve('Monolog\Logger');

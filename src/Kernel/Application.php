@@ -15,6 +15,7 @@ use Closure;
 use SplPriorityQueue;
 use SplStack;
 use Stack\Builder as StackBuilder;
+
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -28,7 +29,7 @@ use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
 use Autarky\Container\ContainerException;
 use Autarky\Container\ContainerInterface;
-use Autarky\Kernel\Errors\ErrorHandlerInterface;
+use Autarky\Errors\ErrorHandlerInterface;
 use Autarky\Routing\RouterInterface;
 
 /**
@@ -40,6 +41,13 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 * The framework version.
 	 */
 	const VERSION = '0.4.x';
+
+	/**
+	 * The application's service providers.
+	 *
+	 * @var array
+	 */
+	protected $providers = [];
 
 	/**
 	 * @var \SplPriorityQueue
@@ -97,49 +105,19 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected $requests;
 
 	/**
-	 * Bootstrap the application instance with the default container and config
-	 * loader for convenience.
-	 *
-	 * @param  string $rootPath     Path to your app root. The config loader
-	 *                              will look for the "config" directory in this
-	 *                              path.
-	 * @param  mixed  $environment  See setEnvironment()
-	 *
-	 * @return static
-	 */
-	public static function bootstrap($rootPath, $environment)
-	{
-		$container = new \Autarky\Container\Container;
-
-		$loaderFactory = new \Autarky\Config\LoaderFactory($container);
-		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
-		$config = new \Autarky\Config\FileStore($loaderFactory);
-
-		$errorHandler = new \Autarky\Kernel\Errors\SymfonyErrorHandler;
-
-		return new static($environment, $container, $config, $errorHandler);
-	}
-
-	/**
 	 * @param mixed $environment  See setEnvironment()
 	 * @param mixed $container    See setContainer()
 	 * @param mixed $config       See setConfig()
 	 * @param mixed $errorHandler See setErrorHandler
 	 */
-	public function __construct(
-		$environment,
-		ContainerInterface $container,
-		ConfigInterface $config,
-		ErrorHandlerInterface $errorHandler
-	) {
+	public function __construct($environment, array $providers)
+	{
 		$this->middlewares = new SplPriorityQueue;
 		$this->configCallbacks = new SplStack;
 		$this->requests = new RequestStack;
 
 		$this->setEnvironment($environment);
-		$this->setContainer($container);
-		$this->setConfig($config);
-		$this->setErrorHandler($errorHandler);
+		$this->setProviders($providers);
 	}
 
 	/**
@@ -187,7 +165,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 			$this->environment = $environment();
 		}
 
-		if ($this->config !== null) {
+		if ($this->config !== null && $this->errorHandler !== null) {
 			$this->config->setEnvironment($this->environment);
 			$this->errorHandler->setDebug($this->config->get('app.debug'));
 		}
@@ -205,6 +183,19 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		}
 
 		return $this->environment;
+	}
+
+	public function setProviders(array $providers)
+	{
+		foreach ($providers as $provider) {
+			$class = is_object($provider) ? get_class($provider) : (string) $provider;
+			$this->providers[$class] = $provider;
+		}
+	}
+
+	public function getProviders()
+	{
+		return array_keys($this->providers);
 	}
 
 	public function setErrorHandler(ErrorHandlerInterface $errorHandler)
@@ -338,12 +329,14 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	{
 		if ($this->booted) return;
 
-		$this->resolveEnvironment();
-
-		foreach ($this->getProviders() as $provider) {
-			$provider = new $provider($this);
+		foreach ($this->providers as $provider) {
+			if (is_string($provider)) {
+				$provider = new $provider();
+			}
 			$this->registerProvider($provider);
 		}
+
+		$this->resolveEnvironment();
 
 		foreach ($this->configCallbacks as $callback) {
 			call_user_func($callback, $this);
@@ -352,17 +345,9 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		$this->booted = true;
 	}
 
-	protected function getProviders()
-	{
-		if ($this->config !== null) {
-			return $this->config->get('app.providers', []);
-		}
-
-		return [];
-	}
-
 	protected function registerProvider(ServiceProvider $provider)
 	{
+		$provider->setApplication($this);
 		$provider->register();
 
 		if ($this->console) {

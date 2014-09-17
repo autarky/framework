@@ -11,15 +11,14 @@ class TwigEngineIntegrationTest extends TestCase
 {
 	protected function makeApplication($providers = array())
 	{
-		$app = parent::makeApplication();
+		$providers[] = 'Autarky\Events\EventDispatcherProvider';
+		$providers[] = 'Autarky\Templating\TwigTemplatingProvider';
+		$app = parent::makeApplication((array) $providers);
 		$app->getConfig()->set('path.templates', TESTS_RSC_DIR.'/templates');
 		$app->getConfig()->set('path.templates-cache', TESTS_RSC_DIR.'/template-cache');
 		$app->getConfig()->set('session.driver', 'null');
 		$app->getConfig()->set('session.mock', true);
 		$app->getConfig()->set('app.debug', true);
-		$providers[] = 'Autarky\Events\EventServiceProvider';
-		$providers[] = 'Autarky\Templating\TwigServiceProvider';
-		$app->getConfig()->set('app.providers', $providers);
 		return $app;
 	}
 
@@ -41,7 +40,7 @@ class TwigEngineIntegrationTest extends TestCase
 	/** @test */
 	public function urlGeneration()
 	{
-		$eng = $this->makeEngine(['Autarky\Routing\RoutingServiceProvider']);
+		$eng = $this->makeEngine(['Autarky\Routing\RoutingProvider']);
 		$this->app->getRequestStack()->push(Request::create('/'));
 		$this->app->getRouter()
 			->addRoute('GET', '/test/route/{param}', function() {}, 'test.route');
@@ -62,7 +61,7 @@ class TwigEngineIntegrationTest extends TestCase
 	/** @test */
 	public function assetUrl()
 	{
-		$eng = $this->makeEngine(['Autarky\Routing\RoutingServiceProvider']);
+		$eng = $this->makeEngine(['Autarky\Routing\RoutingProvider']);
 		$this->app->getRequestStack()->push(Request::create('/index.php/foo/bar'));
 		$result = $eng->render('asseturl.twig');
 		$this->assertEquals('//localhost/asset/test.css.js', $result);
@@ -71,7 +70,7 @@ class TwigEngineIntegrationTest extends TestCase
 	/** @test */
 	public function sessionMessages()
 	{
-		$eng = $this->makeEngine(['Autarky\Session\SessionServiceProvider']);
+		$eng = $this->makeEngine(['Autarky\Session\SessionProvider']);
 		$session = $this->app->resolve('Symfony\Component\HttpFoundation\Session\Session');
 		$data = ['new' => ['_messages' => ['foo', 'bar']]];
 		$session->getFlashBag()->initialize($data);

@@ -27,7 +27,7 @@ use Autarky\Container\ContainerInterface;
 /**
  * Service provider for symfony's session classes.
  */
-class SessionServiceProvider extends ServiceProvider
+class SessionProvider extends ServiceProvider
 {
 	public function register()
 	{

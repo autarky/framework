@@ -16,7 +16,7 @@ use Autarky\Kernel\ServiceProvider;
  * Simple service provider to bind the twig templating engine onto the IoC
  * container.
  */
-class TwigServiceProvider extends ServiceProvider
+class TwigTemplatingProvider extends ServiceProvider
 {
 	public function register()
 	{
@@ -42,8 +42,8 @@ class TwigServiceProvider extends ServiceProvider
 
 		$loader->loadCoreExtensions([
 			'PartialExtension',
-			'Autarky\Routing\RoutingServiceProvider' => 'UrlGenerationExtension',
-			'Autarky\Session\SessionServiceProvider' => 'SessionExtension',
+			'Autarky\Routing\RoutingProvider' => 'UrlGenerationExtension',
+			'Autarky\Session\SessionProvider' => 'SessionExtension',
 		]);
 
 		if ($extensions = $this->app->getConfig()->get('twig.extensions')) {

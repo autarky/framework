@@ -11,7 +11,7 @@
 namespace Autarky\Container;
 
 /**
- * Simple implementation of ContainerAwareInterface that other classes can use..
+ * Simple implementation of ContainerAwareInterface that other classes can use.
  *
  * @see ContainerAwareInterface
  */

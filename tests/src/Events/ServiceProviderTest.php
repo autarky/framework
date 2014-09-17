@@ -14,7 +14,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function canResolve()
 	{
-		$app = $this->makeApplication('Autarky\Events\EventServiceProvider');
+		$app = $this->makeApplication('Autarky\Events\EventDispatcherProvider');
 		$app->boot();
 		$object = $app->getContainer()->resolve('Autarky\Events\EventDispatcher');
 		$this->assertInstanceOf('Autarky\Events\EventDispatcher', $object);
@@ -24,7 +24,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function canResolveFromInterface()
 	{
-		$app = $this->makeApplication('Autarky\Events\EventServiceProvider');
+		$app = $this->makeApplication('Autarky\Events\EventDispatcherProvider');
 		$app->boot();
 		$object = $app->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 		$this->assertInstanceOf('Symfony\Component\EventDispatcher\EventDispatcherInterface', $object);
@@ -33,7 +33,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function setsEventDispatcherOnDispatcherAwareInterface()
 	{
-		$app = $this->makeApplication('Autarky\Events\EventServiceProvider');
+		$app = $this->makeApplication('Autarky\Events\EventDispatcherProvider');
 		$app->boot();
 		$mock = m::mock('Autarky\Events\EventDispatcherAwareInterface');
 		$app->getContainer()->share('foo', function() use ($mock) { return $mock; });

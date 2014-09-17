@@ -17,7 +17,7 @@ use Autarky\Kernel\ServiceProvider;
  * Simple service provider that binds a shared PDO instance onto the container,
  * using settings found in the database config file.
  */
-class DatabaseServiceProvider extends ServiceProvider
+class DatabaseProvider extends ServiceProvider
 {
 	public function register()
 	{

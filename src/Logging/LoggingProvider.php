@@ -20,7 +20,7 @@ use Autarky\Kernel\ServiceProvider;
  * Simple service provider that binds a Monolog instance onto the container and
  * registers an error handler that logs all errors.
  */
-class LogServiceProvider extends ServiceProvider
+class LoggingProvider extends ServiceProvider
 {
 	public function register()
 	{
@@ -49,8 +49,10 @@ class LogServiceProvider extends ServiceProvider
 		$this->app->getContainer()
 			->alias('Psr\Log\LoggerInterface', 'Monolog\Logger');
 
-		$this->app->getErrorHandler()->setLogger(function() {
-			return $this->app->resolve('Psr\Log\LoggerInterface');
-		});
+		if ($errorHandler = $this->app->getErrorHandler()) {
+			$errorHandler->setLogger(function() {
+				return $this->app->resolve('Psr\Log\LoggerInterface');
+			});
+		}
 	}
 }

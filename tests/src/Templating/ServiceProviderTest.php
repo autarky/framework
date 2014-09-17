@@ -8,7 +8,7 @@ class ServiceProviderTest extends TestCase
 {
 	protected function makeApplication($providers = array())
 	{
-		$providers[] = 'Autarky\Templating\TwigServiceProvider';
+		$providers[] = 'Autarky\Templating\TwigTemplatingProvider';
 		$app = parent::makeApplication($providers);
 		$app->getConfig()->set('path.templates', TESTS_RSC_DIR.'/templates');
 		return $app;

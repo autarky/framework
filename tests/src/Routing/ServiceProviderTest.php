@@ -8,7 +8,7 @@ class ServiceProviderTest extends TestCase
 {
 	protected function checkResolve($class)
 	{
-		$app = $this->makeApplication('Autarky\Routing\RoutingServiceProvider');
+		$app = $this->makeApplication('Autarky\Routing\RoutingProvider');
 		$app->boot();
 		$object = $app->getContainer()->resolve($class);
 		$this->assertInstanceOf($class, $object);
@@ -36,7 +36,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function canResolveRequestStack()
 	{
-		$app = $this->makeApplication('Autarky\Routing\RoutingServiceProvider');
+		$app = $this->makeApplication('Autarky\Routing\RoutingProvider');
 		$app->boot();
 		$this->assertSame($app->getRequestStack(), $app->getContainer()->resolve('Symfony\Component\HttpFoundation\RequestStack'));
 	}

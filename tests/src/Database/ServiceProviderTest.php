@@ -8,7 +8,7 @@ class ServiceProviderTest extends TestCase
 	/** @test */
 	public function canResolve()
 	{
-		$app = $this->makeApplication('Autarky\Database\DatabaseServiceProvider');
+		$app = $this->makeApplication('Autarky\Database\DatabaseProvider');
 		$app->boot();
 		$object = $app->resolve('Autarky\Database\MultiPdoContainer');
 		$this->assertInstanceOf('Autarky\Database\MultiPdoContainer', $object);

@@ -18,21 +18,17 @@ class ApplicationTest extends TestCase
 		m::close();
 	}
 
-	public function makeApp($response = null)
+	protected function returnResponse($app, $response)
 	{
-		$app = $this->makeApplication();
-		if ($response) {
-			$mockRouter = m::mock('Autarky\Routing\RouterInterface');
-			$mockRouter->shouldReceive('dispatch')->andReturn(new Response($response));
-			$app->getContainer()->share('Autarky\Routing\RouterInterface', $mockRouter);
-		}
-		return $app;
+		$mockRouter = m::mock('Autarky\Routing\RouterInterface');
+		$mockRouter->shouldReceive('dispatch')->andReturn(new Response($response));
+		$app->getContainer()->share('Autarky\Routing\RouterInterface', $mockRouter);
 	}
 
 	/** @test */
 	public function environmentClosureIsResolvedOnBoot()
 	{
-		$app = $this->makeApp();
+		$app = $this->makeApplication();
 		$app->setEnvironment(function() { return 'testenv'; });
 		$app->boot();
 		$this->assertEquals('testenv', $app->getEnvironment());
@@ -41,7 +37,7 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function environmentCannotBeSetAfterBoot()
 	{
-		$app = $this->makeApp();
+		$app = $this->makeApplication();
 		$app->setEnvironment(function() { return 'testenv'; });
 		$app->boot();
 		$this->setExpectedException('RuntimeException');
@@ -51,7 +47,7 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function prematureGettingOfEnvironmentThrowsException()
 	{
-		$app = $this->makeApp();
+		$app = $this->makeApplication();
 		$app->setEnvironment(function() { return 'testenv'; });
 		$this->setExpectedException('RuntimeException');
 		$app->getEnvironment();
@@ -60,7 +56,8 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function pushStringMiddleware()
 	{
-		$app = $this->makeApp('foo');
+		$app = $this->makeApplication();
+		$this->returnResponse($app, 'foo');
 		$app->addMiddleware(__NAMESPACE__.'\MiddlewareA');
 		$response = $app->run(Request::create(''), false);
 		$this->assertEquals('fooa', $response->getContent());
@@ -69,7 +66,8 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function pushClosureMiddleware()
 	{
-		$app = $this->makeApp('foo');
+		$app = $this->makeApplication();
+		$this->returnResponse($app, 'foo');
 		$app->addMiddleware(function($app) { return new MiddlewareA($app); });
 		$response = $app->run(Request::create(''), false);
 		$this->assertEquals('fooa', $response->getContent());
@@ -78,7 +76,8 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function pushArrayMiddleware()
 	{
-		$app = $this->makeApp('foo');
+		$app = $this->makeApplication();
+		$this->returnResponse($app, 'foo');
 		$app->addMiddleware([__NAMESPACE__.'\MiddlewareC', 'c']);
 		$response = $app->run(Request::create(''), false);
 		$this->assertEquals('foobc', $response->getContent());
@@ -87,7 +86,8 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function pushMiddlewarePriority()
 	{
-		$app = $this->makeApp('foo');
+		$app = $this->makeApplication();
+		$this->returnResponse($app, 'foo');
 		$app->addMiddleware(__NAMESPACE__.'\MiddlewareA', 1);
 		$app->addMiddleware(__NAMESPACE__.'\MiddlewareB', -1);
 		$response = $app->run(Request::create(''), false);
@@ -97,7 +97,7 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function configCallbackIsCalledOnBoot()
 	{
-		$app = $this->makeApp();
+		$app = $this->makeApplication();
 		$booted = false;
 		$app->config(function() use(&$booted) { $booted = true; });
 		$this->assertEquals(false, $booted);
@@ -108,7 +108,7 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function configCallbackIsCalledImmediatelyIfBooted()
 	{
-		$app = $this->makeApp();
+		$app = $this->makeApplication();
 		$booted = false;
 		$app->boot();
 		$app->config(function() use(&$booted) { $booted = true; });
@@ -118,8 +118,7 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function serviceProvidersAreCalled()
 	{
-		$app = $this->makeApp();
-		$app->getConfig()->set('app.providers', [__NAMESPACE__.'\\StubServiceProvider']);
+		$app = $this->makeApplication([__NAMESPACE__.'\\StubServiceProvider']);
 		$app->boot();
 		$this->assertTrue(StubServiceProvider::$called);
 	}

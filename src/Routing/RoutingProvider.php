@@ -16,7 +16,7 @@ use Autarky\Kernel\ServiceProvider;
 /**
  * Simple service provider for the FastRoute implementation.
  */
-class RoutingServiceProvider extends ServiceProvider
+class RoutingProvider extends ServiceProvider
 {
 	public function register()
 	{

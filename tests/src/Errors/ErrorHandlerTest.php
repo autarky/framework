@@ -1,11 +1,11 @@
 <?php
-namespace Autarky\Tests\Kernel;
+namespace Autarky\Tests\Errors;
 
 use PHPUnit_Framework_TestCase;
 use Mockery as m;
 use Exception;
 
-use Autarky\Kernel\Errors\SymfonyErrorHandler;
+use Autarky\Errors\SymfonyErrorHandler;
 
 class ErrorHandlerTest extends PHPUnit_Framework_TestCase
 {

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Kernel\Errors;
+namespace Autarky\Errors;
 
 use Exception;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
