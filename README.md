@@ -1,4 +1,4 @@
-# Autarky [![Build Status](https://travis-ci.org/autarky/framework.png?branch=master)](https://travis-ci.org/autarky/framework) [![Latest Version](http://img.shields.io/github/tag/autarky/framework.svg)](https://github.com/autarky/framework/releases)
+# Autarky [![Build Status](https://travis-ci.org/autarky/framework.png?branch=master)](https://travis-ci.org/autarky/framework) [![Latest Version](http://img.shields.io/github/release/autarky/framework.svg)](https://github.com/autarky/framework/releases)
 
 Read the [wiki](https://github.com/autarky/framework/wiki) for more information.
 
