@@ -10,8 +10,13 @@
 
 namespace Autarky\Config\Loaders;
 
-class PhpFileLoader
+use Autarky\Config\LoaderInterface;
+
+class PhpFileLoader implements LoaderInterface
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function load($path)
 	{
 		$data = require $path;
