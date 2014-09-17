@@ -40,7 +40,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	/**
 	 * The framework version.
 	 */
-	const VERSION = '0.4.x';
+	const VERSION = '0.4.0';
 
 	/**
 	 * The application's service providers.
