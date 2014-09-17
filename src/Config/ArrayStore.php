@@ -10,7 +10,7 @@
 
 namespace Autarky\Config;
 
-use Autarky\Support\Arr;
+use Autarky\Support\ArrayUtils;
 
 /**
  * Simple array-based store primarily for testing purposes.
@@ -26,12 +26,12 @@ class ArrayStore implements ConfigInterface
 
 	public function get($key, $default = null)
 	{
-		return Arr::get($this->data, $key, $default);
+		return ArrayUtils::get($this->data, $key, $default);
 	}
 
 	public function set($key, $value)
 	{
-		Arr::set($this->data, $key, $value);
+		ArrayUtils::set($this->data, $key, $value);
 	}
 
 	public function addNamespace($namespace, $location)

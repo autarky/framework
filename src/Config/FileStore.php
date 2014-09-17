@@ -11,7 +11,7 @@
 namespace Autarky\Config;
 
 use Autarky\Support\NamespacedResourceResolver;
-use Autarky\Support\Arr;
+use Autarky\Support\ArrayUtils;
 
 class FileStore implements ConfigInterface
 {
@@ -73,7 +73,7 @@ class FileStore implements ConfigInterface
 
 		$dataKey = $namespace === null ? $group : $namespace .':'. $group;
 		
-		Arr::set($this->data, $fullKey, $value);
+		ArrayUtils::set($this->data, $fullKey, $value);
 	}
 
 	/**
@@ -98,7 +98,7 @@ class FileStore implements ConfigInterface
 
 		$dataKey = $key === null ? $dataKey : $dataKey.'.'.$key;
 
-		return Arr::get($this->data, $dataKey, $default);
+		return ArrayUtils::get($this->data, $dataKey, $default);
 	}
 
 	protected function loadData($namespace, $group, $dataKey)

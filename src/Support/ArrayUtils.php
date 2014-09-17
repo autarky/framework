@@ -13,7 +13,7 @@ namespace Autarky\Support;
 /**
  * Array utility functions.
  */
-class Arr
+class ArrayUtils
 {
 	/**
 	 * Get an element from an array.
@@ -62,6 +62,8 @@ class Arr
 		foreach ($segments as $segment) {
 			if (!array_key_exists($segment, $data)) {
 				$data[$segment] = [];
+			} else if (!is_array($data[$segment])) {
+				throw new \InvalidArgumentException('Non-array segment encountered');
 			}
 
 			$data =& $data[$segment];
