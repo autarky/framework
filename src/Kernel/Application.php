@@ -142,6 +142,20 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	}
 
 	/**
+	 * Set the environment of the application. Has to be called before boot().
+	 *
+	 * @param \Closure|string $environment
+	 */
+	public function setEnvironment($environment)
+	{
+		if ($this->booted) {
+			throw new \RuntimeException("Cannot set environment after application has booted");
+		}
+
+		$this->environment = $environment;
+	}
+
+	/**
 	 * Resolve the environment.
 	 *
 	 * @return void
