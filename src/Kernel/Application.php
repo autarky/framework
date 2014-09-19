@@ -70,12 +70,12 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected $container;
 
 	/**
-	 * @var \Autarky\Kernel\Errors\ErrorHandlerInterface
+	 * @var \Autarky\Errors\ErrorHandlerInterface
 	 */
 	protected $errorHandler;
 
 	/**
-	 * @var \Symfony\Component\EventDispatcher\DispatcherInterface|false
+	 * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|false
 	 */
 	protected $eventDispatcher;
 
@@ -435,7 +435,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	protected function dispatchEvent($name, Event $event)
 	{
 		if (!$dispatcher = $this->getEventDispatcher()) {
-			return;
+			return null;
 		}
 
 		return $dispatcher->dispatch($name, $event);

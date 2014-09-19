@@ -12,6 +12,7 @@ namespace Autarky\Events;
 
 use Symfony\Component\Console\Application;
 
+use Autarky\Container\ContainerInterface;
 use Autarky\Kernel\ServiceProvider;
 
 /**
@@ -33,7 +34,7 @@ class EventDispatcherProvider extends ServiceProvider
 		$dic->alias('Autarky\Events\EventDispatcher',
 			'Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-		$dic->resolvingAny(function($obj, $dic) {
+		$dic->resolvingAny(function($obj, ContainerInterface $dic) {
 			if ($obj instanceof EventDispatcherAwareInterface) {
 				$obj->setEventDispatcher($dic->resolve('Autarky\Events\EventDispatcher'));
 			}

@@ -20,6 +20,9 @@ abstract class Template extends \Twig_Template implements EventDispatcherAwareIn
 {
 	use EventDispatcherAwareTrait;
 
+	/**
+	 * @var \Autarky\Templating\Template
+	 */
 	protected $template;
 
 	public function setTemplate(\Autarky\Templating\Template $template)
@@ -38,6 +41,6 @@ abstract class Template extends \Twig_Template implements EventDispatcherAwareIn
 			);
 		}
 
-		return parent::display($this->template->getContext()->toArray(), $blocks);
+		parent::display($this->template->getContext()->toArray(), $blocks);
 	}
 }

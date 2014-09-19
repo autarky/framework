@@ -10,14 +10,14 @@
 
 namespace Autarky\Templating\Twig;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Twig_Environment;
 use Twig_LoaderInterface;
 
 use Autarky\Events\EventDispatcherAwareInterface;
 use Autarky\Events\EventDispatcherAwareTrait;
 use Autarky\Templating\TemplateEvent;
 
-class Environment extends \Twig_Environment implements EventDispatcherAwareInterface
+class Environment extends Twig_Environment implements EventDispatcherAwareInterface
 {
 	use EventDispatcherAwareTrait;
 
@@ -39,6 +39,7 @@ class Environment extends \Twig_Environment implements EventDispatcherAwareInter
 				new TemplateEvent($template));
 		}
 
+		/** @var \Autarky\Templating\Twig\Template $twigTemplate */
 		$twigTemplate = parent::loadTemplate($path, $index);
 		$twigTemplate->setTemplate($template);
 		$twigTemplate->setEventDispatcher($this->eventDispatcher);

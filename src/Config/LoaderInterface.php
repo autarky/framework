@@ -22,7 +22,7 @@ interface LoaderInterface
 	 *
 	 * @return array
 	 *
-	 * @throws InvalidArgumentException If location does not contain valid data
+	 * @throws \InvalidArgumentException If location does not contain valid data
 	 */
 	public function load($location);
 }
