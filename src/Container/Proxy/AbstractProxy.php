@@ -44,9 +44,9 @@ abstract class AbstractProxy
 		return call_user_func_array([static::$instances[$key], $method], $args);
 	}
 
-	protected static function getProxyIocKey()
+	protected static function getProxyContainerKey()
 	{
 		// abstract static methods are not allowed, so do this instead
-		throw new \RuntimeException('Method getProxyIocKey must be implemented.');
+		throw new \RuntimeException('Method '.__FUNCTION__.' must be implemented.');
 	}
 }
