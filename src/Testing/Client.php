@@ -23,6 +23,6 @@ class Client extends BaseClient
 	 */
 	public function __construct(Application $app)
 	{
-		parent::__construct($app->getKernel());
+		parent::__construct($app->resolveKernel());
 	}
 }

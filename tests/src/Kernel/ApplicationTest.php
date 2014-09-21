@@ -28,7 +28,7 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function environmentClosureIsResolvedOnBoot()
 	{
-		$app = new Application(function() { return 'testenv'; }, []);
+		$app = $this->makeApplication([], function() { return 'testenv'; });
 		$app->boot();
 		$this->assertEquals('testenv', $app->getEnvironment());
 	}
@@ -36,7 +36,7 @@ class ApplicationTest extends TestCase
 	/** @test */
 	public function prematureGettingOfEnvironmentThrowsException()
 	{
-		$app = new Application(function() { return 'testenv'; }, []);
+		$app = $this->makeApplication([], function() { return 'testenv'; });
 		$this->setExpectedException('RuntimeException');
 		$app->getEnvironment();
 	}

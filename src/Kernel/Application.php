@@ -299,11 +299,6 @@ class Application implements ArrayAccess
 		return $this->stack;
 	}
 
-	public function getKernel()
-	{
-		return $this->kernel;
-	}
-
 	/**
 	 * Add a middleware to the application.
 	 *
@@ -343,7 +338,7 @@ class Application implements ArrayAccess
 		$this->registerProviders();
 		$this->resolveEnvironment();
 		$this->callConfigCallbacks();
-		$this->resolveKernel();
+		$this->resolveStack();
 
 		$this->booted = true;
 	}
@@ -375,8 +370,10 @@ class Application implements ArrayAccess
 		}
 	}
 
-	protected function resolveKernel()
+	protected function resolveStack()
 	{
+		if ($this->stack !== null) return $this->stack;
+
 		$this->stack = new StackBuilder;
 
 		foreach ($this->middlewares as $middleware) {
@@ -386,11 +383,20 @@ class Application implements ArrayAccess
 			call_user_func_array([$this->stack, 'push'], $middleware);
 		}
 
+		return $this->stack;
+	}
+
+	public function resolveKernel()
+	{
+		if ($this->kernel !== null) return $this->kernel;
+
+		$this->resolveStack();
+
 		$kernel = new HttpKernel(
 			$this->getRouter(), $this->errorHandler, $this->requests, $this->getEventDispatcher()
 		);
 
-		$this->kernel = $this->stack->resolve($kernel);
+		return $this->kernel = $this->stack->resolve($kernel);
 	}
 
 	/**
@@ -409,7 +415,8 @@ class Application implements ArrayAccess
 			$request = Request::createFromGlobals();
 		}
 
-		$response = $this->kernel->handle($request);
+		$response = $this->resolveKernel()
+			->handle($request);
 
 		return $send ? $response->send() : $response;
 	}

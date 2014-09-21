@@ -275,7 +275,7 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	 */
 	public function handleUncaught(Exception $exception)
 	{
-		if ($this->rethrow) {
+		if (PHP_SAPI === 'cli') {
 			throw $exception;
 		}
 
