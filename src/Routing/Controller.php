@@ -168,7 +168,21 @@ abstract class Controller implements ContainerAwareInterface
 	}
 
 	/**
-	 * Get the logger.
+	 * Log a message.
+	 *
+	 * @param  string $level   https://github.com/php-fig/log/blob/master/Psr/Log/LogLevel.php
+	 * @param  string $message
+	 * @param  array  $context
+	 *
+	 * @return void
+	 */
+	protected function log($level, $message, array $context = array())
+	{
+		$this->getLogger()->log($level, $message, $context);
+	}
+
+	/**
+	 * Get the logger instance.
 	 *
 	 * @return \Psr\Log\LoggerInterface
 	 */
