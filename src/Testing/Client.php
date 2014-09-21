@@ -18,11 +18,4 @@ use Symfony\Component\HttpKernel\Client as BaseClient;
  */
 class Client extends BaseClient
 {
-	/**
-	 * {@inheritdoc}
-	 */
-	public function __construct(Application $app)
-	{
-		parent::__construct($app->resolveKernel());
-	}
 }

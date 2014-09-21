@@ -19,6 +19,7 @@ use Stack\Builder as StackBuilder;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
@@ -30,7 +31,7 @@ use Autarky\Routing\RouterInterface;
 /**
  * The main application of the framework.
  */
-class Application implements ArrayAccess
+class Application implements HttpKernelInterface, ArrayAccess
 {
 	/**
 	 * The framework version.
@@ -386,7 +387,7 @@ class Application implements ArrayAccess
 		return $this->stack;
 	}
 
-	public function resolveKernel()
+	protected function resolveKernel()
 	{
 		if ($this->kernel !== null) return $this->kernel;
 
@@ -408,16 +409,24 @@ class Application implements ArrayAccess
 	 */
 	public function run(Request $request = null, $send = true)
 	{
-		$this->boot();
-
 		if ($request === null) {
 			$request = Request::createFromGlobals();
 		}
 
-		$response = $this->resolveKernel()
-			->handle($request);
+		$response = $this->handle($request);
 
 		return $send ? $response->send() : $response;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $throw = false)
+	{
+		$this->boot();
+
+		return $this->resolveKernel()
+			->handle($request, $type, $throw);
 	}
 
 	/**
