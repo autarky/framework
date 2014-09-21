@@ -10,6 +10,7 @@
 
 namespace Autarky\Testing;
 
+use Autarky\Kernel\Application;
 use Symfony\Component\HttpKernel\Client as BaseClient;
 
 /**
@@ -20,8 +21,8 @@ class Client extends BaseClient
 	/**
 	 * {@inheritdoc}
 	 */
-	protected function doRequest($request)
+	public function __construct(Application $app)
 	{
-		return $this->kernel->run($request, false);
+		parent::__construct($app->getKernel());
 	}
 }

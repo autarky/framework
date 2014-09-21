@@ -17,14 +17,8 @@ use SplPriorityQueue;
 use SplStack;
 use Stack\Builder as StackBuilder;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event as KernelEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\TerminableInterface;
 
 use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
@@ -36,7 +30,7 @@ use Autarky\Routing\RouterInterface;
 /**
  * The main application of the framework.
  */
-class Application implements HttpKernelInterface, TerminableInterface, ArrayAccess
+class Application implements ArrayAccess
 {
 	/**
 	 * The framework version.
@@ -54,6 +48,11 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 * @var \SplPriorityQueue
 	 */
 	protected $middlewares;
+
+	/**
+	 * @var \Autarky\Kernel\HttpKernel
+	 */
+	protected $kernel;
 
 	/**
 	 * @var \Stack\Builder
@@ -295,6 +294,16 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		return $this->requests;
 	}
 
+	public function getStack()
+	{
+		return $this->stack;
+	}
+
+	public function getKernel()
+	{
+		return $this->kernel;
+	}
+
 	/**
 	 * Add a middleware to the application.
 	 *
@@ -331,20 +340,22 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	{
 		if ($this->booted) return;
 
+		$this->registerProviders();
+		$this->resolveEnvironment();
+		$this->callConfigCallbacks();
+		$this->resolveKernel();
+
+		$this->booted = true;
+	}
+
+	protected function registerProviders()
+	{
 		foreach ($this->providers as $provider) {
 			if (is_string($provider)) {
 				$provider = new $provider();
 			}
 			$this->registerProvider($provider);
 		}
-
-		$this->resolveEnvironment();
-
-		foreach ($this->configCallbacks as $callback) {
-			call_user_func($callback, $this);
-		}
-
-		$this->booted = true;
 	}
 
 	protected function registerProvider(ServiceProvider $provider)
@@ -355,6 +366,31 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 		if ($this->console) {
 			$provider->registerConsole($this->console);
 		}
+	}
+
+	protected function callConfigCallbacks()
+	{
+		foreach ($this->configCallbacks as $callback) {
+			call_user_func($callback, $this);
+		}
+	}
+
+	protected function resolveKernel()
+	{
+		$this->stack = new StackBuilder;
+
+		foreach ($this->middlewares as $middleware) {
+			if (!is_array($middleware)) {
+				$middleware = [$middleware];
+			}
+			call_user_func_array([$this->stack, 'push'], $middleware);
+		}
+
+		$kernel = new HttpKernel(
+			$this->getRouter(), $this->errorHandler, $this->requests, $this->getEventDispatcher()
+		);
+
+		$this->kernel = $this->stack->resolve($kernel);
 	}
 
 	/**
@@ -373,100 +409,9 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 			$request = Request::createFromGlobals();
 		}
 
-		$this->stack = new StackBuilder;
-
-		foreach ($this->middlewares as $middleware) {
-			if (!is_array($middleware)) {
-				$middleware = [$middleware];
-			}
-			call_user_func_array([$this->stack, 'push'], $middleware);
-		}
-
-		$response = $this->stack->resolve($this)
-			->handle($request);
+		$response = $this->kernel->handle($request);
 
 		return $send ? $response->send() : $response;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
-	{
-		try {
-			return $this->innerHandle($request, $type);
-		} catch (Exception $exception) {
-			if (!$catch) {
-				$this->finishRequest();
-				throw $exception;
-			}
-
-			return $this->handleException($exception, $request, $type);
-		}
-	}
-
-	protected function innerHandle(Request $request, $type)
-	{
-		$this->requests->push($request);
-
-		$event = new KernelEvent\GetResponseEvent($this, $request, $type);
-		$this->dispatchEvent(KernelEvents::REQUEST, $event);
-
-		$response = $event->getResponse() ?: $this->getRouter()->dispatch($request);
-
-		return $this->filterResponse($response, $request, $type);
-	}
-
-	protected function handleException(Exception $exception, Request $request, $type)
-	{
-		$event = new KernelEvent\GetResponseForExceptionEvent($this, $request, $type, $exception);
-		$this->dispatchEvent(KernelEvents::EXCEPTION, $event);
-
-		$response = $event->getResponse() ?: $this->errorHandler->handle($exception);
-
-		try {
-			return $this->filterResponse($response, $request, $type);
-		} catch (Exception $e) {
-			return $response;
-		}
-	}
-
-	protected function filterResponse(Response $response, Request $request, $type)
-	{
-		$event = new KernelEvent\FilterResponseEvent($this, $request, $type, $response);
-		$this->dispatchEvent(KernelEvents::RESPONSE, $event);
-
-		$response->prepare($request);
-
-		$this->finishRequest($request, $type);
-
-		return $event->getResponse();
-	}
-
-	protected function finishRequest(Request $request, $type)
-	{
-		$event = new KernelEvent\FinishRequestEvent($this, $request, $type);
-		$this->dispatchEvent(KernelEvents::FINISH_REQUEST, $event);
-
-		$this->requests->pop();
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function terminate(Request $request, Response $response)
-	{
-		$event = new KernelEvent\PostResponseEvent($this, $request, $response);
-		$this->dispatchEvent(KernelEvents::TERMINATE, $event);
-	}
-
-	protected function dispatchEvent($name, Event $event)
-	{
-		if (!$dispatcher = $this->getEventDispatcher()) {
-			return null;
-		}
-
-		return $dispatcher->dispatch($name, $event);
 	}
 
 	/**

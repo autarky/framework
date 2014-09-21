@@ -40,8 +40,10 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		$this->app = $this->createApplication();
-		$this->client = $this->createClient();
 		$this->app->setEnvironment('testing');
+		$this->app->boot();
+		$this->app->getErrorHandler()->setRethrow(true);
+		$this->client = $this->createClient();
 	}
 
 	/**
