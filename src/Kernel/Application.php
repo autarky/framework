@@ -390,13 +390,12 @@ class Application implements ArrayAccess
 	{
 		if ($this->kernel !== null) return $this->kernel;
 
-		$this->resolveStack();
-
 		$kernel = new HttpKernel(
 			$this->getRouter(), $this->errorHandler, $this->requests, $this->getEventDispatcher()
 		);
 
-		return $this->kernel = $this->stack->resolve($kernel);
+		return $this->kernel = $this->resolveStack()
+			->resolve($kernel);
 	}
 
 	/**
