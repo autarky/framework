@@ -416,6 +416,7 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 			$this->dispatchEvent(KernelEvents::EXCEPTION, $event);
 
 			$response = $event->getResponse() ?: $this->errorHandler->handle($exception);
+			$response->prepare($request);
 		}
 
 		$this->requests->pop();
