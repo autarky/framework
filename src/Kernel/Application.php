@@ -12,6 +12,7 @@ namespace Autarky\Kernel;
 
 use ArrayAccess;
 use Closure;
+use Exception;
 use SplPriorityQueue;
 use SplStack;
 use Stack\Builder as StackBuilder;
@@ -392,36 +393,62 @@ class Application implements HttpKernelInterface, TerminableInterface, ArrayAcce
 	 */
 	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
-		$this->requests->push($request);
-
 		try {
-			$event = new KernelEvent\GetResponseEvent($this, $request, $type);
-			$this->dispatchEvent(KernelEvents::REQUEST, $event);
-
-			$response = $event->getResponse() ?: $this->getRouter()->dispatch($request);
-
-			$event = new KernelEvent\FilterResponseEvent($this, $request, $type, $response);
-			$this->dispatchEvent(KernelEvents::RESPONSE, $event);
-
-			$response->prepare($request);
-
-			$event = new KernelEvent\FinishRequestEvent($this, $request, $type, $response);
-			$this->dispatchEvent(KernelEvents::FINISH_REQUEST, $event);
-		} catch (\Exception $exception) {
+			return $this->innerHandle($request, $type);
+		} catch (Exception $exception) {
 			if (!$catch) {
+				$this->finishRequest();
 				throw $exception;
 			}
 
-			$event = new KernelEvent\GetResponseForExceptionEvent($this, $request, $type, $exception);
-			$this->dispatchEvent(KernelEvents::EXCEPTION, $event);
-
-			$response = $event->getResponse() ?: $this->errorHandler->handle($exception);
-			$response->prepare($request);
+			return $this->handleException($exception, $request, $type);
 		}
+	}
+
+	protected function innerHandle(Request $request, $type)
+	{
+		$this->requests->push($request);
+
+		$event = new KernelEvent\GetResponseEvent($this, $request, $type);
+		$this->dispatchEvent(KernelEvents::REQUEST, $event);
+
+		$response = $event->getResponse() ?: $this->getRouter()->dispatch($request);
+
+		return $this->filterResponse($response, $request, $type);
+	}
+
+	protected function handleException(Exception $exception, Request $request, $type)
+	{
+		$event = new KernelEvent\GetResponseForExceptionEvent($this, $request, $type, $exception);
+		$this->dispatchEvent(KernelEvents::EXCEPTION, $event);
+
+		$response = $event->getResponse() ?: $this->errorHandler->handle($exception);
+
+		try {
+			return $this->filterResponse($response, $request, $type);
+		} catch (Exception $e) {
+			return $response;
+		}
+	}
+
+	protected function filterResponse(Response $response, Request $request, $type)
+	{
+		$event = new KernelEvent\FilterResponseEvent($this, $request, $type, $response);
+		$this->dispatchEvent(KernelEvents::RESPONSE, $event);
+
+		$response->prepare($request);
+
+		$this->finishRequest($request, $type);
+
+		return $event->getResponse();
+	}
+
+	protected function finishRequest(Request $request, $type)
+	{
+		$event = new KernelEvent\FinishRequestEvent($this, $request, $type);
+		$this->dispatchEvent(KernelEvents::FINISH_REQUEST, $event);
 
 		$this->requests->pop();
-
-		return $response;
 	}
 
 	/**
