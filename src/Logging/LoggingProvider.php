@@ -32,7 +32,7 @@ class LoggingProvider extends ServiceProvider
 					throw new \RuntimeException("Log directory $logdir does not exist or is not a directory.");
 				}
 
-				$logpath = rtrim($logdir, '\\/').'/'.php_sapi_name().'.log';
+				$logpath = rtrim($logdir, '\\/').'/'.PHP_SAPI.'.log';
 
 				if (file_exists($logpath) && !is_writable($logpath)) {
 					throw new \RuntimeException("Log file $logpath is not writeable.");

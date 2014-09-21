@@ -46,6 +46,11 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 		$this->client = $this->createClient();
 	}
 
+	protected function enableExceptionHandling()
+	{
+		$this->app->getErrorHandler()->setRethrow(false);
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */

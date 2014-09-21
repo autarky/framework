@@ -79,7 +79,7 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	{
 		if ($rethrow !== null) {
 			$this->rethrow = (bool) $rethrow;
-		} else if (php_sapi_name() === 'cli') {
+		} else if (PHP_SAPI === 'cli') {
 			$this->rethrow = true;
 		} else {
 			$this->rethrow = false;
@@ -150,9 +150,9 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	 */
 	public function handle(Exception $exception)
 	{
-		$this->logException($exception);
-
 		if ($this->rethrow) throw $exception;
+
+		$this->logException($exception);
 
 		foreach ($this->handlers as $handler) {
 			if (!$this->matchesTypehint($handler, $exception)) continue;
@@ -275,6 +275,10 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	 */
 	public function handleUncaught(Exception $exception)
 	{
+		if ($this->rethrow) {
+			throw $exception;
+		}
+
 		return $this->handle($exception)
 			->send();
 	}
