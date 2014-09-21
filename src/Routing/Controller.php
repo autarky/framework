@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\EventDispatcher\Event;
 
 use Autarky\Container\ContainerAwareInterface;
 use Autarky\Container\ContainerAwareTrait;
@@ -156,14 +157,14 @@ abstract class Controller implements ContainerAwareInterface
 	 * Dispatch an event.
 	 *
 	 * @param  string $name
-	 * @param  mixed  $data
+	 * @param  Event  $event
 	 *
 	 * @return mixed
 	 */
-	protected function dispatchEvent($name, $data = null)
+	protected function dispatchEvent($name, Event $event)
 	{
 		return $this->getEventDispatcher()
-			->dispatch($name, $data);
+			->dispatch($name, $event);
 	}
 
 	/**
