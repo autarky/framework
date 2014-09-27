@@ -281,8 +281,14 @@ class Container implements ContainerInterface
 				} else if ($param->isDefaultValueAvailable()) {
 					$args[] = $param->getDefaultValue();
 				} else {
+					if ($reflFunc instanceof ReflectionMethod) {
+						$funcName = $reflFunc->getDeclaringClass()->getName()
+							.'::'.$reflFunc->getName();
+					} else {
+						$funcName = $reflFunc->getName();
+					}
 					throw new UnresolvableDependencyException('Unresolvable dependency: '
-						.'Argument #'.$param->getPosition().' ($'.$name.') of '.$reflFunc->getName());
+						.'Argument #'.$param->getPosition().' ($'.$name.') of '.$funcName);
 				}
 			}
 		}

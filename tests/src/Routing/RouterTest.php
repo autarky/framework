@@ -3,9 +3,11 @@ namespace Autarky\Tests\Routing;
 
 use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Autarky\Container\Container;
+use Autarky\Routing\Route;
 use Autarky\Routing\Router;
 
 class RouterTest extends PHPUnit_Framework_TestCase
@@ -82,10 +84,26 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$router = $this->makeRouter();
 		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
 		$route->addAfterFilter(function() { return; });
-		$route->addAfterFilter(function() { return 'baz'; });
+		$route->addAfterFilter(function(Response $r) { $r->setContent('baz'); });
 		$response = $router->dispatch(Request::create('/foo'));
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
 		$this->assertEquals('baz', $response->getContent());
+	}
+
+	/** @test */
+	public function filtersArePassedRouteRequestAndResponse()
+	{
+		$router = $this->makeRouter();
+		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
+		$route->addBeforeFilter(function(Route $route, Request $request) {
+
+		});
+		$route->addAfterFilter(function(Route $route, Request $request, Response $response) {
+
+		});
+		$response = $router->dispatch(Request::create('/foo'));
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals('foo', $response->getContent());
 	}
 
 	/**

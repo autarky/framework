@@ -23,7 +23,6 @@ use FastRoute\Dispatcher\GroupCountBased as Dispatcher;
 use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 
 use Autarky\Container\ContainerInterface;
-use Autarky\Container\ContainerAwareInterface;
 use Autarky\Events\EventDispatcherAwareInterface;
 use Autarky\Events\EventDispatcherAwareTrait;
 
@@ -170,7 +169,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		$methods = (array) $methods;
 
 		if (substr($url, 0, 1) !== '/') {
-			$url = '/'.$url;
+			$url = '/' . $url;
 		}
 
 		$route = $this->createRoute($methods, $url, $handler, $name);
@@ -240,7 +239,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 				foreach ($result[2] as $key => $value) {
 					$args["\$$key"] = $value;
 				}
-				return $this->makeResponse($this->getResult($request, $result[1], $args));
+				return $this->getResponse($request, $result[1], $args);
 				break;
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
@@ -258,7 +257,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		}
 	}
 
-	protected function getResult(Request $request, Route $route, array $args)
+	protected function getResponse(Request $request, Route $route, array $args)
 	{
 		if ($this->eventDispatcher !== null) {
 			$event = new Events\RouteMatchedEvent($request, $route);
@@ -268,20 +267,23 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		$this->currentRoute = $route;
 
 		foreach ($route->getBeforeFilters() as $filter) {
-			if ($result = $this->callFilter($filter, [$route, $request])) {
-				return $result;
+			if ($response = $this->callFilter($filter, $route, $request)) {
+				return $this->makeResponse($response);
 			}
 		}
 
-		$result = $this->callRoute($route, $request, $args);
+		$response = $this->makeResponse($this->callRoute($route, $request, $args));
 
 		foreach ($route->getAfterFilters() as $filter) {
-			if ($afterResult = $this->callFilter($filter, [$route, $request, $result])) {
-				return $afterResult;
-			}
+			$this->callFilter($filter, $route, $request, $response);
 		}
 
-		return $result;
+		return $response;
+	}
+
+	protected function makeResponse($result)
+	{
+		return $result instanceof Response ? $result : new Response($result);
 	}
 
 	protected function callRoute(Route $route, Request $request, array $args)
@@ -291,22 +293,15 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		return $this->container->execute($route->getCallable(), $args);
 	}
 
-	protected function makeResponse($result)
+	protected function callFilter($filter, Route $route, Request $request, Response $response = null)
 	{
-		return $result instanceof Response ? $result : new Response($result);
-	}
+		$args = [
+			'Autarky\Routing\Route' => $route,
+			'Symfony\Component\HttpFoundation\Request' => $request,
+			'Symfony\Component\HttpFoundation\Response' => $response,
+		];
 
-	protected function callFilter($filter, array $args)
-	{
-		if ($filter instanceof Closure) {
-			return call_user_func_array($filter, $args);
-		}
-
-		list($class, $method) = \Autarky\splitclm($filter, 'filter');
-
-		$obj = $this->container->resolve($class);
-
-		return call_user_func_array([$obj, $method], $args);
+		return $this->container->execute($filter, $args);
 	}
 
 	protected function getDispatcher()
