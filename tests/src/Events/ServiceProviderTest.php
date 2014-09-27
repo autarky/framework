@@ -36,7 +36,7 @@ class ServiceProviderTest extends TestCase
 		$app = $this->makeApplication('Autarky\Events\EventDispatcherProvider');
 		$app->boot();
 		$mock = m::mock('Autarky\Events\EventDispatcherAwareInterface');
-		$app->getContainer()->share('foo', function() use ($mock) { return $mock; });
+		$app->getContainer()->define('foo', function() use ($mock) { return $mock; });
 		$mock->shouldReceive('setEventDispatcher')->once();
 		$app->resolve('foo');
 	}

@@ -17,30 +17,33 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function shareClosure()
 	{
 		$c = $this->makeContainer();
-		$c->share('foo', function() { return new \StdClass; });
+		$c->define('foo', function() { return new \StdClass; });
+		$c->share('foo');
 		$this->assertSame($c->resolve('foo'), $c->resolve('foo'));
 	}
 
 	/** @test */
-	public function shareObject()
+	public function alias()
 	{
 		$c = $this->makeContainer();
-		$c->share('foo', $o = new \StdClass);
+		$c->define('foo', function() { return new LowerClass; });
+		$c->share('foo');
+		$c->alias('foo', __NAMESPACE__.'\\LowerClass');
+		$this->assertTrue($c->isBound(__NAMESPACE__.'\\LowerClass'));
+		$this->assertSame($c->resolve('foo'), $c->resolve(__NAMESPACE__.'\\UpperClass')->cl);
+	}
+
+	/** @test */
+	public function instance()
+	{
+		$c = $this->makeContainer();
+		$c->instance('foo', $o = new \StdClass);
 		$this->assertSame($o, $c->resolve('foo'));
 		$this->assertSame($c->resolve('foo'), $c->resolve('foo'));
 	}
 
 	/** @test */
-	public function shareString()
-	{
-		$c = $this->makeContainer();
-		$c->share('foo', 'StdClass');
-		$this->assertInstanceOf('StdClass', $c->resolve('foo'));
-		$this->assertSame($c->resolve('foo'), $c->resolve('foo'));
-	}
-
-	/** @test */
-	public function shareOnlyAbstract()
+	public function shareWithoutFactory()
 	{
 		$c = $this->makeContainer();
 		$c->share('StdClass');
@@ -49,28 +52,10 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function bindClosure()
+	public function factoriesAreNotSharedByDefault()
 	{
 		$c = $this->makeContainer();
-		$c->bind('foo', function() { return new \StdClass; });
-		$this->assertNotSame($c->resolve('foo'), $c->resolve('foo'));
-	}
-
-	/** @test */
-	public function bindObject()
-	{
-		$c = $this->makeContainer();
-		$c->share('foo', $o = new \StdClass);
-		$this->assertSame($o, $c->resolve('foo'));
-		$this->assertSame($c->resolve('foo'), $c->resolve('foo'));
-	}
-
-	/** @test */
-	public function bindString()
-	{
-		$c = $this->makeContainer();
-		$c->bind('foo', 'StdClass');
-		$this->assertInstanceOf('StdClass', $c->resolve('foo'));
+		$c->define('foo', function() { return new \StdClass; });
 		$this->assertNotSame($c->resolve('foo'), $c->resolve('foo'));
 	}
 
@@ -78,12 +63,12 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function resolveDependencies()
 	{
 		$c = $this->makeContainer();
-		$o = $c->resolve(__NAMESPACE__ .'\\UpperClass');
-		$this->assertInstanceOf(__NAMESPACE__ .'\\UpperClass', $o);
-		$this->assertInstanceOf(__NAMESPACE__ .'\\LowerClass', $o->cl);
+		$o1 = $c->resolve(__NAMESPACE__ .'\\UpperClass');
+		$this->assertInstanceOf(__NAMESPACE__ .'\\UpperClass', $o1);
+		$this->assertInstanceOf(__NAMESPACE__ .'\\LowerClass', $o1->cl);
 		$o2 = $c->resolve(__NAMESPACE__ .'\\UpperClass');
-		$this->assertNotSame($o, $o2);
-		$this->assertNotSame($o->cl, $o2->cl);
+		$this->assertNotSame($o1, $o2);
+		$this->assertNotSame($o1->cl, $o2->cl);
 	}
 
 	/** @test */
@@ -91,37 +76,55 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	{
 		$c = $this->makeContainer();
 		$c->share(__NAMESPACE__.'\\LowerClass');
-		$o = $c->resolve(__NAMESPACE__ .'\\UpperClass');
-		$this->assertInstanceOf(__NAMESPACE__ .'\\UpperClass', $o);
-		$this->assertInstanceOf(__NAMESPACE__ .'\\LowerClass', $o->cl);
+		$o1 = $c->resolve(__NAMESPACE__ .'\\UpperClass');
+		$this->assertInstanceOf(__NAMESPACE__ .'\\UpperClass', $o1);
+		$this->assertInstanceOf(__NAMESPACE__ .'\\LowerClass', $o1->cl);
 		$o2 = $c->resolve(__NAMESPACE__ .'\\UpperClass');
-		$this->assertNotSame($o, $o2);
-		$this->assertSame($o->cl, $o2->cl);
+		$this->assertNotSame($o1, $o2);
+		$this->assertSame($o1->cl, $o2->cl);
 	}
 
 	/** @test */
-	public function resolveOptionalDependencies()
+	public function resolveOptionalDependencyIsNullWhenNotConfigured()
 	{
 		$c = $this->makeContainer();
 		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
 		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
 		$this->assertNull($obj->opt);
-
-		$c->bind(__NAMESPACE__.'\\OptionalInterface', __NAMESPACE__.'\\OptionalClass');
-		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
-		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
-		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $obj->opt);
-
 	}
 
 	/** @test */
-	public function alias()
+	public function optionalDependenciesAreResolvedWithAlias()
 	{
 		$c = $this->makeContainer();
-		$c->share('foo', function() { return new LowerClass; });
-		$c->alias(__NAMESPACE__.'\\LowerClass', 'foo');
-		$this->assertTrue($c->isBound(__NAMESPACE__.'\\LowerClass'));
-		$this->assertSame($c->resolve('foo'), $c->resolve(__NAMESPACE__.'\\UpperClass')->cl);
+		$c->alias(__NAMESPACE__.'\\OptionalClass', __NAMESPACE__.'\\OptionalInterface');
+		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
+		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $obj->opt);
+	}
+
+	/** @test */
+	public function optionalDependenciesAreResolvedWithParams()
+	{
+		$c = $this->makeContainer();
+		$c->params(__NAMESPACE__.'\\OptionalDependencyClass', [
+			__NAMESPACE__.'\\OptionalInterface' => __NAMESPACE__.'\\OptionalClass',
+		]);
+		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
+		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $obj->opt);
+	}
+
+	/** @test */
+	public function optionalDependenciesAreResolvedWithParamsUsingVariableNames()
+	{
+		$c = $this->makeContainer();
+		$c->params(__NAMESPACE__.'\\OptionalDependencyClass', [
+			'$opt' => __NAMESPACE__.'\\OptionalClass',
+		]);
+		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
+		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $obj->opt);
 	}
 
 	/** @test */
@@ -136,14 +139,17 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function boundReturnsTrueWhenBound()
 	{
 		$c = $this->makeContainer();
+
 		$this->assertEquals(false, $c->isBound('StdClass'));
-		$this->assertEquals(false, $c->isBound('foo'));
-		$this->assertEquals(false, $c->isBound('bar'));
-		$c->bind('StdClass');
-		$c->bind('foo', function() { return 'foo'; });
-		$c->share('bar', function() { return 'foo'; });
+		$c->share('StdClass');
 		$this->assertEquals(true, $c->isBound('StdClass'));
+
+		$this->assertEquals(false, $c->isBound('foo'));
+		$c->define('foo', function() { return 'foo'; });
 		$this->assertEquals(true, $c->isBound('foo'));
+
+		$this->assertEquals(false, $c->isBound('bar'));
+		$c->instance('bar', 'bar');
 		$this->assertEquals(true, $c->isBound('bar'));
 	}
 
@@ -183,7 +189,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function resolvingCallbacksAreCalled()
 	{
 		$c = $this->makeContainer();
-		$c->bind('foo', function() { return new \StdClass; });
+		$c->define('foo', function() { return new \StdClass; });
 		$c->resolving('foo', function($o, $c) { $o->bar = 'baz'; });
 		$this->assertEquals('baz', $c->resolve('foo')->bar);
 	}
@@ -194,6 +200,42 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$c = $this->makeContainer();
 		$c->resolvingAny(function($o, $c) { $o->bar = 'baz'; });
 		$this->assertEquals('baz', $c->resolve('StdClass')->bar);
+	}
+
+	/** @test */
+	public function executeInvokes()
+	{
+		$c = $this->makeContainer();
+		$retval = $c->execute(function() { return 42; });
+		$this->assertEquals(42, $retval);
+	}
+
+	/** @test */
+	public function executeResolvesDependencies()
+	{
+		$c = $this->makeContainer();
+		$callback = function(LowerClass $lc) { return $lc; };
+		$retval = $c->execute($callback);
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $retval);
+	}
+
+	/** @test */
+	public function executeCanBePassedParams()
+	{
+		$c = $this->makeContainer();
+		$callback = function($param) { return $param; };
+		$retval = $c->execute($callback, ['$param' => 42]);
+		$this->assertEquals(42, $retval);
+	}
+
+	/** @test */
+	public function executeCanBePassedObjectParam()
+	{
+		$c = $this->makeContainer();
+		$lc = new LowerClass;
+		$callback = function(LowerClass $lc) { return $lc; };
+		$retval = $c->execute($callback, ['$lc' => $lc]);
+		$this->assertSame($lc, $retval);
 	}
 }
 

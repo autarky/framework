@@ -16,6 +16,9 @@ class ContainerProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->setContainer(new Container);
+		$this->app->setContainer($dic = new Container);
+		$dic->instance('Autarky\Kernel\Application', $this->app);
+		$dic->instance('Autarky\Container\Container', $dic);
+		$dic->alias('Autarky\Container\Container', 'Autarky\Container\ContainerInterface');
 	}
 }

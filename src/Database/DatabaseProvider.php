@@ -21,11 +21,14 @@ class DatabaseProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->getContainer()->share('Autarky\Database\MultiPdoContainer', function() {
+		$dic = $this->app->getContainer();
+
+		$dic->define('Autarky\Database\MultiPdoContainer', function() {
 			return new MultiPdoContainer($this->app->getConfig());
 		});
+		$dic->share('Autarky\Database\MultiPdoContainer');
 
-		$this->app->getContainer()->share('PDO', function(ContainerInterface $container) {
+		$dic->define('PDO', function(ContainerInterface $container) {
 			return $container->resolve('Autarky\Database\MultiPdoContainer')->getPdo();
 		});
 	}

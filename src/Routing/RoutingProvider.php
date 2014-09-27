@@ -20,19 +20,23 @@ class RoutingProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->getContainer()->share('Symfony\Component\HttpFoundation\RequestStack', function() {
+		$dic = $this->app->getContainer();
+
+		$dic->define('Symfony\Component\HttpFoundation\RequestStack', function() {
 			return $this->app->getRequestStack();
 		});
+		$dic->share('Symfony\Component\HttpFoundation\RequestStack');
 
-		$this->app->getContainer()->share('Autarky\Routing\RouterInterface', function(ContainerInterface $container) {
+		$dic->define('Autarky\Routing\Router', function(ContainerInterface $container) {
 			return new Router(
 				$container, $this->app->getConfig()->get('path.route-cache')
 			);
 		});
+		$dic->share('Autarky\Routing\Router');
 
-		$this->app->getContainer()->share('Autarky\Routing\UrlGenerator');
+		$dic->share('Autarky\Routing\UrlGenerator');
 
-		$this->app->getContainer()->alias('Autarky\Routing\Router',
+		$dic->alias('Autarky\Routing\Router',
 			'Autarky\Routing\RouterInterface');
 
 		$this->app->config(function() {

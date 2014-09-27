@@ -220,9 +220,10 @@ class Application implements HttpKernelInterface, ArrayAccess
 	public function setContainer(ContainerInterface $container)
 	{
 		$this->container = $container;
-		$this->container->share('Autarky\Container\ContainerInterface', $this->container);
-		$this->container->share(get_class($this->container), $this->container);
-		$container->share(get_class($this), $this);
+		$class = get_class($container);
+		$this->container->alias($class, 'Autarky\Container\ContainerInterface');
+		$this->container->instance($class, $this->container);
+		$container->instance(get_class($this), $this);
 	}
 
 	/**

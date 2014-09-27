@@ -24,7 +24,8 @@ class TwigTemplatingProvider extends ServiceProvider
 
 		$dic->share('Autarky\Templating\TemplatingEngine');
 
-		$dic->share('Twig_Environment', [$this, 'makeTwigEnvironment']);
+		$dic->define('Autarky\Templating\Twig\Environment', [$this, 'makeTwigEnvironment']);
+		$dic->share('Autarky\Templating\Twig\Environment');
 		$dic->alias('Autarky\Templating\Twig\Environment', 'Twig_Environment');
 	}
 

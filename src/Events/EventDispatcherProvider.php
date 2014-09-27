@@ -25,11 +25,11 @@ class EventDispatcherProvider extends ServiceProvider
 	{
 		$dic = $this->app->getContainer();
 
-		$dic->share(
-			'Symfony\Component\EventDispatcher\EventDispatcherInterface',
+		$dic->define('Autarky\Events\EventDispatcher',
 			function($dic) {
 				return new EventDispatcher($dic);
 			});
+		$dic->share('Autarky\Events\EventDispatcher');
 
 		$dic->alias('Autarky\Events\EventDispatcher',
 			'Symfony\Component\EventDispatcher\EventDispatcherInterface');

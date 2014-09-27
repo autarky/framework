@@ -24,7 +24,9 @@ class LoggingProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->getContainer()->share('Monolog\Logger', function() {
+		$dic = $this->app->getContainer();
+
+		$dic->define('Monolog\Logger', function() {
 			$logger = new Logger($this->app->getEnvironment());
 
 			if ($logdir = $this->app->getConfig()->get('path.logs')) {
@@ -45,9 +47,9 @@ class LoggingProvider extends ServiceProvider
 
 			return $logger;
 		});
+		$dic->share('Monolog\Logger');
 
-		$this->app->getContainer()
-			->alias('Psr\Log\LoggerInterface', 'Monolog\Logger');
+		$dic->alias('Monolog\Logger', 'Psr\Log\LoggerInterface');
 
 		if ($errorHandler = $this->app->getErrorHandler()) {
 			$errorHandler->setLogger(function() {

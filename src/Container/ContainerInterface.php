@@ -41,60 +41,86 @@ namespace Autarky\Container;
 interface ContainerInterface
 {
 	/**
-	 * Bind something to the container. Something that is bound will be re-
-	 * constructed each time, so there is no singleton. The exception is if
-	 * $concrete is an object, in which case the object will be bound onto the
-	 * container as a singleton.
+	 * Define a factory for a given class.
 	 *
-	 * @param  string $abstract
-	 * @param  mixed  $concrete
+	 * @param  string $class
+	 * @param  mixed  $factory
 	 *
 	 * @return void
 	 */
-	public function bind($abstract, $concrete = null);
+	public function define($class, $factory);
 
 	/**
-	 * Bind something to the container and share it, effectively making it a
-	 * shared/singleton object.
+	 * Place an already instantiated object into the container.
 	 *
-	 * @param  string $abstract
-	 * @param  mixed  $concrete
+	 * @param  string $class
+	 * @param  object $instance
 	 *
 	 * @return void
 	 */
-	public function share($abstract, $concrete = null);
+	public function instance($class, $instance);
+
+	/**
+	 * Tell the container that a given class should be a shared instance, i.e.
+	 * only constructed once.
+	 *
+	 * @param  string $class
+	 *
+	 * @return void
+	 */
+	public function share($class);
+
+	/**
+	 * Define a set of constructor arguments for a specific class.
+	 *
+	 * @param  string $class
+	 * @param  array  $params
+	 *
+	 * @return void
+	 */
+	public function params($class, array $params);
 
 	/**
 	 * Define an alias.
 	 *
+	 * @param  string $original
 	 * @param  string $alias
-	 * @param  string $target The abstract key the alias points towards.
 	 *
 	 * @return void
 	 */
-	public function alias($alias, $target);
+	public function alias($original, $alias);
 
 	/**
-	 * Determine if a class/key is bound onto the container or not.
+	 * Determine if a class is bound onto the container or not.
 	 *
-	 * @param  string  $abstract
+	 * @param  string  $class
 	 *
 	 * @return boolean
 	 */
-	public function isBound($abstract);
+	public function isBound($class);
 
 	/**
-	 * Resolve an object from the IoC container. Dependencies of the resolved
+	 * Resolve a class from the container. Dependencies of the resolved
 	 * object should also be resolved recursively if possible.
 	 *
 	 * If the object resolved is an instance of ContainerAwareInterface, the
 	 * container should call setContainer($this) on it.
 	 *
-	 * @param  string $abstract
+	 * @param  string $class
 	 *
 	 * @return mixed
 	 */
-	public function resolve($abstract);
+	public function resolve($class);
+
+	/**
+	 * Execute a function, closure or class method, resolving type-hinted
+	 * arguments as necessary.
+	 *
+	 * @param  string|array $args
+	 *
+	 * @return mixed
+	 */
+	public function execute($args);
 
 	/**
 	 * Register a callback for whenever the given key is resolved.

@@ -39,7 +39,7 @@ class SessionProvider extends ServiceProvider
 
 	protected function registerSessionHandler()
 	{
-		$this->app->getContainer()->share(
+		$this->app->getContainer()->define(
 			'SessionHandlerInterface',
 			function (ContainerInterface $container) {
 				switch ($this->app->getConfig()->get('session.handler')) {
@@ -77,11 +77,13 @@ class SessionProvider extends ServiceProvider
 							$this->app->getConfig()->get('session.handler'));
 				}
 			});
+		$this->app->getContainer()
+			->share('SessionHandlerInterface');
 	}
 
 	protected function registerSessionStorage()
 	{
-		$this->app->getContainer()->share(
+		$this->app->getContainer()->define(
 			'Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface',
 			function (ContainerInterface $container) {
 				if ($this->app->getConfig()->get('session.mock')) {
@@ -93,12 +95,16 @@ class SessionProvider extends ServiceProvider
 
 				return new NativeSessionStorage($options, $handler);
 			});
+		$this->app->getContainer()
+			->share('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface');
 	}
 
 	protected function registerSession()
 	{
-		$this->app->getContainer()->share(
-			'Symfony\Component\HttpFoundation\Session\SessionInterface',
+		$this->app->getContainer()
+			->share('Symfony\Component\HttpFoundation\Session\Session');
+		$this->app->getContainer()->define(
+			'Symfony\Component\HttpFoundation\Session\Session',
 			function (ContainerInterface $container) {
 				$session = new Session(
 					$container->resolve('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface'),

@@ -22,7 +22,7 @@ class ApplicationTest extends TestCase
 	{
 		$mockRouter = m::mock('Autarky\Routing\RouterInterface');
 		$mockRouter->shouldReceive('dispatch')->andReturn(new Response($response));
-		$app->getContainer()->share('Autarky\Routing\RouterInterface', $mockRouter);
+		$app->getContainer()->instance('Autarky\Routing\RouterInterface', $mockRouter);
 	}
 
 	/** @test */

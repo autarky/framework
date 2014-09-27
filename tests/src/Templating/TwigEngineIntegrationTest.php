@@ -53,7 +53,7 @@ class TwigEngineIntegrationTest extends TestCase
 	{
 		$eng = $this->makeEngine();
 		$mock = m::mock(['bar' => 'baz']);
-		$this->app->share('foo', $mock);
+		$this->app->getContainer()->instance('foo', $mock);
 		$result = $eng->render('partial.twig');
 		$this->assertEquals('baz', $result);
 	}
