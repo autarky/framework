@@ -151,55 +151,17 @@ class Route
 	}
 
 	/**
-	 * Run the route.
-	 *
-	 * @param \Symfony\Component\HttpFoundation\Request $request
-	 * @param array                                     $args
-	 * @param \Autarky\Container\ContainerInterface     $container
+	 * Get the route callable.
 	 *
 	 * @return mixed
 	 */
-	public function run(Request $request = null, array $args = array(), ContainerInterface $container = null)
+	public function getCallable()
 	{
-		if ($this->handler instanceof Closure) {
-			$callable = $this->handler;
-		} else {
-			list($class, $method) = \Autarky\splitclm($this->handler, 'action');
-
-			$obj = $container ? $container->resolve($class) : new $class;
-			$callable = [$obj, $method];
+		if (is_callable($this->handler)) {
+			return $this->handler;
 		}
 
-		if ($request) {
-			$this->addRequestToArgs($args, $callable, $request);
-		}
-
-		return call_user_func_array($callable, $args);
-	}
-
-	protected function addRequestToArgs(array &$args, callable $callable, Request $request)
-	{
-		if (is_array($callable)) {
-			$refl = new ReflectionMethod($callable[0], $callable[1]);
-		} else {
-			$refl = new ReflectionFunction($callable);
-		}
-
-		$params = $refl->getParameters();
-
-		if (empty($params)) return;
-
-		$paramClass = $params[0]
-			->getClass();
-
-		if (!$paramClass) return;
-
-		if (
-			$paramClass->isSubclassOf('Symfony\Component\HttpFoundation\Request') ||
-			$paramClass->getName() == 'Symfony\Component\HttpFoundation\Request'
-		) {
-			array_unshift($args, $request);
-		}
+		return \Autarky\splitclm($this->handler, 'action');
 	}
 
 	/**

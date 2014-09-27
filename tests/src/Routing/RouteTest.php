@@ -16,30 +16,6 @@ class RouteTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function routeCanBeRan()
-	{
-		$route = new Route(['get'], '/', function() { return 'foo'; });
-		$this->assertEquals('foo', $route->run());
-	}
-
-	/** @test */
-	public function routeWithClassHandlerCanBeRan()
-	{
-		$route = new Route(['get'], '/', __NAMESPACE__.'\RouteHandlerStub:handle');
-		$this->assertEquals('foo', $route->run());
-	}
-
-	/** @test */
-	public function requestIsAddedAsFirstParam()
-	{
-		$route = new Route(['get'], '/request/{v}', function(Request $r, $v) { return $v; });
-		$this->assertEquals('foo', $route->run(Request::create('/'), ['foo']));
-
-		$route = new Route(['get'], '/request/{v}', __NAMESPACE__.'\RouteHandlerStub:handleRequest');
-		$this->assertEquals('foo', $route->run(Request::create('/'), ['foo']));
-	}
-
-	/** @test */
 	public function tooFewParamsThrowsException()
 	{
 		$route = new Route(['get'], '/{v1}/{v2}', function() { return 'OK'; });

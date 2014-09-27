@@ -236,7 +236,11 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 		switch ($result[0]) {
 			case \FastRoute\Dispatcher::FOUND:
-				return $this->makeResponse($this->getResult($request, $result[1], $result[2]));
+				$args = [];
+				foreach ($result[2] as $key => $value) {
+					$args["\$$key"] = $value;
+				}
+				return $this->makeResponse($this->getResult($request, $result[1], $args));
 				break;
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
@@ -269,7 +273,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 			}
 		}
 
-		$result = $route->run($request, $args, $this->container);
+		$result = $this->callRoute($route, $request, $args);
 
 		foreach ($route->getAfterFilters() as $filter) {
 			if ($afterResult = $this->callFilter($filter, [$route, $request, $result])) {
@@ -278,6 +282,13 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		}
 
 		return $result;
+	}
+
+	protected function callRoute(Route $route, Request $request, array $args)
+	{
+		$args['Symfony\Component\HttpFoundation\Request'] = $request;
+
+		return $this->container->execute($route->getCallable(), $args);
 	}
 
 	protected function makeResponse($result)
