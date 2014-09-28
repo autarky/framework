@@ -248,37 +248,37 @@ class Container implements ContainerInterface
 		return $reflClass->newInstanceArgs($args);
 	}
 
-	protected function getFunctionArguments(ReflectionFunctionAbstract $reflFunc, array $params = null)
+	protected function getFunctionArguments(ReflectionFunctionAbstract $func, array $params = null)
 	{
 		$args = [];
 
-		foreach ($reflFunc->getParameters() as $param) {
+		foreach ($func->getParameters() as $param) {
 			$name = $param->getName();
-			$paramClass = $param->getClass();
+			$class = $param->getClass();
 
-			if ($paramClass) {
-				$paramClass = $paramClass->getName();
+			if ($class) {
+				$class = $class->getName();
 
 				if ($params && array_key_exists("\$$name", $params)) {
-					$paramClass = $params["\$$name"];
+					$class = $params["\$$name"];
 				}
 
-				if (is_object($paramClass)) {
-					$args[] = $paramClass;
+				if (is_object($class)) {
+					$args[] = $class;
 					continue;
 				}
 
-				if ($params && array_key_exists($paramClass, $params)) {
-					$paramClass = $params[$paramClass];
+				if ($params && array_key_exists($class, $params)) {
+					$class = $params[$class];
 				}
 
-				if (is_object($paramClass)) {
-					$args[] = $paramClass;
+				if (is_object($class)) {
+					$args[] = $class;
 					continue;
 				}
 
 				try {
-					$args[] = $this->resolve($paramClass);
+					$args[] = $this->resolve($class);
 				} catch (ReflectionException $exception) {
 					if ($param->isOptional()) {
 						$args[] = null;
@@ -292,7 +292,7 @@ class Container implements ContainerInterface
 				} else if ($param->isDefaultValueAvailable()) {
 					$args[] = $param->getDefaultValue();
 				} else {
-					throw new UnresolvableArgumentException($param, $reflFunc);
+					throw new UnresolvableArgumentException($param, $func);
 				}
 			}
 		}

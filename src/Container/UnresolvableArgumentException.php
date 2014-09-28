@@ -35,28 +35,33 @@ class UnresolvableArgumentException extends ContainerException
 	protected function getFunctionName(ReflectionFunctionAbstract $func)
 	{
 		if ($func->isClosure()) {
-			if ($class = $func->getClosureScopeClass()) {
-				$location = $class->getName();
-			} else {
-				$location = $func->getFileName();
-			}
-
-			$startLine = $func->getStartLine();
-			$endLine = $func->getEndLine();
-
-			if ($startLine == $endLine) {
-				$lines = "line $startLine";
-			} else {
-				$lines = "lines {$startLine}-{$endLine}";
-			}
-
-			return "closure in $location on $lines";
+			return 'closure in '.$this->getClosureLocation($func);
 		}
 
 		if ($func instanceof ReflectionMethod) {
 			return $func->getDeclaringClass()->getName() . '::' . $func->getName();
 		}
 
-		return $func . $func->getName();
+		return $func->getName().' in '.$func->getFileName();
+	}
+
+	protected function getClosureLocation(ReflectionFunctionAbstract $func)
+	{
+		if ($class = $func->getClosureScopeClass()) {
+			$location = $class->getName();
+		} else {
+			$location = $func->getFileName();
+		}
+
+		$startLine = $func->getStartLine();
+		$endLine = $func->getEndLine();
+
+		if ($startLine == $endLine) {
+			$location .= " on line $startLine";
+		} else {
+			$location .= " on lines {$startLine}-{$endLine}";
+		}
+
+		return $location;
 	}
 }
