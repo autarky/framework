@@ -220,10 +220,7 @@ class Application implements HttpKernelInterface, ArrayAccess
 	public function setContainer(ContainerInterface $container)
 	{
 		$this->container = $container;
-		$class = get_class($container);
-		$this->container->alias($class, 'Autarky\Container\ContainerInterface');
-		$this->container->instance($class, $this->container);
-		$container->instance(get_class($this), $this);
+		$container->instance('Autarky\Kernel\Application', $this);
 	}
 
 	/**
@@ -244,8 +241,6 @@ class Application implements HttpKernelInterface, ArrayAccess
 	public function setConfig(ConfigInterface $config)
 	{
 		$this->config = $config;
-		$this->container->share('Autarky\Config\ConfigInterface', $this->config);
-		$this->container->share(get_class($this->config), $this->config);
 	}
 
 	/**

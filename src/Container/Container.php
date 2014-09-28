@@ -71,6 +71,12 @@ class Container implements ContainerInterface
 	 */
 	protected $resolvingAnyCallbacks = [];
 
+	public function __construct()
+	{
+		$this->instance('Autarky\Container\Container', $this);
+		$this->alias('Autarky\Container\Container', 'Autarky\Container\ContainerInterface');
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
