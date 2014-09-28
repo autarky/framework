@@ -269,7 +269,7 @@ class Container implements ContainerInterface
 		return $reflClass->newInstanceArgs($args);
 	}
 
-	protected function getFunctionArguments(ReflectionFunctionAbstract $func, array $params = null)
+	protected function getFunctionArguments(ReflectionFunctionAbstract $func, array $params = array())
 	{
 		$args = [];
 

@@ -14,6 +14,8 @@ use Autarky\Kernel\ServiceProvider;
 
 class ConfigProvider extends ServiceProvider
 {
+	protected $configPath;
+
 	public function __construct($configPath)
 	{
 		$this->configPath = $configPath;

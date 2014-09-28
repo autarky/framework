@@ -70,7 +70,7 @@ class Application implements HttpKernelInterface
 	protected $container;
 
 	/**
-	 * @var \Autarky\Errors\ErrorHandlerInterface
+	 * @var \Autarky\Errors\ErrorHandlerManagerInterface
 	 */
 	protected $errorHandler;
 
