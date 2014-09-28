@@ -2,12 +2,19 @@
 namespace Autarky\Tests\Container;
 
 use PHPUnit_Framework_TestCase;
+use Mockery as m;
 
 use Autarky\Container\IlluminateContainer;
 use Autarky\Container\Container;
 
 class ContainerTest extends PHPUnit_Framework_TestCase
 {
+	protected function tearDown()
+	{
+		parent::tearDown();
+		m::close();
+	}
+
 	protected function makeContainer()
 	{
 		return new Container;
@@ -57,6 +64,15 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$c = $this->makeContainer();
 		$c->define('foo', function() { return new \StdClass; });
 		$this->assertNotSame($c->resolve('foo'), $c->resolve('foo'));
+	}
+
+	/** @test */
+	public function externalClassFactory()
+	{
+		$c = $this->makeContainer();
+		$c->define('foo.factory', function() { return new StubFactory; });
+		$c->define('foo', ['foo.factory', 'makeFoo']);
+		$this->assertEquals('foo', $c->resolve('foo'));
 	}
 
 	/** @test */
@@ -268,5 +284,10 @@ class DefaultValueStub {
 	public function __construct($value = 'foo')
 	{
 		$this->value = $value;
+	}
+}
+class StubFactory {
+	public function makeFoo() {
+		return 'foo';
 	}
 }

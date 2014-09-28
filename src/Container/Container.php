@@ -76,25 +76,21 @@ class Container implements ContainerInterface
 	 */
 	public function define($class, $factory)
 	{
-		$this->factories[$class] = $this->getFactory($factory);
-	}
+		$isArray = is_array($factory);
+		$isCallable = is_callable($factory);
 
-	protected function getFactory($factory)
-	{
-		if (is_callable($factory)) {
-			return $factory;
-		} else if (is_array($factory)) {
-			return function($container) use($factory) {
+		if ($isArray && !$isCallable) {
+			$factory = function($container) use($factory) {
 				return $container->execute($factory);
-			};
-		} else if (is_string($factory)) {
-			return function($container) use($factory) {
-				return $container->build($factory);
 			};
 		}
 
-		$type = is_object($factory) ? get_class($factory) : gettype($factory);
-		throw new \InvalidArgumentException("Factory must be a callable, array or string, $type given");
+		if (!$isCallable && !$isArray) {
+			$type = is_object($factory) ? get_class($factory) : gettype($factory);
+			throw new \InvalidArgumentException("Factory must be a callable or array, $type given");
+		}
+
+		$this->factories[$class] = $factory;
 	}
 
 	/**
@@ -137,22 +133,23 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function execute($args, array $params = array())
+	public function execute($callable, array $params = array())
 	{
-		if (is_string($args) && strpos($args, '::') !== false) {
-			$args = explode('::', $args);
+		if (is_string($callable) && strpos($callable, '::') !== false) {
+			$callable = explode('::', $callable);
 		}
 
-		if (is_array($args)) {
-			$class = $args[0];
-			$method = $args[1];
-			$reflClass = new ReflectionClass($this->resolve($class));
-			$reflFunc = $reflClass->getMethod($method);
-		} else if (is_string($args) || is_callable($args)) {
-			$reflFunc = new ReflectionFunction($args);
+		if (is_array($callable)) {
+			$class = $callable[0];
+			$method = $callable[1];
+			$object = $this->resolve($class);
+			$reflFunc = new ReflectionMethod($object, $method);
+		} else if (is_string($callable) || is_callable($callable)) {
+			$reflFunc = new ReflectionFunction($callable);
 			$class = null;
 		} else {
-			throw new \InvalidArgumentException();
+			$type = is_object($callable) ? get_class($callable) : gettype($callable);
+			throw new \InvalidArgumentException("Callable must be a callable or array, $type given");
 		}
 
 		if ($class && array_key_exists($class, $this->params)) {
@@ -160,6 +157,10 @@ class Container implements ContainerInterface
 		}
 
 		$args = $this->getFunctionArguments($reflFunc, $params);
+
+		if ($class) {
+			return $reflFunc->invokeArgs($object, $args);
+		}
 
 		return $reflFunc->invokeArgs($args);
 	}
