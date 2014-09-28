@@ -211,6 +211,19 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function resolvingCallbacksAreCalledForAliases()
+	{
+		$c = $this->makeContainer();
+		$c->alias(__NAMESPACE__.'\\OptionalClass', __NAMESPACE__.'\\OptionalInterface');
+		$called = false;
+		$c->resolving(__NAMESPACE__.'\\OptionalInterface', function() use(&$called) {
+			$called = true;
+		});
+		$c->resolve(__NAMESPACE__.'\\OptionalInterface');
+		$this->assertEquals(true, $called);
+	}
+
+	/** @test */
 	public function resolvingAnyCallbacksAreCalled()
 	{
 		$c = $this->makeContainer();

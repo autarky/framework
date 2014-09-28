@@ -11,28 +11,10 @@
 namespace Autarky\Container;
 
 /**
- * A container in Autarky is a class that contains information about how to
- * resolve different objects.
- *
- * The container has two jobs - it needs to receive information (usually from
- * service providers) on how it should resolve different keys/classes/interfaces
- * and, of course, resolve these when asked to.
- *
- * A few method arguments repeat themselves in this interface's methods.
- *
- * $abstract is the key that the container should store the metainformation
- * under. Under the hood the container keeps a hashmap of abstract => concrete
- * in some fashion. $abstract can be a plain string or a string that represeents
- * a class or an interface.
- *
- * $concrete tells the container how $abstract should be resolved when it is
- * requested. Sometimes $concrete will be left as null - in this case, $abstract
- * should fill $concrete's role. Common use cases for this would be binding a
- * singleton class onto the container but not constructing it until it is
- * requested to be resolved.
- *
- * The container should to the best of its abilities try and recursively resolve
- * all classes' dependencies automatically.
+ * The container in Autarky is a combination of a service locator and a
+ * dependency injector. Whenever dealing with classes that have dependencies,
+ * the container should usually be told to resolve an instance of that class
+ * rather than instantiating it yourself.
  *
  * @link http://en.wikipedia.org/wiki/Service_locator_pattern
  * @link http://en.wikipedia.org/wiki/Inversion_of_control
@@ -43,6 +25,10 @@ interface ContainerInterface
 	/**
 	 * Define a factory for a given class.
 	 *
+	 * The factory can be a closure, a string containing the name of a function,
+	 * an array of [$object, 'method'] or an array of ['Class', 'method']. If
+	 * the latter is used, 'Class' will be resolved out of the container.
+	 *
 	 * @param  string $class
 	 * @param  mixed  $factory
 	 *
@@ -51,7 +37,11 @@ interface ContainerInterface
 	public function define($class, $factory);
 
 	/**
-	 * Place an already instantiated object into the container.
+	 * Place an already instantiated object into the container. This will make
+	 * it available as a shared instance.
+	 *
+	 * The $class argument should usually be the exact class name of the
+	 * instance, except in cases of mocking.
 	 *
 	 * @param  string $class
 	 * @param  object $instance
@@ -62,7 +52,8 @@ interface ContainerInterface
 
 	/**
 	 * Tell the container that a given class should be a shared instance, i.e.
-	 * only constructed once.
+	 * only constructed once. No matter time how many times that class is
+	 * resolved out of the container, it will be the same instance.
 	 *
 	 * @param  string $class
 	 *
@@ -73,27 +64,39 @@ interface ContainerInterface
 	/**
 	 * Define a set of constructor arguments for a specific class.
 	 *
-	 * @param  string $class
-	 * @param  array  $params
+	 * The parameters can be an associative array where the keys are either
+	 * class/interface names to map against type-hints of the class' constructor
+	 * arguments, or variable names (including the $ prefix).
+	 *
+	 * @param  string|array $classOrClasses
+	 * @param  array        $params
 	 *
 	 * @return void
 	 */
-	public function params($class, array $params);
+	public function params($classOrClasses, array $params);
 
 	/**
 	 * Define an alias.
 	 *
-	 * @param  string $original
-	 * @param  string $alias
+	 * Whenever the container is asked to resolve $alias, in any context,
+	 * $original should be used instead. Note that it is not possible to have
+	 * multiple levels of aliases (e.g. original is aliased to alias1, alias1
+	 * is aliased to alias2).
+	 *
+	 * @param  string       $original
+	 * @param  string|array $aliasOrAliases
 	 *
 	 * @return void
 	 */
-	public function alias($original, $alias);
+	public function alias($original, $aliasOrAliases);
 
 	/**
 	 * Determine if a class is bound onto the container or not.
 	 *
-	 * @param  string  $class
+	 * Returns true if a factory is defined, if the class is defined as shared,
+	 * or if an instance is set. Aliases are looked up.
+	 *
+	 * @param  string $class
 	 *
 	 * @return boolean
 	 */
@@ -101,13 +104,13 @@ interface ContainerInterface
 
 	/**
 	 * Resolve a class from the container. Dependencies of the resolved
-	 * object should also be resolved recursively if possible.
+	 * object will be resolved recursively.
 	 *
 	 * If the object resolved is an instance of ContainerAwareInterface, the
-	 * container should call setContainer($this) on it.
+	 * container will call setContainer($this) on it.
 	 *
 	 * @param  string $class
-	 * @param  array  $params
+	 * @param  array  $params See ContainerInterface::params()
 	 *
 	 * @return mixed
 	 */
@@ -117,22 +120,28 @@ interface ContainerInterface
 	 * Execute a function, closure or class method, resolving type-hinted
 	 * arguments as necessary.
 	 *
+	 * Callable can be anything that passes is_callable() in PHP, including an
+	 * array of ['ClassName', 'method'], in which case the class will first be
+	 * resolved from the container.
+	 *
 	 * @param  string|array $callable
-	 * @param  array        $params
+	 * @param  array        $params   See ContainerInterface::params()
 	 *
 	 * @return mixed
 	 */
 	public function invoke($callable, array $params = array());
 
 	/**
-	 * Register a callback for whenever the given key is resolved.
+	 * Register a callback for whenever the given class is resolved.
 	 *
-	 * @param  string   $key
-	 * @param  callable $callback
+	 * This works for both aliases and original classes.
+	 *
+	 * @param  string|array $classOrClasses
+	 * @param  callable     $callback
 	 *
 	 * @return void
 	 */
-	public function resolving($key, callable $callback);
+	public function resolving($classOrClasses, callable $callback);
 
 	/**
 	 * Register a callback for whenever anything is resolved.

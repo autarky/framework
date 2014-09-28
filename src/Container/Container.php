@@ -116,20 +116,24 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function alias($original, $alias)
+	public function alias($original, $aliasOrAliases)
 	{
-		$this->aliases[$alias] = $original;
+		foreach ((array) $aliasOrAliases as $alias) {
+			$this->aliases[$alias] = $original;
+		}
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function params($class, array $params)
+	public function params($classOrClassess, array $params)
 	{
-		if (!array_key_exists($class, $this->params)) {
-			$this->params[$class] = $params;
-		} else {
-			$this->params[$class] = array_replace($this->params[$class], $params);
+		foreach ((array) $classOrClasses as $class) {
+			if (!array_key_exists($class, $this->params)) {
+				$this->params[$class] = $params;
+			} else {
+				$this->params[$class] = array_replace($this->params[$class], $params);
+			}
 		}
 	}
 
@@ -178,7 +182,10 @@ class Container implements ContainerInterface
 	 */
 	public function resolve($class, array $params = array())
 	{
+		$alias = null;
+
 		if (array_key_exists($class, $this->aliases)) {
+			$alias = $class;
 			$class = $this->aliases[$class];
 		}
 
@@ -196,6 +203,9 @@ class Container implements ContainerInterface
 			$object->setContainer($this);
 		}
 
+		if ($alias) {
+			$this->callResolvingCallbacks($alias, $object);
+		}
 		$this->callResolvingCallbacks($class, $object);
 
 		if ($this->isShared($class)) {
@@ -317,9 +327,11 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function resolving($key, callable $callback)
+	public function resolving($classOrClasses, callable $callback)
 	{
-		$this->resolvingCallbacks[$key][] = $callback;
+		foreach ((array) $classOrClasses as $class) {
+			$this->resolvingCallbacks[$class][] = $callback;
+		}
 	}
 
 	/**
