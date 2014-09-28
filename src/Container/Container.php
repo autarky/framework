@@ -76,18 +76,15 @@ class Container implements ContainerInterface
 	 */
 	public function define($class, $factory)
 	{
-		$isArray = is_array($factory);
-		$isCallable = is_callable($factory);
+		if (!is_callable($factory)) {
+			if (!is_array($factory)) {
+				$type = is_object($factory) ? get_class($factory) : gettype($factory);
+				throw new \InvalidArgumentException("Factory must be a callable or array, $type given");
+			}
 
-		if ($isArray && !$isCallable) {
 			$factory = function($container) use($factory) {
 				return $container->invoke($factory);
 			};
-		}
-
-		if (!$isCallable && !$isArray) {
-			$type = is_object($factory) ? get_class($factory) : gettype($factory);
-			throw new \InvalidArgumentException("Factory must be a callable or array, $type given");
 		}
 
 		$this->factories[$class] = $factory;
