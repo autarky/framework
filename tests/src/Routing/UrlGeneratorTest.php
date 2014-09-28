@@ -7,13 +7,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 use Autarky\Container\Container;
 use Autarky\Routing\Router;
+use Autarky\Routing\Invoker;
 use Autarky\Routing\UrlGenerator;
 
 class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 {
 	public function makeRouterAndGenerator($request = null)
 	{
-		$router = new Router(new Container);
+		$router = new Router(new Invoker(new Container));
 		$requests = new RequestStack;
 		if ($request) $requests->push($request);
 		return [$router, new UrlGenerator($router, $requests)];

@@ -9,12 +9,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Autarky\Container\Container;
 use Autarky\Routing\Route;
 use Autarky\Routing\Router;
+use Autarky\Routing\Invoker;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
 	public function makeRouter()
 	{
-		return new Router(new Container);
+		return new Router(new Invoker(new Container));
 	}
 
 	/** @test */

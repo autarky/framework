@@ -22,7 +22,6 @@ use FastRoute\RouteParser\Std as RouteParser;
 use FastRoute\Dispatcher\GroupCountBased as Dispatcher;
 use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 
-use Autarky\Container\ContainerInterface;
 use Autarky\Events\EventDispatcherAwareInterface;
 use Autarky\Events\EventDispatcherAwareTrait;
 
@@ -34,9 +33,9 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	use EventDispatcherAwareTrait;
 
 	/**
-	 * @var \Autarky\Container\ContainerInterface
+	 * @var \Autarky\Routing\Invoker
 	 */
-	protected $container;
+	protected $invoker;
 
 	/**
 	 * @var \FastRoute\RouteCollector
@@ -82,9 +81,9 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	 */
 	protected $namedRoutes = [];
 
-	public function __construct(ContainerInterface $container, $cachePath = null)
+	public function __construct(Invoker $invoker, $cachePath = null)
 	{
-		$this->container = $container;
+		$this->invoker = $invoker;
 
 		if ($cachePath) {
 			$this->cachePath = $cachePath;
@@ -290,7 +289,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	{
 		$args['Symfony\Component\HttpFoundation\Request'] = $request;
 
-		return $this->container->execute($route->getCallable(), $args);
+		return $this->invoker->invoke($route->getCallable(), $args);
 	}
 
 	protected function callFilter($filter, Route $route, Request $request, Response $response = null)
@@ -301,7 +300,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 			'Symfony\Component\HttpFoundation\Response' => $response,
 		];
 
-		return $this->container->execute($filter, $args);
+		return $this->invoker->invoke($filter, $args);
 	}
 
 	protected function getDispatcher()

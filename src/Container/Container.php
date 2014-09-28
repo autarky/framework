@@ -81,7 +81,7 @@ class Container implements ContainerInterface
 
 		if ($isArray && !$isCallable) {
 			$factory = function($container) use($factory) {
-				return $container->execute($factory);
+				return $container->invoke($factory);
 			};
 		}
 
@@ -133,7 +133,7 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function execute($callable, array $params = array())
+	public function invoke($callable, array $params = array())
 	{
 		if (is_string($callable) && strpos($callable, '::') !== false) {
 			$callable = explode('::', $callable);
@@ -288,7 +288,7 @@ class Container implements ContainerInterface
 					} else {
 						$funcName = $reflFunc->getName();
 					}
-					throw new UnresolvableDependencyException('Unresolvable dependency: '
+					throw new UnresolvableArgumentException('Unresolvable argument: '
 						.'Argument #'.$param->getPosition().' ($'.$name.') of '.$funcName);
 				}
 			}

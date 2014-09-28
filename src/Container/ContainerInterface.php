@@ -116,11 +116,12 @@ interface ContainerInterface
 	 * Execute a function, closure or class method, resolving type-hinted
 	 * arguments as necessary.
 	 *
-	 * @param  string|array $args
+	 * @param  string|array $callable
+	 * @param  array        $params
 	 *
 	 * @return mixed
 	 */
-	public function execute($args);
+	public function invoke($callable, array $params = array());
 
 	/**
 	 * Register a callback for whenever the given key is resolved.

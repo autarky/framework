@@ -186,10 +186,10 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function unresolvableDependencyThrowsException()
+	public function unresolvableArgumentThrowsException()
 	{
 		$c = $this->makeContainer();
-		$this->setExpectedException('Autarky\Container\UnresolvableDependencyException');
+		$this->setExpectedException('Autarky\Container\UnresolvableArgumentException');
 		$c->resolve(__NAMESPACE__.'\\UnresolvableStub');
 	}
 
@@ -219,38 +219,38 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function executeInvokes()
+	public function invokeInvokes()
 	{
 		$c = $this->makeContainer();
-		$retval = $c->execute(function() { return 42; });
+		$retval = $c->invoke(function() { return 42; });
 		$this->assertEquals(42, $retval);
 	}
 
 	/** @test */
-	public function executeResolvesDependencies()
+	public function invokeResolvesDependencies()
 	{
 		$c = $this->makeContainer();
 		$callback = function(LowerClass $lc) { return $lc; };
-		$retval = $c->execute($callback);
+		$retval = $c->invoke($callback);
 		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $retval);
 	}
 
 	/** @test */
-	public function executeCanBePassedParams()
+	public function invokeCanBePassedParams()
 	{
 		$c = $this->makeContainer();
 		$callback = function($param) { return $param; };
-		$retval = $c->execute($callback, ['$param' => 42]);
+		$retval = $c->invoke($callback, ['$param' => 42]);
 		$this->assertEquals(42, $retval);
 	}
 
 	/** @test */
-	public function executeCanBePassedObjectParam()
+	public function invokeCanBePassedObjectParam()
 	{
 		$c = $this->makeContainer();
 		$lc = new LowerClass;
 		$callback = function(LowerClass $lc) { return $lc; };
-		$retval = $c->execute($callback, ['$lc' => $lc]);
+		$retval = $c->invoke($callback, ['$lc' => $lc]);
 		$this->assertSame($lc, $retval);
 	}
 }

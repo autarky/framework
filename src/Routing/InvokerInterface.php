@@ -8,8 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Container;
+namespace Autarky\Routing;
 
-class UnresolvableDependencyException extends ContainerException
+interface InvokerInterface
 {
+	public function invoke($callable, array $args = array());
 }
