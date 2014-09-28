@@ -13,9 +13,10 @@ namespace Autarky\Container;
 use Closure;
 use ReflectionClass;
 use ReflectionException;
-use ReflectionMethod;
 use ReflectionFunction;
 use ReflectionFunctionAbstract;
+use ReflectionMethod;
+use ReflectionParameter;
 
 /**
  * Default implementation of the IoC container.
@@ -126,7 +127,7 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function params($classOrClassess, array $params)
+	public function params($classOrClasses, array $params)
 	{
 		foreach ((array) $classOrClasses as $class) {
 			if (!array_key_exists($class, $this->params)) {
@@ -263,40 +264,12 @@ class Container implements ContainerInterface
 		$args = [];
 
 		foreach ($func->getParameters() as $param) {
-			$name = $param->getName();
 			$class = $param->getClass();
 
 			if ($class) {
-				$class = $class->getName();
-
-				if ($params && array_key_exists("\$$name", $params)) {
-					$class = $params["\$$name"];
-				}
-
-				if (is_object($class)) {
-					$args[] = $class;
-					continue;
-				}
-
-				if ($params && array_key_exists($class, $params)) {
-					$class = $params[$class];
-				}
-
-				if (is_object($class)) {
-					$args[] = $class;
-					continue;
-				}
-
-				try {
-					$args[] = $this->resolve($class);
-				} catch (ReflectionException $exception) {
-					if ($param->isOptional()) {
-						$args[] = null;
-					} else {
-						throw $exception;
-					}
-				}
+				$args[] = $this->resolveClassArg($class, $param, $params);
 			} else {
+				$name = $param->getName();
 				if ($params && array_key_exists("\$$name", $params)) {
 					$args[] = $params["\$$name"];
 				} else if ($param->isDefaultValueAvailable()) {
@@ -308,6 +281,38 @@ class Container implements ContainerInterface
 		}
 
 		return $args;
+	}
+
+	protected function resolveClassArg(ReflectionClass $class, ReflectionParameter $param, array $params)
+	{
+		$name = $param->getName();
+		$class = $class->getName();
+
+		if ($params && array_key_exists("\$$name", $params)) {
+			$class = $params["\$$name"];
+		}
+
+		if (is_object($class)) {
+			return $class;
+		}
+
+		if ($params && array_key_exists($class, $params)) {
+			$class = $params[$class];
+		}
+
+		if (is_object($class)) {
+			return $class;
+		}
+
+		try {
+			return $this->resolve($class);
+		} catch (ReflectionException $exception) {
+			if ($param->isOptional()) {
+				return null;
+			}
+
+			throw $exception;
+		}
 	}
 
 	/**
