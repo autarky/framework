@@ -36,7 +36,7 @@ class Application implements HttpKernelInterface, ArrayAccess
 	/**
 	 * The framework version.
 	 */
-	const VERSION = '0.4.1';
+	const VERSION = '0.5.x';
 
 	/**
 	 * The application's service providers.
