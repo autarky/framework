@@ -10,7 +10,6 @@
 
 namespace Autarky\Kernel;
 
-use ArrayAccess;
 use Closure;
 use Exception;
 use SplPriorityQueue;
@@ -31,7 +30,7 @@ use Autarky\Routing\RouterInterface;
 /**
  * The main application of the framework.
  */
-class Application implements HttpKernelInterface, ArrayAccess
+class Application implements HttpKernelInterface
 {
 	/**
 	 * The framework version.
@@ -434,11 +433,11 @@ class Application implements HttpKernelInterface, ArrayAccess
 	}
 
 	/**
-	 * @see \Autarky\Container\ContainerInterface::bind()
+	 * @see \Autarky\Container\ContainerInterface::define()
 	 */
-	public function bind()
+	public function define()
 	{
-		return call_user_func_array([$this->container, 'bind'], func_get_args());
+		return call_user_func_array([$this->container, 'define'], func_get_args());
 	}
 
 	/**
@@ -457,23 +456,27 @@ class Application implements HttpKernelInterface, ArrayAccess
 		return call_user_func_array([$this->container, 'alias'], func_get_args());
 	}
 
-	public function offsetGet($key)
+	/**
+	 * @see \Autarky\Container\ContainerInterface::params()
+	 */
+	public function params()
 	{
-		return $this->container->resolve($key);
+		return call_user_func_array([$this->container, 'params'], func_get_args());
 	}
 
-	public function offsetExists($key)
+	/**
+	 * @see \Autarky\Container\ContainerInterface::invoke()
+	 */
+	public function invoke()
 	{
-		// @todo ?
+		return call_user_func_array([$this->container, 'invoke'], func_get_args());
 	}
 
-	public function offsetSet($key, $value)
+	/**
+	 * @see \Autarky\Routing\RouterInterface::addRoute()
+	 */
+	public function route()
 	{
-		$this->container->bind($key, $value);
-	}
-
-	public function offsetUnset($key)
-	{
-		// @todo ?
+		return call_user_func_array([$this->getRouter(), 'addRoute'], func_get_args());
 	}
 }
