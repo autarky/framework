@@ -227,10 +227,36 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function invokeThrowsExceptionOnUnresolvableArgument()
+	{
+		$this->setExpectedException('Autarky\Container\UnresolvableArgumentException',
+			'Unresolvable argument: Argument #1 ($foo) of Autarky\Tests\Container\StaticStub::f');
+		$c = $this->makeContainer();
+		$c->invoke([__NAMESPACE__.'\\StaticStub', 'f']);
+	}
+
+	/** @test */
+	public function invokeExceptionMessageIsCorrectForClosures()
+	{
+		$this->setExpectedException('Autarky\Container\UnresolvableArgumentException',
+			'Unresolvable argument: Argument #1 ($foo) of closure in '.__CLASS__.' on line');
+		$c = $this->makeContainer();
+		$c->invoke(function($foo){});
+	}
+
+	/** @test */
 	public function invokeCanInvokeStaticMethods()
 	{
 		$c = $this->makeContainer();
 		$retval = $c->invoke([__NAMESPACE__.'\\StaticStub', 'f'], ['$foo' => 'foo']);
+		$this->assertEquals('foobar', $retval);
+	}
+
+	/** @test */
+	public function invokeCanInvokeStaticMethodsWithString()
+	{
+		$c = $this->makeContainer();
+		$retval = $c->invoke(__NAMESPACE__.'\\StaticStub::f', ['$foo' => 'foo']);
 		$this->assertEquals('foobar', $retval);
 	}
 

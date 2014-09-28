@@ -34,6 +34,11 @@ class UnresolvableArgumentException extends ContainerException
 
 	protected function getFunctionName(ReflectionFunctionAbstract $reflFunc)
 	{
+		if ($reflFunc->isClosure()) {
+			return 'closure in ' . $reflFunc->getDeclaringClass()->getName()
+				. ' on line ' . $reflFunc->getStartLine();
+		}
+
 		$func = '';
 
 		if ($reflFunc instanceof ReflectionMethod) {
