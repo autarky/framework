@@ -121,17 +121,27 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function appendHandler(callable $handler)
+	public function appendHandler($handler)
 	{
-		$this->handlers->push($handler);
+		$this->addHandler('push', $handler);
 	}
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function prependHandler(callable $handler)
+	public function prependHandler($handler)
 	{
-		$this->handlers->unshift($handler);
+		$this->addHandler('unshift', $handler);
+	}
+
+	protected function addHandler($method, $handler)
+	{
+		if (!$handler instanceof ErrorHandlerInterface && !is_callable($handler)) {
+			$type = is_object($handler) ? get_class($handler) : gettype($handler);
+			throw new \InvalidArgumentException("Error handler must be callable or instance of Autarky\Errors\ErrorHandlerInterface, $type given");
+		}
+
+		$this->handlers->$method($handler);
 	}
 
 	/**
@@ -170,7 +180,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		foreach ($this->handlers as $handler) {
 			if (!$this->matchesTypehint($handler, $exception)) continue;
 
-			$result = call_user_func($handler, $exception);
+			$result = $this->callHandler($handler, $exception);
 
 			if ($result !== null) {
 				return $this->makeResponse($result, $exception);
@@ -178,6 +188,14 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		}
 
 		return $this->makeResponse($this->defaultHandler($exception), $exception);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function handles(Exception $exception)
+	{
+		return true;
 	}
 
 	/**
@@ -240,13 +258,17 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	/**
 	 * Check if a handler's argument typehint matches an exception.
 	 *
-	 * @param  callable   $handler
-	 * @param  \Exception $exception
+	 * @param  callable|ErrorHandlerInterface $handler
+	 * @param  \Exception                     $exception
 	 *
 	 * @return bool
 	 */
-	protected function matchesTypehint(callable $handler, Exception $exception)
+	protected function matchesTypehint($handler, Exception $exception)
 	{
+		if ($handler instanceof ErrorHandlerInterface) {
+			return $handler->handles($exception);
+		}
+
 		$params = (new ReflectionFunction($handler))
 			->getParameters();
 
@@ -266,6 +288,15 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		}
 
 		return $handlerHint->isInstance($exception);
+	}
+
+	protected function callHandler($handler, Exception $exception)
+	{
+		if ($handler instanceof ErrorHandlerInterface) {
+			return $handler->handle($exception);
+		}
+
+		return call_user_func($handler, $exception);
 	}
 
 	/**

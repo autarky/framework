@@ -24,7 +24,7 @@ use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
 use Autarky\Container\ContainerException;
 use Autarky\Container\ContainerInterface;
-use Autarky\Errors\ErrorHandlerInterface;
+use Autarky\Errors\ErrorHandlerManagerInterface;
 use Autarky\Routing\RouterInterface;
 
 /**
@@ -199,7 +199,7 @@ class Application implements HttpKernelInterface
 		return array_keys($this->providers);
 	}
 
-	public function setErrorHandler(ErrorHandlerInterface $errorHandler)
+	public function setErrorHandler(ErrorHandlerManagerInterface $errorHandler)
 	{
 		$this->errorHandler = $errorHandler;
 		$this->errorHandler->setApplication($this);

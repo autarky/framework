@@ -18,7 +18,7 @@ use Autarky\Kernel\Application;
  *
  * Written primarily for testing purposes.
  */
-class StubErrorHandler implements ErrorHandlerInterface
+class StubErrorHandler implements ErrorHandlerManagerInterface
 {
 	public function setApplication(Application $app)
 	{
@@ -40,12 +40,17 @@ class StubErrorHandler implements ErrorHandlerInterface
 		//
 	}
 
-	public function appendHandler(callable $handler)
+	public function appendHandler($handler)
 	{
 		//
 	}
 
-	public function prependHandler(callable $handler)
+	public function prependHandler($handler)
+	{
+		//
+	}
+
+	public function setDefaultHandler(ErrorHandlerInterface $handler)
 	{
 		//
 	}
@@ -58,5 +63,10 @@ class StubErrorHandler implements ErrorHandlerInterface
 	public function handle(Exception $exception)
 	{
 		throw $exception;
+	}
+
+	public function handles(Exception $exception)
+	{
+		return true;
 	}
 }

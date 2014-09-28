@@ -23,4 +23,12 @@ class SymfonyErrorHandler implements ErrorHandlerInterface
 		return (new SymfonyExceptionHandler($this->debug))
 			->createResponse($exception);
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function handles(Exception $exception)
+	{
+		return true;
+	}
 }

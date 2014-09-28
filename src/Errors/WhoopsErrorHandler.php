@@ -32,4 +32,12 @@ class WhoopsErrorHandler implements ErrorHandlerInterface
 
 		return $whoops->handleException($exception);
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function handles(Exception $exception)
+	{
+		return true;
+	}
 }

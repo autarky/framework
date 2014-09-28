@@ -53,20 +53,20 @@ interface ErrorHandlerManagerInterface extends ErrorHandlerInterface
 	/**
 	 * Append a handler to the list of handlers.
 	 *
-	 * @param  callable $handler
+	 * @param  callable|ErrorHandlerInterface $handler
 	 *
 	 * @return void
 	 */
-	public function appendHandler(callable $handler);
+	public function appendHandler($handler);
 
 	/**
 	 * Prepend a handler to the list of handlers.
 	 *
-	 * @param  callable $handler
+	 * @param  callable|ErrorHandlerInterface $handler
 	 *
 	 * @return void
 	 */
-	public function prependHandler(callable $handler);
+	public function prependHandler($handler);
 
 	/**
 	 * Set the default handler that will be called if no other handlers are
