@@ -227,6 +227,14 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function invokeCanInvokeStaticMethods()
+	{
+		$c = $this->makeContainer();
+		$retval = $c->invoke([__NAMESPACE__.'\\StaticStub', 'f'], ['$foo' => 'foo']);
+		$this->assertEquals('foobar', $retval);
+	}
+
+	/** @test */
 	public function invokeResolvesDependencies()
 	{
 		$c = $this->makeContainer();
@@ -289,5 +297,10 @@ class DefaultValueStub {
 class StubFactory {
 	public function makeFoo() {
 		return 'foo';
+	}
+}
+class StaticStub {
+	public static function f($foo) {
+		return $foo.'bar';
 	}
 }

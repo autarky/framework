@@ -132,16 +132,24 @@ class Container implements ContainerInterface
 	 */
 	public function invoke($callable, array $params = array())
 	{
-		if (is_string($callable) && strpos($callable, '::') !== false) {
+		$isString = is_string($callable);
+		$isCallable = is_callable($callable);
+
+		if ($isString && strpos($callable, '::') !== false) {
 			$callable = explode('::', $callable);
 		}
 
 		if (is_array($callable)) {
 			$class = $callable[0];
 			$method = $callable[1];
-			$object = $this->resolve($class);
-			$reflFunc = new ReflectionMethod($object, $method);
-		} else if (is_string($callable) || is_callable($callable)) {
+			if ($isCallable) {
+				$object = null;
+				$reflFunc = new ReflectionMethod($class, $method);
+			} else {
+				$object = $this->resolve($class);
+				$reflFunc = new ReflectionMethod($object, $method);
+			}
+		} else if ($isString || $isCallable) {
 			$reflFunc = new ReflectionFunction($callable);
 			$class = null;
 		} else {
@@ -287,8 +295,8 @@ class Container implements ContainerInterface
 					} else {
 						$funcName = $reflFunc->getName();
 					}
-					throw new UnresolvableArgumentException('Unresolvable argument: '
-						.'Argument #'.$param->getPosition().' ($'.$name.') of '.$funcName);
+					throw new UnresolvableArgumentException('Unresolvable argument: Argument #'
+						.($param->getPosition() + 1).' ($'.$name.') of '.$funcName);
 				}
 			}
 		}
