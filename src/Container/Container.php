@@ -151,6 +151,9 @@ class Container implements ContainerInterface
 			$callable = explode('::', $callable);
 		}
 
+		$class = null;
+		$object = null;
+
 		if (is_array($callable)) {
 			$class = $callable[0];
 			$method = $callable[1];
@@ -169,7 +172,6 @@ class Container implements ContainerInterface
 			}
 		} else if (is_callable($callable)) {
 			$reflFunc = new ReflectionFunction($callable);
-			$class = null;
 		} else {
 			$type = is_object($callable) ? get_class($callable) : gettype($callable);
 			throw new \InvalidArgumentException("Callable must be a callable or array, $type given");

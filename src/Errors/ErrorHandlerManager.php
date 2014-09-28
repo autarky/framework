@@ -187,7 +187,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 			}
 		}
 
-		return $this->makeResponse($this->defaultHandler($exception), $exception);
+		return $this->makeResponse($this->defaultHandler->handle($exception), $exception);
 	}
 
 	/**

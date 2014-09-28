@@ -15,6 +15,13 @@ use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 
 class SymfonyErrorHandler implements ErrorHandlerInterface
 {
+	protected $debug;
+
+	public function __construct($debug)
+	{
+		$this->debug = (bool) $debug;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
