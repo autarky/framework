@@ -82,7 +82,7 @@ class Route
 	{
 		// for each regex match in $this->pattern, get the first param in
 		// $params and replace the match with that
-		$callback = function ($match) use (&$params, &$matches) {
+		$callback = function () use (&$params, &$matches) {
 			if (count($params) < 1) {
 				throw new \InvalidArgumentException('Too few parameters given');
 			}

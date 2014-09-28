@@ -72,7 +72,7 @@ class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResou
 	 */
 	public function creating($name, $handler, $priority = 0)
 	{
-		$this->addEventListener('creating', $name, $handler, $priority = 0);
+		$this->addEventListener('creating', $name, $handler, $priority);
 	}
 
 	/**
@@ -86,7 +86,7 @@ class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResou
 	 */
 	public function rendering($name, $handler, $priority = 0)
 	{
-		$this->addEventListener('rendering', $name, $handler, $priority = 0);
+		$this->addEventListener('rendering', $name, $handler, $priority);
 	}
 
 	protected function addEventListener($event, $name, $handler, $priority = 0)

@@ -71,8 +71,6 @@ class FileStore implements ConfigInterface
 			$this->loadData($namespace, $group, $key);
 		}
 
-		$dataKey = $namespace === null ? $group : $namespace .':'. $group;
-		
 		ArrayUtils::set($this->data, $fullKey, $value);
 	}
 

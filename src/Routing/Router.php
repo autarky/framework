@@ -248,20 +248,16 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 					$args["\$$key"] = $value;
 				}
 				return $this->getResponse($request, $result[1], $args);
-				break;
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
 				throw new NotFoundHttpException('No route match for path '.$request->getPathInfo() ?: '/');
-				break;
 
 			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				throw new MethodNotAllowedHttpException($result[1], 'Method '.$request->getMethod()
 					.' not allowed for path '.$request->getPathInfo() ?: '/');
-				break;
 
 			default:
 				throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
-				break;
 		}
 	}
 
