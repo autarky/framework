@@ -18,15 +18,18 @@ class UnresolvableArgumentException extends ContainerException
 {
 	public function __construct(ReflectionParameter $param)
 	{
+		parent::__construct($this->makeMessage($param));
+	}
+
+	protected function makeMessage(ReflectionParameter $param)
+	{
 		$pos = $param->getPosition() + 1;
 
 		$name = $param->getName();
 
 		$func = $this->getFunctionName($param->getDeclaringFunction());
 
-		$message = "Unresolvable argument: Argument #{$pos} (\${$name}) of {$func}";
-
-		parent::__construct($message);
+		return "Unresolvable argument: Argument #{$pos} (\${$name}) of {$func}";
 	}
 
 	protected function getFunctionName(ReflectionFunctionAbstract $reflFunc)
