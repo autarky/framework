@@ -14,12 +14,12 @@ use Exception;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 
-class WhoopsErrorHandler extends AbstractErrorHandler
+class WhoopsErrorHandler implements ErrorHandlerInterface
 {
 	/**
 	 * {@inheritdoc}
 	 */
-	protected function defaultHandler(Exception $exception)
+	public function handle(Exception $exception)
 	{
 		if (!class_exists('Whoops\Run')) {
 			return 'Composer package filp/whoops must be installed for WhoopsErrorHandler to work.';

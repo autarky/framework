@@ -13,12 +13,12 @@ namespace Autarky\Errors;
 use Exception;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 
-class SymfonyErrorHandler extends AbstractErrorHandler
+class SymfonyErrorHandler implements ErrorHandlerInterface
 {
 	/**
 	 * {@inheritdoc}
 	 */
-	protected function defaultHandler(Exception $exception)
+	public function handle(Exception $exception)
 	{
 		return (new SymfonyExceptionHandler($this->debug))
 			->createResponse($exception);

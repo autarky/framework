@@ -16,6 +16,10 @@ class ErrorHandlerProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$this->app->setErrorHandler(new SymfonyErrorHandler);
+		$manager = new ErrorHandlerManager();
+
+		$manager->setDefaultHandler(new SymfonyErrorHandler);
+
+		$this->app->setErrorHandler($manager);
 	}
 }

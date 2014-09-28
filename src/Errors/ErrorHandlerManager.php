@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 use Autarky\Kernel\Application;
 
-abstract class AbstractErrorHandler implements ErrorHandlerInterface
+class ErrorHandlerManager implements ErrorHandlerManagerInterface
 {
 	/**
 	 * @var \Autarky\Kernel\Application
@@ -36,6 +36,11 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	 * @var \SplDoublyLinkedList
 	 */
 	protected $handlers;
+
+	/**
+	 * @var ErrorHandlerInterface|null
+	 */
+	protected $defaultHandler;
 
 	/**
 	 * Debug mode.
@@ -127,6 +132,14 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 	public function prependHandler(callable $handler)
 	{
 		$this->handlers->unshift($handler);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setDefaultHandler(ErrorHandlerInterface $handler)
+	{
+		$this->defaultHandler = $handler;
 	}
 
 	/**
@@ -254,15 +267,6 @@ abstract class AbstractErrorHandler implements ErrorHandlerInterface
 
 		return $handlerHint->isInstance($exception);
 	}
-
-	/**
-	 * Create a default error response.
-	 *
-	 * @param  \Exception $exception
-	 *
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	abstract protected function defaultHandler(Exception $exception);
 
 	/**
 	 * Handle an uncaught exception. Does the same as handle(), but also sends
