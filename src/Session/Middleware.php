@@ -12,6 +12,7 @@ namespace Autarky\Session;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -67,12 +68,25 @@ class Middleware implements HttpKernelInterface
 			return $this->kernel->handle($request, $type, $catch);
 		}
 
+		$this->initSession($request);
+
+		$response = $this->kernel->handle($request, $type, $catch);
+
+		if ($this->session->isStarted()) {
+			$this->attachSession($request, $response);
+		}
+
+		return $response;
+	}
+
+	protected function initSession(Request $request)
+	{
 		$request->setSession($this->session);
 
-		$cookies = $request->cookies;
+		$sessionName = $this->session->getName();
 
-		if ($cookies->has($this->session->getName())) {
-			$this->session->setId($cookies->get($this->session->getName()));
+		if ($request->cookies->has($sessionName)) {
+			$this->session->setId($request->cookies->get($sessionName));
 		} else {
 			$this->session->migrate(false);
 		}
@@ -80,31 +94,28 @@ class Middleware implements HttpKernelInterface
 		if ($this->forceStart) {
 			$this->session->start();
 		}
+	}
 
-		$response = $this->kernel->handle($request, $type, $catch);
+	protected function attachSession(Request $request, Response $response)
+	{
+		$this->session->save();
 
-		if ($this->session->isStarted()) {
-			$this->session->save();
+		$params = array_merge(session_get_cookie_params(), $this->cookies);
 
-			$params = array_merge(session_get_cookie_params(), $this->cookies);
-
-			if ($params['lifetime'] !== 0) {
-				$params['lifetime'] = $request->server->get('REQUEST_TIME') + $params['lifetime'];
-			}
-
-			$cookie = new Cookie(
-				$this->session->getName(),
-				$this->session->getId(),
-				$params['lifetime'],
-				$params['path'],
-				$params['domain'],
-				$params['secure'],
-				$params['httponly']
-			);
-
-			$response->headers->setCookie($cookie);
+		if ($params['lifetime'] !== 0) {
+			$params['lifetime'] = $request->server->get('REQUEST_TIME') + $params['lifetime'];
 		}
 
-		return $response;
+		$cookie = new Cookie(
+			$this->session->getName(),
+			$this->session->getId(),
+			$params['lifetime'],
+			$params['path'],
+			$params['domain'],
+			$params['secure'],
+			$params['httponly']
+		);
+
+		$response->headers->setCookie($cookie);
 	}
 }
