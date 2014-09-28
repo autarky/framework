@@ -81,7 +81,7 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function define($class, $factory)
+	public function define($class, $factory, array $params = array())
 	{
 		if (!is_callable($factory)) {
 			if (!is_array($factory)) {
@@ -92,6 +92,10 @@ class Container implements ContainerInterface
 			$factory = function($container) use($factory) {
 				return $container->invoke($factory);
 			};
+		}
+
+		if ($params) {
+			$this->params($class, $params);
 		}
 
 		$this->factories[$class] = $factory;
@@ -147,17 +151,23 @@ class Container implements ContainerInterface
 			$callable = explode('::', $callable);
 		}
 
-		$isCallable = is_callable($callable);
-
 		if (is_array($callable)) {
 			$class = $callable[0];
 			$method = $callable[1];
-			$object = $this->resolve($class);
+
+			if (is_object($class)) {
+				$object = $class;
+				$class = get_class($object);
+			} else {
+				$object = $this->resolve($class);
+			}
+
 			$reflFunc = new ReflectionMethod($object, $method);
+
 			if ($reflFunc->isStatic()) {
 				$object = null;
 			}
-		} else if (is_string($callable) || $isCallable) {
+		} else if (is_callable($callable)) {
 			$reflFunc = new ReflectionFunction($callable);
 			$class = null;
 		} else {

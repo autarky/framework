@@ -29,12 +29,13 @@ interface ContainerInterface
 	 * an array of [$object, 'method'] or an array of ['Class', 'method']. If
 	 * the latter is used, 'Class' will be resolved out of the container.
 	 *
-	 * @param  string $class
-	 * @param  mixed  $factory
+	 * @param  string   $class
+	 * @param  callable $factory
+	 * @param  array    $params  See ContainerInterface::params()
 	 *
 	 * @return void
 	 */
-	public function define($class, $factory);
+	public function define($class, $factory, array $params = array());
 
 	/**
 	 * Place an already instantiated object into the container. This will make
@@ -124,8 +125,8 @@ interface ContainerInterface
 	 * array of ['ClassName', 'method'], in which case the class will first be
 	 * resolved from the container.
 	 *
-	 * @param  string|array $callable
-	 * @param  array        $params   See ContainerInterface::params()
+	 * @param  callable $callable
+	 * @param  array    $params   See ContainerInterface::params()
 	 *
 	 * @return mixed
 	 */
