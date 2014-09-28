@@ -168,7 +168,7 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function resolve($class)
+	public function resolve($class, array $params = array())
 	{
 		if (array_key_exists($class, $this->aliases)) {
 			$class = $this->aliases[$class];
@@ -181,7 +181,7 @@ class Container implements ContainerInterface
 		if (array_key_exists($class, $this->factories)) {
 			$object = call_user_func($this->factories[$class], $this);
 		} else {
-			$object = $this->build($class);
+			$object = $this->build($class, $params);
 		}
 
 		if ($object instanceof ContainerAwareInterface) {
@@ -215,7 +215,7 @@ class Container implements ContainerInterface
 		return array_key_exists($class, $this->shared) && $this->shared[$class];
 	}
 
-	protected function build($class)
+	protected function build($class, array $params = array())
 	{
 		if (!class_exists($class)) {
 			throw new NotInstantiableException("Class $class does not exist");
@@ -231,7 +231,9 @@ class Container implements ContainerInterface
 			return $reflClass->newInstance();
 		}
 
-		$params = array_key_exists($class, $this->params) ? $this->params[$class] : null;
+		if (array_key_exists($class, $this->params)) {
+			$params = array_replace($this->params[$class], $params);
+		}
 
 		$args = $this->getFunctionArguments($reflClass->getMethod('__construct'), $params);
 

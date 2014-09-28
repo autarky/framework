@@ -107,10 +107,11 @@ interface ContainerInterface
 	 * container should call setContainer($this) on it.
 	 *
 	 * @param  string $class
+	 * @param  array  $params
 	 *
 	 * @return mixed
 	 */
-	public function resolve($class);
+	public function resolve($class, array $params = array());
 
 	/**
 	 * Execute a function, closure or class method, resolving type-hinted
