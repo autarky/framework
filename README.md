@@ -38,4 +38,4 @@ Read the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
 
 ### License
 
-The contents of this repository is released under the [MIT license](http://opensource.org/licenses/MIT). See the [LICENSE](LICENSE) included for more information.
+The contents of this repository is released under the [MIT license](http://opensource.org/licenses/MIT). See the [LICENSE](LICENSE) file included for more information.
