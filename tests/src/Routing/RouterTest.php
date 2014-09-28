@@ -82,7 +82,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$router = $this->makeRouter();
 		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
 		$route->addAfterFilter(function() { return; });
-		$route->addAfterFilter(function() { return 'baz'; });
+		$route->addAfterFilter(function($route, $request, $respnose) { $respnose->setContent('baz'); });
 		$response = $router->dispatch(Request::create('/foo'));
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
 		$this->assertEquals('baz', $response->getContent());

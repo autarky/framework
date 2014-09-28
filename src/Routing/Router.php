@@ -236,7 +236,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 		switch ($result[0]) {
 			case \FastRoute\Dispatcher::FOUND:
-				return $this->makeResponse($this->getResult($request, $result[1], $result[2]));
+				return $this->getResult($request, $result[1], $result[2]);
 				break;
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
@@ -265,19 +265,19 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 		foreach ($route->getBeforeFilters() as $filter) {
 			if ($result = $this->callFilter($filter, [$route, $request])) {
-				return $result;
+				return $this->makeResponse($result);
 			}
 		}
 
-		$result = $route->run($request, $args, $this->container);
+		$response = $this->makeResponse(
+			$route->run($request, $args, $this->container)
+		);
 
 		foreach ($route->getAfterFilters() as $filter) {
-			if ($afterResult = $this->callFilter($filter, [$route, $request, $result])) {
-				return $afterResult;
-			}
+			$this->callFilter($filter, [$route, $request, $response]);
 		}
 
-		return $result;
+		return $response;
 	}
 
 	protected function makeResponse($result)
