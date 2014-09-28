@@ -39,7 +39,7 @@ class Container implements ContainerInterface
 	/**
 	 * Classes that should be shared instances.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $shared = [];
 
