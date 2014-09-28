@@ -74,4 +74,14 @@ interface RouterInterface
 	 * @return void
 	 */
 	public function group(array $flags, Closure $callback);
+
+	/**
+	 * Mount an array config onto the routes.
+	 *
+	 * @param  array  $routes
+	 * @param  string $path
+	 *
+	 * @return void
+	 */
+	public function mount(array $routes, $path = '/');
 }

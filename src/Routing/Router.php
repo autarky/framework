@@ -33,7 +33,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	use EventDispatcherAwareTrait;
 
 	/**
-	 * @var \Autarky\Routing\Invoker
+	 * @var \Autarky\Routing\InvokerInterface
 	 */
 	protected $invoker;
 
@@ -81,7 +81,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	 */
 	protected $namedRoutes = [];
 
-	public function __construct(Invoker $invoker, $cachePath = null)
+	public function __construct(InvokerInterface $invoker, $cachePath = null)
 	{
 		$this->invoker = $invoker;
 
@@ -119,13 +119,13 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		$this->filters[$name] = $handler;
 	}
 
-	protected function getFilter($name)
+	/**
+	 * {@inheritdoc}
+	 */
+	public function mount(array $routes, $path = '/')
 	{
-		if (!array_key_exists($name, $this->filters)) {
-			throw new \InvalidArgumentException("Filter with name $name is not defined");
-		}
-
-		return $this->filters[$name];
+		(new Configuration($this, $routes))
+			->mount($path);
 	}
 
 	/**
@@ -152,6 +152,15 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 		$this->currentPrefix = $oldPrefix;
 		$this->currentFilters = $oldFilters;
+	}
+
+	protected function getFilter($name)
+	{
+		if (!array_key_exists($name, $this->filters)) {
+			throw new \InvalidArgumentException("Filter with name $name is not defined");
+		}
+
+		return $this->filters[$name];
 	}
 
 	/**
