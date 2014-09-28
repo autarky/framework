@@ -16,33 +16,33 @@ use ReflectionFunctionAbstract;
 
 class UnresolvableArgumentException extends ContainerException
 {
-	public function __construct(ReflectionParameter $param)
+	public function __construct(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)
 	{
-		parent::__construct($this->makeMessage($param));
+		parent::__construct($this->makeMessage($param, $func));
 	}
 
-	protected function makeMessage(ReflectionParameter $param)
+	protected function makeMessage(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)
 	{
 		$pos = $param->getPosition() + 1;
 
 		$name = $param->getName();
 
-		$func = $this->getFunctionName($param->getDeclaringFunction());
+		$func = $this->getFunctionName($func ?: $param->getDeclaringFunction());
 
 		return "Unresolvable argument: Argument #{$pos} (\${$name}) of {$func}";
 	}
 
-	protected function getFunctionName(ReflectionFunctionAbstract $reflFunc)
+	protected function getFunctionName(ReflectionFunctionAbstract $func)
 	{
-		if ($reflFunc->isClosure()) {
-			if ($class = $reflFunc->getClosureScopeClass()) {
+		if ($func->isClosure()) {
+			if ($class = $func->getClosureScopeClass()) {
 				$location = $class->getName();
 			} else {
-				$location = $reflFunc->getFileName();
+				$location = $func->getFileName();
 			}
 
-			$startLine = $reflFunc->getStartLine();
-			$endLine = $reflFunc->getEndLine();
+			$startLine = $func->getStartLine();
+			$endLine = $func->getEndLine();
 
 			if ($startLine == $endLine) {
 				$lines = "line $startLine";
@@ -53,12 +53,10 @@ class UnresolvableArgumentException extends ContainerException
 			return "closure in $location on $lines";
 		}
 
-		$func = '';
-
-		if ($reflFunc instanceof ReflectionMethod) {
-			$func .= $reflFunc->getDeclaringClass()->getName().'::';
+		if ($func instanceof ReflectionMethod) {
+			return $func->getDeclaringClass()->getName() . '::' . $func->getName();
 		}
 
-		return $func . $reflFunc->getName();
+		return $func . $func->getName();
 	}
 }

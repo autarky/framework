@@ -292,13 +292,7 @@ class Container implements ContainerInterface
 				} else if ($param->isDefaultValueAvailable()) {
 					$args[] = $param->getDefaultValue();
 				} else {
-					if ($reflFunc instanceof ReflectionMethod) {
-						$funcName = $reflFunc->getDeclaringClass()->getName()
-							.'::'.$reflFunc->getName();
-					} else {
-						$funcName = $reflFunc->getName();
-					}
-					throw new UnresolvableArgumentException($param);
+					throw new UnresolvableArgumentException($param, $reflFunc);
 				}
 			}
 		}
