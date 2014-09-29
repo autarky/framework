@@ -12,8 +12,6 @@ namespace Autarky\Events;
 
 use Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 
-use Autarky\Container\ContainerInterface;
-
 /**
  * Event dispatcher.
  *
@@ -23,13 +21,13 @@ use Autarky\Container\ContainerInterface;
 class EventDispatcher extends SymfonyEventDispatcher
 {
 	/**
-	 * @var \Autarky\Container\ContainerInterface
+	 * @var \Autarky\Events\ListenerResolver
 	 */
-	protected $container;
+	protected $resolver;
 
-	public function __construct(ContainerInterface $container)
+	public function __construct(ListenerResolver $resolver)
 	{
-		$this->container = $container;
+		$this->resolver = $resolver;
 	}
 
 	/**
@@ -43,7 +41,7 @@ class EventDispatcher extends SymfonyEventDispatcher
 		if (is_string($listener)) {
 			list($class, $method) = \Autarky\splitclm($listener, 'handle');
 			$listener = function($event) use($class, $method) {
-				return $this->container->resolve($class)
+				return $this->resolver->resolve($class)
 					->$method($event);
 			};
 		}

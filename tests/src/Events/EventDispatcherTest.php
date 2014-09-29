@@ -5,6 +5,7 @@ use Mockery as m;
 use PHPUnit_Framework_TestCase;
 
 use Autarky\Events\EventDispatcher;
+use Autarky\Events\ListenerResolver;
 use Autarky\Container\Container;
 
 class EventDispatcherTest extends PHPUnit_Framework_TestCase
@@ -22,7 +23,7 @@ class EventDispatcherTest extends PHPUnit_Framework_TestCase
 
 	protected function makeDispatcher()
 	{
-		return new EventDispatcher(new Container);
+		return new EventDispatcher(new ListenerResolver(new Container));
 	}
 
 	/** @test */

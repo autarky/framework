@@ -257,9 +257,10 @@ class Application implements HttpKernelInterface
 	public function getEventDispatcher()
 	{
 		if ($this->eventDispatcher === null) {
-			try {
-				$this->eventDispatcher = $this->container->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-			} catch (ContainerException $e) {
+			$class = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
+			if ($this->container->isBound($class)) {
+				$this->eventDispatcher = $this->container->resolve($class);
+			} else {
 				$this->eventDispatcher = false;
 			}
 		}
