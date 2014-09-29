@@ -11,20 +11,34 @@
 namespace Autarky\Errors;
 
 use Exception;
+use Symfony\Component\Debug\ExceptionHandler;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 
-class WhoopsErrorHandler implements ErrorHandlerInterface
+class DefaultErrorHandler implements ErrorHandlerInterface
 {
+	protected $debug;
+
+	public function __construct($debug)
+	{
+		$this->debug = (bool) $debug;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function handle(Exception $exception)
 	{
-		if (!class_exists('Whoops\Run')) {
-			return 'Composer package filp/whoops must be installed for WhoopsErrorHandler to work.';
+		if ($this->debug && class_exists('Whoops\Run')) {
+			return $this->handleWithWhoops($exception);
 		}
 
+		return (new ExceptionHandler($this->debug))
+			->createResponse($exception);
+	}
+
+	protected function handleWithWhoops(Exception $exception)
+	{
 		$whoops = new Run();
 		$whoops->allowQuit(false);
 		$whoops->writeToOutput(false);

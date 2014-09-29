@@ -20,11 +20,6 @@ use Autarky\Kernel\Application;
  */
 class StubErrorHandler implements ErrorHandlerManagerInterface
 {
-	public function setApplication(Application $app)
-	{
-		//
-	}
-
 	public function setDebug($toggle)
 	{
 		//

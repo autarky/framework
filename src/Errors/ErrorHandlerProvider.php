@@ -16,10 +16,19 @@ class ErrorHandlerProvider extends ServiceProvider
 {
 	public function register()
 	{
-		$manager = new ErrorHandlerManager();
+		$dic = $this->app->getContainer();
+		$debug = $this->app->getConfig()->get('app.debug');
 
-		$manager->setDefaultHandler(new SymfonyErrorHandler);
+		$manager = new ErrorHandlerManager(
+			new HandlerResolver($dic),
+			new ApplicationContextCollector($this->app)
+		);
+
+		$manager->setDefaultHandler(new DefaultErrorHandler($debug));
 
 		$this->app->setErrorHandler($manager);
+
+		$dic->instance('Autarky\Errors\ErrorHandlerManager', $manager);
+		$dic->alias('Autarky\Errors\ErrorHandlerManager', 'Autarky\Errors\ErrorHandlerManagerInterface');
 	}
 }

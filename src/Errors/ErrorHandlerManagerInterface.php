@@ -21,20 +21,6 @@ use Autarky\Kernel\Application;
 interface ErrorHandlerManagerInterface extends ErrorHandlerInterface
 {
 	/**
-	 * Set the error handler application.
-	 *
-	 * @param \Autarky\Kernel\Application $app
-	 */
-	public function setApplication(Application $app);
-
-	/**
-	 * Set whether the error handler is in debug mode or not.
-	 *
-	 * @param bool $toggle
-	 */
-	public function setDebug($toggle);
-
-	/**
 	 * Set whether exceptions should be handled or rethrown.
 	 *
 	 * @param bool $toggle

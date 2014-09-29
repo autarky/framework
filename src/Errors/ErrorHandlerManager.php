@@ -23,9 +23,14 @@ use Autarky\Kernel\Application;
 class ErrorHandlerManager implements ErrorHandlerManagerInterface
 {
 	/**
-	 * @var \Autarky\Kernel\Application
+	 * @var \Autarky\Errors\HandlerResolver
 	 */
-	protected $app;
+	protected $resolver;
+
+	/**
+	 * @var \Autarky\Errors\ContextCollectorInterface
+	 */
+	protected $contextCollector;
 
 	/**
 	 * @var \Closure|\Psr\Log\LoggerInterface
@@ -43,38 +48,19 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	protected $defaultHandler;
 
 	/**
-	 * Debug mode.
-	 *
-	 * @var boolean
-	 */
-	protected $debug = false;
-
-	/**
 	 * Re-throw exceptions rather than handling them.
 	 *
 	 * @var boolean
 	 */
 	protected $rethrow = false;
 
-	public function __construct()
-	{
+	public function __construct(
+		HandlerResolver $resolver,
+		ContextCollectorInterface $contextCollector
+	) {
+		$this->resolver = $resolver;
+		$this->contextCollector = $contextCollector;
 		$this->handlers = new SplDoublyLinkedList;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setApplication(Application $app)
-	{
-		$this->app = $app;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setDebug($debug)
-	{
-		$this->debug = (bool) $debug;
 	}
 
 	/**
@@ -89,16 +75,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		} else {
 			$this->rethrow = false;
 		}
-	}
-
-	/**
-	 * Get the handlers.
-	 *
-	 * @return \SplDoublyLinkedList
-	 */
-	public function getHandlers()
-	{
-		return $this->handlers;
 	}
 
 	/**
@@ -136,9 +112,13 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 
 	protected function addHandler($method, $handler)
 	{
-		if (!$handler instanceof ErrorHandlerInterface && !is_callable($handler)) {
+		if (
+			!$handler instanceof ErrorHandlerInterface
+			&& !is_callable($handler)
+			&& !is_string($handler)
+		) {
 			$type = is_object($handler) ? get_class($handler) : gettype($handler);
-			throw new \InvalidArgumentException("Error handler must be callable or instance of Autarky\Errors\ErrorHandlerInterface, $type given");
+			throw new \InvalidArgumentException("Error handler must be callable, string or instance of Autarky\Errors\ErrorHandlerInterface, $type given");
 		}
 
 		$this->handlers->$method($handler);
@@ -177,8 +157,15 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 
 		$this->logException($exception);
 
-		foreach ($this->handlers as $handler) {
-			if (!$this->matchesTypehint($handler, $exception)) continue;
+		foreach ($this->handlers as $index => $handler) {
+			if (is_string($handler)) {
+				$handler = $this->resolver->resolve($handler);
+				$this->handlers->offsetSet($index, $handler);
+			}
+
+			if (!$this->matchesTypehint($handler, $exception)) {
+				continue;
+			}
 
 			$result = $this->callHandler($handler, $exception);
 
@@ -209,25 +196,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	{
 		if ($this->logger === null) return;
 
-		$this->getLogger()->error($exception, $this->getContext());
-	}
-
-	/**
-	 * Get an array of context data for the application.
-	 *
-	 * @return array
-	 */
-	protected function getContext()
-	{
-		$request = $this->app->getRequestStack()->getCurrentRequest();
-		$route = $this->app->getRouter()->getCurrentRoute();
-		$routeName = ($route && $route->getName()) ? $route->getName() : 'No route';
-
-		return [
-			'method' => $request ? $request->getMethod() : null,
-			'uri' => $request ? $request->getRequestUri() : null,
-			'name' => $routeName,
-		];
+		$this->getLogger()->error($exception, $this->contextCollector->getContext());
 	}
 
 	/**
@@ -238,21 +207,22 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	protected function makeResponse($result, Exception $exception)
+	protected function makeResponse($response, Exception $exception)
 	{
-		if ($result instanceof Response) {
-			return $result;
+		if (!$response instanceof Response) {
+			$response = new Response($response);
 		}
 
-		if ($exception instanceof HttpExceptionInterface) {
-			$statusCode = $exception->getStatusCode();
-			$headers = $exception->getHeaders();
-		} else {
-			$statusCode = 500;
-			$headers = [];
+		if (!$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
+			if ($exception instanceof HttpExceptionInterface) {
+				$response->setStatusCode($exception->getStatusCode());
+				$response->headers->add($exception->getHeaders());
+			} else {
+				$response->setStatusCode(500);
+			}
 		}
 
-		return new Response($result, $statusCode, $headers);
+		return $response;
 	}
 
 	/**

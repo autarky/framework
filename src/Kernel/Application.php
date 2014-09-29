@@ -115,7 +115,7 @@ class Application implements HttpKernelInterface
 		$this->middlewares = new SplPriorityQueue;
 		$this->configCallbacks = new SplStack;
 		$this->requests = new RequestStack;
-		$this->environment = $environment;
+		$this->setEnvironment($environment);
 		
 		foreach ($providers as $provider) {
 			$class = is_object($provider) ? get_class($provider) : (string) $provider;
@@ -144,35 +144,23 @@ class Application implements HttpKernelInterface
 	/**
 	 * Set the environment of the application. Has to be called before boot().
 	 *
-	 * @param \Closure|string $environment
+	 * @param string $environment
 	 */
 	public function setEnvironment($environment)
 	{
 		if ($this->booted) {
-			throw new \RuntimeException("Cannot set environment after application has booted");
+			throw new \RuntimeException('Cannot set environment after application has booted');
+		}
+
+		if (is_callable($environment)) {
+			$environment = call_user_func($environment);
+		}
+
+		if (!is_string($environment)) {
+			throw new \InvalidArgumentException('Environment must be a string');
 		}
 
 		$this->environment = $environment;
-	}
-
-	/**
-	 * Resolve the environment.
-	 *
-	 * @return void
-	 */
-	protected function resolveEnvironment()
-	{
-		if ($this->environment instanceof Closure) {
-			$environment = $this->environment;
-			$this->environment = $environment();
-		}
-
-		if ($this->config !== null) {
-			$this->config->setEnvironment($this->environment);
-			if ($this->errorHandler !== null) {
-				$this->errorHandler->setDebug($this->config->get('app.debug'));
-			}
-		}
 	}
 
 	/**
@@ -182,7 +170,7 @@ class Application implements HttpKernelInterface
 	 */
 	public function getEnvironment()
 	{
-		if (!$this->environment || $this->environment instanceof Closure) {
+		if (!$this->booted) {
 			throw new \RuntimeException('Environment has not yet been resolved');
 		}
 
@@ -202,7 +190,6 @@ class Application implements HttpKernelInterface
 	public function setErrorHandler(ErrorHandlerManagerInterface $errorHandler)
 	{
 		$this->errorHandler = $errorHandler;
-		$this->errorHandler->setApplication($this);
 		$this->errorHandler->register();
 	}
 
@@ -332,7 +319,6 @@ class Application implements HttpKernelInterface
 		if ($this->booted) return;
 
 		$this->registerProviders();
-		$this->resolveEnvironment();
 		$this->callConfigCallbacks();
 		$this->resolveStack();
 
