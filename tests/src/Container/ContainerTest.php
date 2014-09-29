@@ -181,7 +181,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function nonInstantiableClassNameThrowsException()
 	{
 		$c = $this->makeContainer();
-		$this->setExpectedException('Autarky\Container\NotInstantiableException');
+		$this->setExpectedException('Autarky\Container\Exception\NotInstantiableException');
 		$c->resolve('Iterator');
 	}
 
@@ -189,7 +189,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function unresolvableArgumentThrowsException()
 	{
 		$c = $this->makeContainer();
-		$this->setExpectedException('Autarky\Container\UnresolvableArgumentException');
+		$this->setExpectedException('Autarky\Container\Exception\UnresolvableArgumentException');
 		$c->resolve(__NAMESPACE__.'\\UnresolvableStub');
 	}
 
@@ -242,7 +242,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function invokeThrowsExceptionOnUnresolvableArgument()
 	{
-		$this->setExpectedException('Autarky\Container\UnresolvableArgumentException',
+		$this->setExpectedException('Autarky\Container\Exception\UnresolvableArgumentException',
 			'Unresolvable argument: Argument #1 ($foo) of Autarky\Tests\Container\StaticStub::f');
 		$c = $this->makeContainer();
 		$c->invoke([__NAMESPACE__.'\\StaticStub', 'f']);
@@ -251,7 +251,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function invokeExceptionMessageIsCorrectForClosures()
 	{
-		$this->setExpectedException('Autarky\Container\UnresolvableArgumentException',
+		$this->setExpectedException('Autarky\Container\Exception\UnresolvableArgumentException',
 			'Unresolvable argument: Argument #1 ($foo) of closure in '.__CLASS__.' on line');
 		$c = $this->makeContainer();
 		$c->invoke(function($foo){});

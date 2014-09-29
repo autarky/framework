@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Container;
+namespace Autarky\Container\Exception;
 
 use ReflectionException;
 

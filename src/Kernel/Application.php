@@ -22,7 +22,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
-use Autarky\Container\ContainerException;
 use Autarky\Container\ContainerInterface;
 use Autarky\Errors\ErrorHandlerManagerInterface;
 use Autarky\Routing\RouterInterface;

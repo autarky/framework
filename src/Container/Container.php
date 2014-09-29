@@ -249,13 +249,13 @@ class Container implements ContainerInterface
 	protected function build($class, array $params = array())
 	{
 		if (!class_exists($class)) {
-			throw new NotInstantiableException("Class $class does not exist");
+			throw new Exception\NotInstantiableException("Class $class does not exist");
 		}
 
 		$reflClass = new ReflectionClass($class);
 
 		if (!$reflClass->isInstantiable()) {
-			throw new NotInstantiableException("Class $class is not instantiable");
+			throw new Exception\NotInstantiableException("Class $class is not instantiable");
 		}
 
 		if (!$reflClass->hasMethod('__construct')) {
@@ -287,7 +287,7 @@ class Container implements ContainerInterface
 				} else if ($param->isDefaultValueAvailable()) {
 					$args[] = $param->getDefaultValue();
 				} else {
-					throw new UnresolvableArgumentException($param, $func);
+					throw new Exception\UnresolvableArgumentException($param, $func);
 				}
 			}
 		}
