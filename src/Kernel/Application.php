@@ -190,7 +190,6 @@ class Application implements HttpKernelInterface
 	public function setErrorHandler(ErrorHandlerManagerInterface $errorHandler)
 	{
 		$this->errorHandler = $errorHandler;
-		$this->errorHandler->register();
 	}
 
 	public function getErrorHandler()

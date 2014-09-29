@@ -14,6 +14,13 @@ use Autarky\Kernel\ServiceProvider;
 
 class ErrorHandlerProvider extends ServiceProvider
 {
+	protected $register;
+
+	public function __construct($register = true)
+	{
+		$this->register = (bool) $register;
+	}
+
 	public function register()
 	{
 		$dic = $this->app->getContainer();
@@ -27,6 +34,10 @@ class ErrorHandlerProvider extends ServiceProvider
 		$manager->setDefaultHandler(new DefaultErrorHandler($debug));
 
 		$this->app->setErrorHandler($manager);
+
+		if ($this->register) {
+			$manager->register();
+		}
 
 		$dic->instance('Autarky\Errors\ErrorHandlerManager', $manager);
 		$dic->alias('Autarky\Errors\ErrorHandlerManager', 'Autarky\Errors\ErrorHandlerManagerInterface');
