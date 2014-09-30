@@ -2,6 +2,7 @@
 namespace Autarky\Tests\Routing;
 
 use PHPUnit_Framework_TestCase;
+use Mockery as m;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -13,6 +14,11 @@ use Autarky\Routing\Invoker;
 
 class RouterTest extends PHPUnit_Framework_TestCase
 {
+	public function tearDown()
+	{
+		m::close();
+	}
+
 	public function makeRouter()
 	{
 		return new Router(new Invoker(new Container));
@@ -107,6 +113,43 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('foo', $response->getContent());
 	}
 
+	/** @test */
+	public function filtersAreResolvedFromContainer()
+	{
+		$router = new Router(new Invoker($container = new Container));
+		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
+		$route->addBeforeFilter('StubFilter:f');
+		$container->instance('StubFilter', new StubFilter);
+		$response = $router->dispatch(Request::create('/foo'));
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals('f', $response->getContent());
+	}
+
+	/** @test */
+	public function filtersResolvedFromTheContainerCallFilterMethodByDefault()
+	{
+		$router = new Router(new Invoker($container = new Container));
+		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
+		$route->addBeforeFilter('StubFilter');
+		$container->instance('StubFilter', new StubFilter);
+		$response = $router->dispatch(Request::create('/foo'));
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals('filter', $response->getContent());
+	}
+
+	/** @test */
+	public function filtersAndRespondersCanBeSeparate()
+	{
+		$router = new Router(new Invoker($container = new Container));
+		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
+		$route->addBeforeFilter(['StubFilter', 'StubResponder']);
+		$container->instance('StubFilter', new StubFilter);
+		$container->instance('StubResponder', new StubResponder);
+		$response = $router->dispatch(Request::create('/foo'));
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals('respond', $response->getContent());
+	}
+
 	/**
 	 * @test
 	 * @dataProvider getPrefixPathData
@@ -125,5 +168,20 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		return array_map(function($prefix, $path) {
 			return [$prefix, $path, '/foo/bar'];
 		}, ['foo', '/foo', 'foo/', '/foo/'], ['bar', '/bar', 'bar/', '/bar/']);
+	}
+}
+
+class StubFilter {
+	public function f() {
+		return __FUNCTION__;
+	}
+	public function filter() {
+		return __FUNCTION__;
+	}
+}
+
+class StubResponder {
+	public function respond() {
+		return __FUNCTION__;
 	}
 }
