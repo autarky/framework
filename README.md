@@ -1,4 +1,5 @@
 # Autarky [![Build Status](https://travis-ci.org/autarky/framework.png?branch=master)](https://travis-ci.org/autarky/framework) [![Latest Version](http://img.shields.io/github/release/autarky/framework.svg)](https://github.com/autarky/framework/releases)
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/autarky/framework?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Autarky is a PHP framework for experienced developers and/or quick learners. Read the [wiki](https://github.com/autarky/framework/wiki) for more information.
 
