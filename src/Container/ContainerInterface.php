@@ -56,11 +56,23 @@ interface ContainerInterface
 	 * only constructed once. No matter time how many times that class is
 	 * resolved out of the container, it will be the same instance.
 	 *
-	 * @param  string $class
+	 * @param  string|array $classOrClasses
 	 *
 	 * @return void
 	 */
-	public function share($class);
+	public function share($classOrClasses);
+
+	/**
+	 * Define a class or classes as internal.
+	 *
+	 * Internal classes cannot be resolved directly, but can be resolved as
+	 * dependencies to other classes.
+	 *
+	 * @param  string|array $classOrClasses
+	 *
+	 * @return void
+	 */
+	public function internal($classOrClasses);
 
 	/**
 	 * Define a set of constructor arguments for a specific class.

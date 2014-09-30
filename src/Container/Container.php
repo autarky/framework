@@ -72,6 +72,20 @@ class Container implements ContainerInterface
 	 */
 	protected $resolvingAnyCallbacks = [];
 
+	/**
+	 * Internal classes.
+	 *
+	 * @var array
+	 */
+	protected $internals = [];
+
+	/**
+	 * Whether internal classes should be protected from resolving or not.
+	 *
+	 * @var boolean
+	 */
+	protected $protectInternals = true;
+
 	public function __construct()
 	{
 		$this->instance('Autarky\Container\Container', $this);
@@ -113,9 +127,21 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function share($class)
+	public function share($classOrClasses)
 	{
-		$this->shared[$class] = true;
+		foreach ((array) $classOrClasses as $class) {
+			$this->shared[$class] = true;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function internal($classOrClasses)
+	{
+		foreach ((array) $classOrClasses as $class) {
+			$this->internals[$class] = true;
+		}
 	}
 
 	/**
@@ -202,15 +228,22 @@ class Container implements ContainerInterface
 			$class = $this->aliases[$class];
 		}
 
+		$this->checkProtected($class, $alias);
+
 		if (array_key_exists($class, $this->instances)) {
 			return $this->instances[$class];
 		}
+
+		$previousState = $this->protectInternals;
+		$this->protectInternals = false;
 
 		if (array_key_exists($class, $this->factories)) {
 			$object = call_user_func($this->factories[$class], $this);
 		} else {
 			$object = $this->build($class, $params);
 		}
+
+		$this->protectInternals = $previousState;
 
 		if ($object instanceof ContainerAwareInterface) {
 			$object->setContainer($this);
@@ -226,6 +259,30 @@ class Container implements ContainerInterface
 		}
 
 		return $object;
+	}
+
+	protected function checkProtected($class, $alias)
+	{
+		if (!$this->protectInternals) {
+			return;
+		}
+
+		if ($alias) {
+			if ($this->isProtected($class) || $this->isProtected($alias)) {
+				$msg = "Class $class (via alias $alias) or its alias is internal and cannot be resolved.";
+				throw new Exception\ResolvingInternalException($msg);
+			}
+		} else {
+			if ($this->isProtected($class)) {
+				$msg = "Class $class is internal and cannot be resolved.";
+				throw new Exception\ResolvingInternalException($msg);
+			}
+		}
+	}
+
+	protected function isProtected($class)
+	{
+		return array_key_exists($class, $this->internals) && $this->internals[$class];
 	}
 
 	protected function callResolvingCallbacks($key, $object)

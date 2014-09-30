@@ -300,6 +300,16 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$retval = $c->invoke($callback, ['$lc' => $lc]);
 		$this->assertSame($lc, $retval);
 	}
+
+	/** @test */
+	public function internalClassesAreProtected()
+	{
+		$c = $this->makeContainer();
+		$c->internal(__NAMESPACE__.'\\LowerClass');
+		$c->resolve(__NAMESPACE__ .'\\UpperClass');
+		$this->setExpectedException('Autarky\Container\Exception\ResolvingInternalException');
+		$c->resolve(__NAMESPACE__ .'\\LowerClass');
+	}
 }
 
 class LowerClass {}
