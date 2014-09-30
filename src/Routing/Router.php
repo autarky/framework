@@ -299,13 +299,31 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 	protected function callFilter($filter, Route $route, Request $request, Response $response = null)
 	{
-		$args = [
+		$params = [
 			'Autarky\Routing\Route' => $route,
 			'Symfony\Component\HttpFoundation\Request' => $request,
 			'Symfony\Component\HttpFoundation\Response' => $response,
 		];
 
-		return $this->invoker->invoke($filter, $args);
+		if (is_array($filter)) {
+			$responder = $this->getCallable($filter[1], 'respond');
+			$filter = $this->getCallable($filter[0], 'filter');
+			$shouldRespond = $this->invoker->invoke($filter, $params);
+			if ($shouldRespond) {
+				return $this->invoker->invoke($responder, $params);
+			}
+		} else {
+			$filter = $this->getCallable($filter, 'filter');
+			return $this->invoker->invoke($filter, $params);
+		}
+	}
+
+	protected function getCallable($callable, $defaultMethod)
+	{
+		if (is_string($callable) && !is_callable($callable)) {
+			return \Autarky\splitclm($callable, $defaultMethod);
+		}
+		return $callable;
 	}
 
 	protected function getDispatcher()
