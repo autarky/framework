@@ -86,6 +86,13 @@ class Container implements ContainerInterface
 	 */
 	protected $protectInternals = true;
 
+	/**
+	 * Whether to "autowire" classes or not.
+	 *
+	 * @var boolean
+	 */
+	protected $autowire = true;
+
 	public function __construct()
 	{
 		$this->instance('Autarky\Container\Container', $this);
@@ -239,8 +246,13 @@ class Container implements ContainerInterface
 
 		if (array_key_exists($class, $this->factories)) {
 			$object = call_user_func($this->factories[$class], $this);
-		} else {
+		} else if ($this->autowire) {
 			$object = $this->build($class, $params);
+		} else {
+			if ($alias) {
+				$class = "$class (via $alias)";
+			}
+			throw new Exception\ResolvingException("No factory defined for $class");
 		}
 
 		$this->protectInternals = $previousState;
@@ -414,5 +426,15 @@ class Container implements ContainerInterface
 	public function resolvingAny(callable $callback)
 	{
 		$this->resolvingAnyCallbacks[] = $callback;
+	}
+
+	/**
+	 * Enable or disable autowiring.
+	 *
+	 * @param boolean $autowire
+	 */
+	public function setAutowire($autowire)
+	{
+		$this->autowire = (bool) $autowire;
 	}
 }

@@ -310,6 +310,15 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException('Autarky\Container\Exception\ResolvingInternalException');
 		$c->resolve(__NAMESPACE__ .'\\LowerClass');
 	}
+
+	/** @test */
+	public function cannotAutoresolveIfAutowiringIsDisabled()
+	{
+		$c = $this->makeContainer();
+		$c->setAutowire(false);
+		$this->setExpectedException('Autarky\Container\Exception\ResolvingException');
+		$c->resolve(__NAMESPACE__ .'\\UpperClass');
+	}
 }
 
 class LowerClass {}

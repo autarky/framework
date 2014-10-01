@@ -10,6 +10,6 @@
 
 namespace Autarky\Container\Exception;
 
-class ResolvingInternalException extends ResolvingException
+class ResolvingException extends ContainerException
 {
 }
