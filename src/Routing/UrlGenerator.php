@@ -44,7 +44,7 @@ class UrlGenerator
 	 */
 	public function setAssetRoot($assetRoot)
 	{
-		$this->assetRoot = ltrim($assetRoot, '/');
+		$this->assetRoot = rtrim($assetRoot, '/');
 	}
 
 	/**
