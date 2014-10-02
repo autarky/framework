@@ -104,9 +104,9 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function resolveOptionalDependencyIsNullWhenNotConfigured()
 	{
 		$c = $this->makeContainer();
-		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
-		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
-		$this->assertNull($obj->opt);
+		$o = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $o->lc);
+		$this->assertNull($o->opt);
 	}
 
 	/** @test */
@@ -114,9 +114,9 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	{
 		$c = $this->makeContainer();
 		$c->alias(__NAMESPACE__.'\\OptionalClass', __NAMESPACE__.'\\OptionalInterface');
-		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
-		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
-		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $obj->opt);
+		$o = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $o->lc);
+		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $o->opt);
 	}
 
 	/** @test */
@@ -126,9 +126,9 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$c->params(__NAMESPACE__.'\\OptionalDependencyClass', [
 			__NAMESPACE__.'\\OptionalInterface' => __NAMESPACE__.'\\OptionalClass',
 		]);
-		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
-		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
-		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $obj->opt);
+		$o = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $o->lc);
+		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $o->opt);
 	}
 
 	/** @test */
@@ -138,17 +138,28 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$c->params(__NAMESPACE__.'\\OptionalDependencyClass', [
 			'$opt' => __NAMESPACE__.'\\OptionalClass',
 		]);
-		$obj = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
-		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $obj->lc);
-		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $obj->opt);
+		$o = $c->resolve(__NAMESPACE__.'\\OptionalDependencyClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\LowerClass', $o->lc);
+		$this->assertInstanceOf(__NAMESPACE__.'\\OptionalClass', $o->opt);
+	}
+
+	/** @test */
+	public function paramsAreMerged()
+	{
+		$c = $this->makeContainer();
+		$c->params(__NAMESPACE__.'\ParamStub', ['$foo' => 'old_foo']);
+		$c->params(__NAMESPACE__.'\ParamStub', ['$foo' => 'new_foo', '$bar' => 'bar']);
+		$o = $c->resolve(__NAMESPACE__.'\ParamStub');
+		$this->assertEquals('new_foo', $o->foo);
+		$this->assertEquals('bar', $o->bar);
 	}
 
 	/** @test */
 	public function containerAware()
 	{
 		$c = $this->makeContainer();
-		$o = $c->resolve(__NAMESPACE__.'\CA');
-		$this->assertSame($c, $o->container);
+		$o = $c->resolve(__NAMESPACE__.'\ContainerAware');
+		$this->assertSame($c, $o->getContainer());
 	}
 
 	/** @test */
@@ -197,8 +208,8 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function canResolveWithDependencyDefaultValue()
 	{
 		$c = $this->makeContainer();
-		$obj = $c->resolve(__NAMESPACE__.'\\DefaultValueStub');
-		$this->assertEquals('foo', $obj->value);
+		$o = $c->resolve(__NAMESPACE__.'\\DefaultValueStub');
+		$this->assertEquals('foo', $o->value);
 	}
 
 	/** @test */
@@ -237,6 +248,23 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$c = $this->makeContainer();
 		$retval = $c->invoke(function() { return 42; });
 		$this->assertEquals(42, $retval);
+	}
+
+	/** @test */
+	public function canInvokeObjectMethod()
+	{
+		$c = $this->makeContainer();
+		$retval = $c->invoke([new StubFactory, 'makeFoo']);
+		$this->assertEquals('foo', $retval);
+	}
+
+	/** @test */
+	public function invokeWithObjectLooksUpClassParams()
+	{
+		$c = $this->makeContainer();
+		$c->params(__NAMESPACE__.'\StubFactory', ['$suffix' => 'bar']);
+		$retval = $c->invoke([new StubFactory, 'makeFoo']);
+		$this->assertEquals('foobar', $retval);
 	}
 
 	/** @test */
@@ -342,12 +370,12 @@ class OptionalDependencyClass {
 		$this->lc = $lc; $this->opt = $opt;
 	}
 }
-class CA implements \Autarky\Container\ContainerAwareInterface
+class ContainerAware implements \Autarky\Container\ContainerAwareInterface
 {
-	public $container;
-	public function setContainer(\Autarky\Container\ContainerInterface $container)
+	use \Autarky\Container\ContainerAwareTrait;
+	public function getContainer()
 	{
-		$this->container = $container;
+		return $this->container;
 	}
 }
 class UnresolvableStub {
@@ -361,12 +389,18 @@ class DefaultValueStub {
 	}
 }
 class StubFactory {
-	public function makeFoo() {
-		return 'foo';
+	public function makeFoo($suffix = '') {
+		return 'foo' . $suffix;
 	}
 }
 class StaticStub {
 	public static function f($foo) {
 		return $foo.'bar';
+	}
+}
+class ParamStub {
+	public function __construct($foo, $bar) {
+		$this->foo = $foo;
+		$this->bar = $bar;
 	}
 }
