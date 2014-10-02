@@ -34,7 +34,7 @@ class Application implements HttpKernelInterface
 	/**
 	 * The framework version.
 	 */
-	const VERSION = '0.5.0';
+	const VERSION = '0.5.1';
 
 	/**
 	 * The application's service providers.
@@ -225,6 +225,7 @@ class Application implements HttpKernelInterface
 	public function setConfig(ConfigInterface $config)
 	{
 		$this->config = $config;
+		$config->setEnvironment($this->environment);
 	}
 
 	/**
