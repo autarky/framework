@@ -319,6 +319,14 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException('Autarky\Container\Exception\ResolvingException');
 		$c->resolve(__NAMESPACE__ .'\\UpperClass');
 	}
+
+	/** @test */
+	public function containerAndContainerInterfaceAreShared()
+	{
+		$c = $this->makeContainer();
+		$this->assertSame($c, $c->resolve('Autarky\Container\Container'));
+		$this->assertSame($c, $c->resolve('Autarky\Container\ContainerInterface'));
+	}
 }
 
 class LowerClass {}
