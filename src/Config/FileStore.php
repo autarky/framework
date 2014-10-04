@@ -34,8 +34,9 @@ class FileStore implements ConfigInterface
 	/**
 	 * @param string $path Path to config files in the global namespace.
 	 */
-	public function __construct(LoaderFactory $loaderFactory, $path)
+	public function __construct(LoaderFactory $loaderFactory, $path, $environment)
 	{
+		$this->environment = $environment;
 		$this->loaderFactory = $loaderFactory;
 		$this->setLocation($path);
 	}
@@ -126,5 +127,10 @@ class FileStore implements ConfigInterface
 		$loader = $this->loaderFactory->getForPath($path);
 
 		return $loader->load($path);
+	}
+
+	public function setEnvironment($environment)
+	{
+		// do nothing - deprecated method
 	}
 }

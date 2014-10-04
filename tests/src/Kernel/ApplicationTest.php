@@ -110,15 +110,6 @@ class ApplicationTest extends TestCase
 		$app->boot();
 		$this->assertTrue(StubServiceProvider::$called);
 	}
-
-	/** @test */
-	public function configEnvironmentIsSet()
-	{
-		$app = new \Autarky\Kernel\Application('testing', []);
-		$config = m::mock('Autarky\Config\ConfigInterface');
-		$config->shouldReceive('setEnvironment')->with('testing')->once();
-		$app->setConfig($config);
-	}
 }
 
 abstract class AbstractMiddleware implements HttpKernelInterface

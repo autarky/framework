@@ -14,11 +14,11 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 		return TESTS_RSC_DIR.'/config';
 	}
 
-	protected function makeConfig()
+	protected function makeConfig($env = 'default')
 	{
 		$loaderFactory = new LoaderFactory(new \Autarky\Container\Container);
 		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
-		return new FileStore($loaderFactory, $this->getConfigPath());
+		return new FileStore($loaderFactory, $this->getConfigPath(), $env);
 	}
 
 	/** @test */
@@ -63,8 +63,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function environmentOverrides()
 	{
-		$config = $this->makeConfig();
-		$config->setEnvironment('dummyenv');
+		$config = $this->makeConfig('dummyenv');
 		$this->assertEquals('baz', $config->get('testfile.foo'));
 	}
 
@@ -87,8 +86,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function namespaceInEnvironment()
 	{
-		$config = $this->makeConfig();
-		$config->setEnvironment('dummyenv');
+		$config = $this->makeConfig('dummyenv');
 		$config->addNamespace('namespace', $this->getConfigPath().'/vendor/namespace');
 		$this->assertEquals('ONE', $config->get('namespace:testfile.one'));
 	}

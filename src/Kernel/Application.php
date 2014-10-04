@@ -225,7 +225,6 @@ class Application implements HttpKernelInterface
 	public function setConfig(ConfigInterface $config)
 	{
 		$this->config = $config;
-		$config->setEnvironment($this->environment);
 	}
 
 	/**
@@ -318,11 +317,11 @@ class Application implements HttpKernelInterface
 	{
 		if ($this->booted) return;
 
+		$this->booted = true;
+
 		$this->registerProviders();
 		$this->callConfigCallbacks();
 		$this->resolveStack();
-
-		$this->booted = true;
 	}
 
 	protected function registerProviders()

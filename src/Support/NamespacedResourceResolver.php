@@ -47,16 +47,6 @@ trait NamespacedResourceResolver
 	}
 
 	/**
-	 * Set the enrivonment.
-	 *
-	 * @param string $environment
-	 */
-	public function setEnvironment($environment)
-	{
-		$this->environment = $environment;
-	}
-
-	/**
 	 * Parse a key, returning an array of [namespace, group, key]. If namespace
 	 * is null, no namespace is provided. If key is null, the entire group
 	 * is being requested.

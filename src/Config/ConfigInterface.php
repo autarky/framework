@@ -40,6 +40,8 @@ interface ConfigInterface extends NamespacedResourceResolverInterface
 	 * Set the environment.
 	 *
 	 * @param string $environment
+	 *
+	 * @deprecated
 	 */
 	public function setEnvironment($environment);
 }
