@@ -18,6 +18,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	{
 		$loaderFactory = new LoaderFactory(new \Autarky\Container\Container);
 		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
+		$loaderFactory->addLoader('yml', 'Autarky\Config\Loaders\YamlFileLoader');
 		return new FileStore($loaderFactory, $this->getConfigPath(), $env);
 	}
 
@@ -106,5 +107,13 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 		$config->getLoaderFactory()->addLoader('mock', m::mock(['load' => ['foo' => 'bar']]));
 		$this->assertEquals('bar', $config->get('mockedfile.foo'));
 		$this->assertEquals(null, $config->get('mockedfile.bar'));
+	}
+
+	/** @test */
+	public function yamlFilesCanBeParsed()
+	{
+		$config = $this->makeConfig();
+		$config->getLoaderFactory()->addLoader('yml', 'Autarky\Config\Loaders\YamlFileLoader');
+		$this->assertEquals('bar', $config->get('testyml.foo'));
 	}
 }

@@ -26,8 +26,10 @@ class ConfigProvider extends ServiceProvider
 		$dic = $this->app->getContainer();
 
 		$loaderFactory = new LoaderFactory($dic);
-		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
 		$dic->instance('Autarky\Config\Loaders\LoaderFactory', $loaderFactory);
+
+		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
+		$loaderFactory->addLoader(['yml', 'yaml'], 'Autarky\Config\Loaders\YamlFileLoader');
 
 		$store = new FileStore($loaderFactory, $this->configPath, $this->app->getEnvironment());
 		$dic->instance('Autarky\Config\FileStore', $store);
