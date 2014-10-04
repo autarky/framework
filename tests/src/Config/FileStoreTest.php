@@ -95,7 +95,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function notArrayThrowsException()
 	{
-		$this->setExpectedException('InvalidArgumentException');
+		$this->setExpectedException('RuntimeException');
 		$config = $this->makeConfig();
 		$config->get('notarray.foo');
 	}

@@ -111,11 +111,18 @@ class FileStore implements ConfigInterface
 		foreach ($locations as $location) {
 			foreach ($extensions as $extension) {
 				$path = "{$location}/{$group}.{$extension}";
-				if (file_exists($path)) {
-					$fileData = $this->getDataFromFile($path);
-					$data = array_merge($data, $fileData);
-					break;
+
+				if (!file_exists($path)) {
+					continue;
 				}
+
+				if (!is_readable($path)) {
+					throw new \RuntimeException("File is not readable: $path");
+				}
+
+				$fileData = $this->getDataFromFile($path);
+				$data = array_replace($data, $fileData);
+				break;
 			}
 		}
 

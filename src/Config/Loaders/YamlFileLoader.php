@@ -27,10 +27,6 @@ class YamlFileLoader implements LoaderInterface
 	 */
 	public function load($path)
 	{
-		if (!file_exists($path)) {
-			throw new \InvalidArgumentException("File does not exist: $path");
-		}
-
 		$yaml = file_get_contents($path);
 
 		return $this->parser->parse($yaml);
