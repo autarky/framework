@@ -90,7 +90,7 @@ class SessionProvider extends ServiceProvider
 					return new MockArraySessionStorage;
 				}
 
-				$options = $this->app->getConfig()->get('session.handler-options', []);
+				$options = $this->app->getConfig()->get('session.storage-options', []);
 				$handler = $container->resolve('SessionHandlerInterface');
 
 				return new NativeSessionStorage($options, $handler);
