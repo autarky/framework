@@ -1,6 +1,10 @@
 # Autarky [![Build Status](https://travis-ci.org/autarky/framework.png?branch=master)](https://travis-ci.org/autarky/framework) [![Latest Version](http://img.shields.io/github/release/autarky/framework.svg)](https://github.com/autarky/framework/releases)
 
-Autarky is a PHP framework for experienced developers and/or quick learners. Read the [wiki](https://github.com/autarky/framework/wiki) for more information.
+Autarky is a PHP framework for experienced developers and/or quick learners.
+
+Documentation is available in the [wiki](https://github.com/autarky/framework/wiki).
+
+Changes and upgrade instructions are documented in [releases](https://github.com/autarky/framework/releases).
 
 ### Installation
 
