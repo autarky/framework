@@ -54,20 +54,20 @@ class SessionProvider extends ServiceProvider
 						$connection = $this->app->getConfig()->get('session.db-connection');
 						$pdo = $container->resolve('Autarky\Database\MultiPdoContainer')
 							->getPdo($connection);
-						$options = $this->app->getConfig()->get('session.handler-options');
+						$options = $this->app->getConfig()->get('session.handler-options', []);
 						return new PdoSessionHandler($pdo, $options);
 
 					case 'mongo':
 						return new MongoDbSessionHandler($container->resolve('MongoClient'),
-							$this->app->getConfig()->get('session.handler-options'));
+							$this->app->getConfig()->get('session.handler-options', []));
 
 					case 'memcache':
 						return new MemcacheSessionHandler($container->resolve('Memcache'),
-							$this->app->getConfig()->get('session.handler-options'));
+							$this->app->getConfig()->get('session.handler-options', []));
 
 					case 'memcached':
 						return new MemcachedSessionHandler($container->resolve('Memcached'),
-							$this->app->getConfig()->get('session.handler-options'));
+							$this->app->getConfig()->get('session.handler-options', []));
 
 					case 'null':
 						return new NullSessionHandler;
