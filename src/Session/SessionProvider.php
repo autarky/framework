@@ -51,23 +51,23 @@ class SessionProvider extends ServiceProvider
 						return new NativeFileSessionHandler($path);
 
 					case 'pdo':
-						$connection = $this->app->getConfig()->get('session.db-connection');
+						$connection = $this->app->getConfig()->get('session.db_connection');
 						$pdo = $container->resolve('Autarky\Database\MultiPdoContainer')
 							->getPdo($connection);
-						$options = $this->app->getConfig()->get('session.handler-options', []);
+						$options = $this->app->getConfig()->get('session.handler_options', []);
 						return new PdoSessionHandler($pdo, $options);
 
 					case 'mongo':
 						return new MongoDbSessionHandler($container->resolve('MongoClient'),
-							$this->app->getConfig()->get('session.handler-options', []));
+							$this->app->getConfig()->get('session.handler_options', []));
 
 					case 'memcache':
 						return new MemcacheSessionHandler($container->resolve('Memcache'),
-							$this->app->getConfig()->get('session.handler-options', []));
+							$this->app->getConfig()->get('session.handler_options', []));
 
 					case 'memcached':
 						return new MemcachedSessionHandler($container->resolve('Memcached'),
-							$this->app->getConfig()->get('session.handler-options', []));
+							$this->app->getConfig()->get('session.handler_options', []));
 
 					case 'null':
 						return new NullSessionHandler;
@@ -90,7 +90,7 @@ class SessionProvider extends ServiceProvider
 					return new MockArraySessionStorage;
 				}
 
-				$options = $this->app->getConfig()->get('session.storage-options', []);
+				$options = $this->app->getConfig()->get('session.storage_options', []);
 				$handler = $container->resolve('SessionHandlerInterface');
 
 				return new NativeSessionStorage($options, $handler);

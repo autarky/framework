@@ -35,7 +35,7 @@ class TwigTemplatingProvider extends ServiceProvider
 		$loader = new Twig\FileLoader($config->get('path.templates'));
 
 		$env = new Twig\Environment($loader, [
-			'cache' => $config->get('path.templates-cache'),
+			'cache' => $config->get('path.templates_cache'),
 			'debug' => $config->get('app.debug'),
 		]);
 

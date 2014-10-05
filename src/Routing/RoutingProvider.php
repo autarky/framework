@@ -30,7 +30,7 @@ class RoutingProvider extends ServiceProvider
 		$dic->define('Autarky\Routing\Router', function(ContainerInterface $container) {
 			return new Router(
 				$container->resolve('Autarky\Routing\Invoker'),
-				$this->app->getConfig()->get('path.route-cache')
+				$this->app->getConfig()->get('path.route_cache')
 			);
 		});
 		$dic->share('Autarky\Routing\Router');
