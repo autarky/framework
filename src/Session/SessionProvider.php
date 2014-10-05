@@ -51,7 +51,7 @@ class SessionProvider extends ServiceProvider
 						return new NativeFileSessionHandler($path);
 
 					case 'pdo':
-						$connection = $this->app->getConfig()->get('session.connection');
+						$connection = $this->app->getConfig()->get('session.db-connection');
 						$pdo = $container->resolve('Autarky\Database\MultiPdoContainer')
 							->getPdo($connection);
 						$options = $this->app->getConfig()->get('session.handler-options');
