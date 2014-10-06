@@ -34,7 +34,7 @@ class Application implements HttpKernelInterface
 	/**
 	 * The framework version.
 	 */
-	const VERSION = '0.5.3';
+	const VERSION = '0.5.4';
 
 	/**
 	 * The application's service providers.
@@ -205,6 +205,7 @@ class Application implements HttpKernelInterface
 	{
 		$this->container = $container;
 		$container->instance('Autarky\Kernel\Application', $this);
+		$container->instance('Symfony\Component\HttpFoundation\RequestStack', $this->requests);
 	}
 
 	/**
