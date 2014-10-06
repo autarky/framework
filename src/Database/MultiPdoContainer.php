@@ -10,7 +10,7 @@
 
 namespace Autarky\Database;
 
-use Pdo;
+use PDO;
 
 use Autarky\Config\ConfigInterface;
 
@@ -36,7 +36,7 @@ class MultiPdoContainer
 	 *
 	 * @var \PDO[]
 	 */
-	protected $instances;
+	protected $instances = [];
 
 	/**
 	 * The default PDO options.
@@ -88,9 +88,25 @@ class MultiPdoContainer
 			throw new \InvalidArgumentException("Connection $connection not defined");
 		}
 
+		if (!isset($config['dsn'])) {
+			throw new \InvalidArgumentException("Connection $connection missing data: dsn");
+		}
+
+		if (strpos($config['dsn'], 'sqlite') === 0) {
+			$username = $password = '';
+		} else {
+			foreach (['username', 'password'] as $key) {
+				if (!isset($config[$key])) {
+					throw new \InvalidArgumentException("Connection $connection missing data: $key");
+				}
+			}
+			$username = $config['username'];
+			$password = $config['password'];
+		}
+
 		$configOptions = array_key_exists('options', $config) ? $config['options'] : [];
 
-		return new PDO($config['dsn'], $config['username'], $config['password'],
+		return new PDO($config['dsn'], $username, $password,
 			$configOptions + $this->defaultPdoOptions);
 	}
 }
