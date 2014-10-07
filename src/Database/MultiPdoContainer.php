@@ -52,6 +52,10 @@ class MultiPdoContainer
 		PDO::ATTR_EMULATE_PREPARES   => false,
 	];
 
+	/**
+	 * @param ConfigInterface $config
+	 * @param string|null     $defaultConnection If null, "database.connection" is retrieved from $config
+	 */
 	public function __construct(ConfigInterface $config, $defaultConnection = null)
 	{
 		$this->config = $config;

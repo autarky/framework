@@ -26,5 +26,6 @@ function splitclm($string, $default)
 	$segments = explode(':', $string);
 	$class = $segments[0];
 	$method = isset($segments[1]) ? $segments[1] : $default;
+
 	return [$class, $method];
 }

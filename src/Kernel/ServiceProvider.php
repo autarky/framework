@@ -16,8 +16,8 @@ use Symfony\Component\Console\Application as ConsoleApplication;
  * Abstract class for service providers.
  *
  * Service providers are modular application configuration classes. They can do
- * anything from binding a service class onto the IoC container to add a bunch
- * of routes with distinct functionality.
+ * anything from binding a service class onto the service container to add a
+ * bunch of routes with distinct functionality.
  */
 abstract class ServiceProvider
 {
@@ -26,12 +26,27 @@ abstract class ServiceProvider
 	 */
 	protected $app;
 
+	/**
+	 * @param Application $app
+	 */
 	public function setApplication(Application $app)
 	{
 		$this->app = $app;
 	}
 
+	/**
+	 * Register the service provider.
+	 *
+	 * @return void
+	 */
 	abstract public function register();
 
+	/**
+	 * Register the service provider with the console application.
+	 *
+	 * @param  ConsoleApplication $console
+	 *
+	 * @return void
+	 */
 	public function registerConsole(ConsoleApplication $console) {}
 }

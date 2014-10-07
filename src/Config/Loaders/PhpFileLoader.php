@@ -12,6 +12,12 @@ namespace Autarky\Config\Loaders;
 
 use Autarky\Config\LoaderInterface;
 
+/**
+ * PHP file config loader.
+ *
+ * Works with PHP files which declare a file-wide "return" statement which
+ * returns an associative array.
+ */
 class PhpFileLoader implements LoaderInterface
 {
 	/**

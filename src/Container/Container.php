@@ -19,7 +19,7 @@ use ReflectionMethod;
 use ReflectionParameter;
 
 /**
- * Default implementation of the IoC container.
+ * Default implementation of the container.
  */
 class Container implements ContainerInterface
 {
@@ -93,6 +93,12 @@ class Container implements ContainerInterface
 	 */
 	protected $autowire = true;
 
+	/**
+	 * Create a new instance of the container.
+	 *
+	 * On instantiation, the container instance will bind itself onto itself,
+	 * and alias the ContainerInterface to the class name.
+	 */
 	public function __construct()
 	{
 		$this->instance('Autarky\Container\Container', $this);

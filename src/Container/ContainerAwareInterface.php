@@ -13,13 +13,13 @@ namespace Autarky\Container;
 /**
  * Interface for container-aware classes.
  *
- * A container-aware class is a class that is aware of the framework's IoC
+ * A container-aware class is a class that is aware of the framework's service
  * container, and can thereby both bind objects onto the container and resolve
  * items from it.
  *
  * Container-aware classes should be used sparingly and usually only at the top
  * level of your class hierarchy, as they tightly couple your class to this
- * framework's IoC container. Web controllers are a common use case for
+ * framework's service container. Web controllers are a common use case for
  * container-aware classes, as controllers often need to resolve many types of
  * services - the session, router, templating engine and so on.
  *

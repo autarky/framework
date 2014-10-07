@@ -10,6 +10,10 @@
 
 namespace Autarky\Container\Exception;
 
+/**
+ * Exception that is thrown when one tries to resolve a class that is defined as
+ * internal.
+ */
 class ResolvingInternalException extends ResolvingException
 {
 }

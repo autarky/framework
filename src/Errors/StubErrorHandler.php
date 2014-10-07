@@ -20,46 +20,73 @@ use Autarky\Kernel\Application;
  */
 class StubErrorHandler implements ErrorHandlerManagerInterface
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function setDebug($toggle)
 	{
 		//
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function setRethrow($toggle)
 	{
 		//
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function setLogger($logger)
 	{
 		//
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function appendHandler($handler)
 	{
 		//
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function prependHandler($handler)
 	{
 		//
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function setDefaultHandler(ErrorHandlerInterface $handler)
 	{
 		//
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		//
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function handle(Exception $exception)
 	{
 		throw $exception;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function handles(Exception $exception)
 	{
 		return true;

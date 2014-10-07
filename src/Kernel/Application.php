@@ -186,11 +186,21 @@ class Application implements HttpKernelInterface
 		return array_keys($this->providers);
 	}
 
+	/**
+	 * Set the application's error handler.
+	 *
+	 * @param ErrorHandlerManagerInterface $errorHandler
+	 */
 	public function setErrorHandler(ErrorHandlerManagerInterface $errorHandler)
 	{
 		$this->errorHandler = $errorHandler;
 	}
 
+	/**
+	 * Get the application's error handler.
+	 *
+	 * @return ErrorHandlerManagerInterface
+	 */
 	public function getErrorHandler()
 	{
 		return $this->errorHandler;
@@ -275,11 +285,6 @@ class Application implements HttpKernelInterface
 	public function getRequestStack()
 	{
 		return $this->requests;
-	}
-
-	public function getStack()
-	{
-		return $this->stack;
 	}
 
 	/**

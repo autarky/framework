@@ -15,10 +15,22 @@ use Symfony\Component\Debug\ExceptionHandler;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 
+/**
+ * The default default error handler. Returns a whoops error screen if the
+ * filp/whoops package is installed, otherwise a simple symfony error screen.
+ */
 class DefaultErrorHandler implements ErrorHandlerInterface
 {
+	/**
+	 * Whether or not debug is enabled.
+	 *
+	 * @var boolean
+	 */
 	protected $debug;
 
+	/**
+	 * @param boolean $debug
+	 */
 	public function __construct($debug)
 	{
 		$this->debug = (bool) $debug;

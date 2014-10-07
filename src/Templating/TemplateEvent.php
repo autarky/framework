@@ -19,6 +19,9 @@ class TemplateEvent extends Event
 	 */
 	protected $template;
 
+	/**
+	 * @param Template $template
+	 */
 	public function __construct(Template $template)
 	{
 		$this->template = $template;

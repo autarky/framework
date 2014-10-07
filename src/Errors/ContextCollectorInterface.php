@@ -10,7 +10,15 @@
 
 namespace Autarky\Errors;
 
+/**
+ * Class that collects an array of context data from an application instance.
+ */
 interface ContextCollectorInterface
 {
+	/**
+	 * Get an array of context data for the application.
+	 *
+	 * @return array
+	 */
 	public function getContext();
 }

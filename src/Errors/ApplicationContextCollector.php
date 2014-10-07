@@ -12,19 +12,26 @@ namespace Autarky\Errors;
 
 use Autarky\Kernel\Application;
 
+/**
+ * {@inheritdoc}
+ */
 class ApplicationContextCollector implements ContextCollectorInterface
 {
+	/**
+	 * @var Application
+	 */
 	protected $app;
 
+	/**
+	 * @param Application $app
+	 */
 	public function __construct(Application $app)
 	{
 		$this->app = $app;
 	}
 
 	/**
-	 * Get an array of context data for the application.
-	 *
-	 * @return array
+	 * {@inheritdoc}
 	 */
 	public function getContext()
 	{

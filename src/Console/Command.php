@@ -12,11 +12,20 @@ namespace Autarky\Console;
 
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
+/**
+ * {@inheritdoc}
+ */
 class Command extends SymfonyCommand
 {
+	/**
+	 * @var \Autarky\Kernel\Application
+	 */
 	protected $app;
 
-	public function setAutarkyApplication($app)
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setAutarkyApplication(\Autarky\Kernel\Application $app)
 	{
 		$this->app = $app;
 	}

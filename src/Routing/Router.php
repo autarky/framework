@@ -81,6 +81,10 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	 */
 	protected $namedRoutes = [];
 
+	/**
+	 * @param InvokerInterface $invoker
+	 * @param string|null      $cachePath
+	 */
 	public function __construct(InvokerInterface $invoker, $cachePath = null)
 	{
 		$this->invoker = $invoker;
@@ -193,6 +197,12 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		return $route;
 	}
 
+	/**
+	 * Add a named route to the router.
+	 *
+	 * @param string $name
+	 * @param Route  $route
+	 */
 	public function addNamedRoute($name, Route $route)
 	{
 		if (array_key_exists($name, $this->namedRoutes)) {

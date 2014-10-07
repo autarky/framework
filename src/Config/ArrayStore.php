@@ -24,21 +24,33 @@ class ArrayStore implements ConfigInterface
 		$this->data = $data;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function get($key, $default = null)
 	{
 		return ArrayUtils::get($this->data, $key, $default);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function set($key, $value)
 	{
 		ArrayUtils::set($this->data, $key, $value);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function addNamespace($namespace, $location)
 	{
 		// do nothing
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function setEnvironment($environment)
 	{
 		// do nothing

@@ -10,7 +10,18 @@
 
 namespace Autarky\Routing;
 
+/**
+ * Class that can invoke a route's callable.
+ */
 interface InvokerInterface
 {
+	/**
+	 * Invoke a route's callable.
+	 *
+	 * @param  string|array $callable
+	 * @param  array        $args
+	 *
+	 * @return mixed
+	 */
 	public function invoke($callable, array $args = array());
 }

@@ -10,10 +10,20 @@
 
 namespace Autarky\Templating;
 
+/**
+ * Class representation of template context - the variables that are available
+ * inside a template.
+ */
 class TemplateContext
 {
+	/**
+	 * @var array
+	 */
 	protected $data = [];
 
+	/**
+	 * @param array $context
+	 */
 	public function __construct(array $context = null)
 	{
 		if ($context) {

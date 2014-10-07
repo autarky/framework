@@ -12,15 +12,27 @@ namespace Autarky\Routing;
 
 use Autarky\Container\ContainerInterface;
 
+/**
+ * {@inheritdoc}
+ */
 class Invoker implements InvokerInterface
 {
+	/**
+	 * @var ContainerInterface
+	 */
 	protected $container;
 
+	/**
+	 * @param ContainerInterface $container
+	 */
 	public function __construct(ContainerInterface $container)
 	{
 		$this->container = $container;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function invoke($callable, array $args = array())
 	{
 		return $this->container->invoke($callable, $args);

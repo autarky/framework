@@ -12,6 +12,9 @@ namespace Autarky\Errors;
 
 use Exception;
 
+/**
+ * Class that can handle exceptions.
+ */
 interface ErrorHandlerInterface
 {
 	/**

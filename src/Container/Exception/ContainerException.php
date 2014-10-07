@@ -12,6 +12,9 @@ namespace Autarky\Container\Exception;
 
 use ReflectionException;
 
+/**
+ * Generic exception for exceptions thrown by the container.
+ */
 class ContainerException extends ReflectionException
 {
 }

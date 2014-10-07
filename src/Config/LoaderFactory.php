@@ -12,6 +12,12 @@ namespace Autarky\Config;
 
 use Autarky\Container\ContainerInterface;
 
+/**
+ * Factory for file-based loaders.
+ *
+ * Keeps an array of extension => class, where the class is lazily resolved out
+ * of the framework's service container when needed.
+ */
 class LoaderFactory
 {
 	/**
