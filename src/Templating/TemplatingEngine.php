@@ -15,6 +15,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Autarky\Events\EventDispatcherAwareInterface;
 use Autarky\Support\NamespacedResourceResolverInterface;
 
+/**
+ * A wrapper for Twig.
+ */
 class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResourceResolverInterface
 {
 	/**
@@ -31,6 +34,9 @@ class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResou
 	 */
 	protected $eventDispatcher;
 
+	/**
+	 * @param Twig\Environment $twig
+	 */
 	public function __construct(Twig\Environment $twig)
 	{
 		$this->twig = $twig;
@@ -64,9 +70,9 @@ class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResou
 	/**
 	 * Register an event listener for when a template is being created.
 	 *
-	 * @param  string           $name
-	 * @param  \Closure|string  $handler
-	 * @param  integer          $priority
+	 * @param  string          $name
+	 * @param  \Closure|string $handler
+	 * @param  integer         $priority
 	 *
 	 * @return void
 	 */
@@ -78,9 +84,9 @@ class TemplatingEngine implements EventDispatcherAwareInterface, NamespacedResou
 	/**
 	 * Register an event listener for when a template is being rendered.
 	 *
-	 * @param  string           $name
-	 * @param  \Closure|string  $handler
-	 * @param  integer          $priority
+	 * @param  string          $name
+	 * @param  \Closure|string $handler
+	 * @param  integer         $priority
 	 *
 	 * @return void
 	 */

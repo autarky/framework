@@ -14,8 +14,15 @@ use ReflectionParameter;
 use ReflectionMethod;
 use ReflectionFunctionAbstract;
 
+/**
+ * Exception that is thrown when an argument to a method that the container
+ * needs to invoke, cannot be resolved.
+ */
 class UnresolvableArgumentException extends ContainerException
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function __construct(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)
 	{
 		parent::__construct($this->makeMessage($param, $func));

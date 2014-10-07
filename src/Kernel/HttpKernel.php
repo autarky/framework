@@ -27,13 +27,37 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Autarky\Errors\ErrorHandlerInterface;
 use Autarky\Routing\RouterInterface;
 
+/**
+ * The framework's HTTP kernel.
+ */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {
+	/**
+	 * @var RouterInterface
+	 */
 	protected $router;
+
+	/**
+	 * @var ErrorHandlerInterface
+	 */
 	protected $errorHandler;
+
+	/**
+	 * @var RequestStack
+	 */
 	protected $requests;
+
+	/**
+	 * @var EventDispatcherInterface
+	 */
 	protected $eventDispatcher;
 
+	/**
+	 * @param RouterInterface          $router
+	 * @param ErrorHandlerInterface    $errorHandler
+	 * @param RequestStack             $requests
+	 * @param EventDispatcherInterface $eventDispatcher Optional
+	 */
 	public function __construct(
 		RouterInterface $router,
 		ErrorHandlerInterface $errorHandler,

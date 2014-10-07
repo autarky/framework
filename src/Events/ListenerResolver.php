@@ -12,15 +12,31 @@ namespace Autarky\Events;
 
 use Autarky\Container\ContainerInterface;
 
+/**
+ * Class that resolves listeners.
+ */
 class ListenerResolver
 {
+	/**
+	 * @var ContainerInterface
+	 */
 	protected $container;
 
+	/**
+	 * @param ContainerInterface $container
+	 */
 	public function __construct(ContainerInterface $container)
 	{
 		$this->container = $container;
 	}
 
+	/**
+	 * Resolve a listener.
+	 *
+	 * @param  string $handler
+	 *
+	 * @return object
+	 */
 	public function resolve($handler)
 	{
 		return $this->container->resolve($handler);

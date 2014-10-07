@@ -10,6 +10,10 @@
 
 namespace Autarky\Container\Exception;
 
+/**
+ * Exception that is thrown when one tries to resolve a class that cannot be
+ * instantiated.
+ */
 class NotInstantiableException extends ContainerException
 {
 }

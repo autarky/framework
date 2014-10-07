@@ -10,6 +10,9 @@
 
 namespace Autarky\Templating;
 
+/**
+ * Class representation of a template.
+ */
 class Template
 {
 	/**
@@ -26,6 +29,10 @@ class Template
 	 */
 	protected $context;
 
+	/**
+	 * @param string $name
+	 * @param array  $context
+	 */
 	public function __construct($name, array $context = array())
 	{
 		$this->name = $name;

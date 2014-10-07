@@ -12,6 +12,9 @@ namespace Autarky\Routing;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * URL generator.
+ */
 class UrlGenerator
 {
 	/**
@@ -31,6 +34,10 @@ class UrlGenerator
 	 */
 	protected $assetRoot;
 
+	/**
+	 * @param RouterInterface $router
+	 * @param RequestStack    $requests
+	 */
 	public function __construct(RouterInterface $router, RequestStack $requests)
 	{
 		$this->router = $router;

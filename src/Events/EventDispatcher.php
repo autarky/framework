@@ -25,6 +25,9 @@ class EventDispatcher extends SymfonyEventDispatcher
 	 */
 	protected $resolver;
 
+	/**
+	 * @param ListenerResolver $resolver
+	 */
 	public function __construct(ListenerResolver $resolver)
 	{
 		$this->resolver = $resolver;

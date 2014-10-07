@@ -15,14 +15,24 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * A console command that spawns an interactive shell with the help of the
+ * composer package "boris".
+ */
 class BorisCommand extends Command
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	protected function configure()
 	{
 		$this->setName('boris')
 			->setDescription('Start an interactive boris shell.');
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		if (!class_exists('Boris\Boris')) {

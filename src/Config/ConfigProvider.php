@@ -12,6 +12,11 @@ namespace Autarky\Config;
 
 use Autarky\Kernel\ServiceProvider;
 
+/**
+ * Provides config to the application.
+ *
+ * This service provider is vital to the framework.
+ */
 class ConfigProvider extends ServiceProvider
 {
 	protected $configPath;

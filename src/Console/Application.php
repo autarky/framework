@@ -14,15 +14,31 @@ use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Autarky\Console\Command as AutarkyCommand;
 
+/**
+ * {@inheritdoc}
+ */
 class Application extends SymfonyApplication
 {
+	/**
+	 * The Autarky Application object instance.
+	 *
+	 * @var \Autarky\Kernel\Application
+	 */
 	protected $app;
 
-	public function setAutarkyApplication($app)
+	/**
+	 * Set the Autarky application instance.
+	 *
+	 * @param Autarky\Kernel\Application $app
+	 */
+	public function setAutarkyApplication(\Autarky\Kernel\Application $app)
 	{
 		$this->app = $app;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function add(SymfonyCommand $command)
 	{
 		if ($command instanceof AutarkyCommand) {

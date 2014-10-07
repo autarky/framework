@@ -26,12 +26,27 @@ abstract class ServiceProvider
 	 */
 	protected $app;
 
+	/**
+	 * @param Application $app
+	 */
 	public function setApplication(Application $app)
 	{
 		$this->app = $app;
 	}
 
+	/**
+	 * Register the service provider.
+	 *
+	 * @return void
+	 */
 	abstract public function register();
 
+	/**
+	 * Register the service provider with the console application.
+	 *
+	 * @param  ConsoleApplication $console
+	 *
+	 * @return void
+	 */
 	public function registerConsole(ConsoleApplication $console) {}
 }

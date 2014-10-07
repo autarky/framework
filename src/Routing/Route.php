@@ -120,7 +120,9 @@ class Route
 	}
 
 	/**
-	 * @see addFilter
+	 * Add a before filter.
+	 *
+	 * @param mixed $filter
 	 */
 	public function addBeforeFilter($filter)
 	{
@@ -128,23 +130,41 @@ class Route
 	}
 
 	/**
-	 * @see addFilter
+	 * Add an after filter.
+	 *
+	 * @param mixed $filter
 	 */
 	public function addAfterFilter($filter)
 	{
 		$this->afterFilters[] = $filter;
 	}
 
+	/**
+	 * Add a before or after filter.
+	 *
+	 * @param string $when   "before" or "after"
+	 * @param mixed  $filter
+	 */
 	public function addFilter($when, $filter)
 	{
 		$this->{'add'.ucfirst($when).'Filter'}($filter);
 	}
 
+	/**
+	 * Get the route's before filters.
+	 *
+	 * @return array
+	 */
 	public function getBeforeFilters()
 	{
 		return $this->beforeFilters;
 	}
 
+	/**
+	 * Get the route's after filters.
+	 *
+	 * @return array
+	 */
 	public function getAfterFilters()
 	{
 		return $this->afterFilters;

@@ -12,15 +12,31 @@ namespace Autarky\Errors;
 
 use Autarky\Container\ContainerInterface;
 
+/**
+ * Class for resolving error handlers.
+ */
 class HandlerResolver
 {
+	/**
+	 * @var ContainerInterface
+	 */
 	protected $container;
 
+	/**
+	 * @param ContainerInterface $container
+	 */
 	public function __construct(ContainerInterface $container)
 	{
 		$this->container = $container;
 	}
 
+	/**
+	 * Resolve a handler.
+	 *
+	 * @param  mixed $handler
+	 *
+	 * @return ErrorHandlerInterface|callable
+	 */
 	public function resolve($handler)
 	{
 		if (!is_string($handler)) {

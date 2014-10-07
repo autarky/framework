@@ -20,6 +20,10 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 use Autarky\Kernel\Application;
 
+/**
+ * Manager that can handle exceptions as well as keep track of multiple other
+ * exception handlers.
+ */
 class ErrorHandlerManager implements ErrorHandlerManagerInterface
 {
 	/**
@@ -54,6 +58,10 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 */
 	protected $rethrow = false;
 
+	/**
+	 * @param HandlerResolver           $resolver
+	 * @param ContextCollectorInterface $contextCollector
+	 */
 	public function __construct(
 		HandlerResolver $resolver,
 		ContextCollectorInterface $contextCollector
@@ -85,7 +93,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		$this->logger = $logger;
 	}
 
-	public function getLogger()
+	protected function getLogger()
 	{
 		if ($this->logger instanceof \Closure) {
 			$this->logger = call_user_func($this->logger);
@@ -340,7 +348,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 *
 	 * @return \Symfony\Component\Debug\Exception\FatalErrorException|null
 	 */
-	public function makeFatalErrorException()
+	protected function makeFatalErrorException()
 	{
 		$error = error_get_last();
 

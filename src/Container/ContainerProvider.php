@@ -12,6 +12,11 @@ namespace Autarky\Container;
 
 use Autarky\Kernel\ServiceProvider;
 
+/**
+ * Provides the application with a container.
+ *
+ * This service provider is vital to the framework.
+ */
 class ContainerProvider extends ServiceProvider
 {
 	public function register()

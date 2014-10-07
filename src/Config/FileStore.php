@@ -13,6 +13,12 @@ namespace Autarky\Config;
 use Autarky\Support\NamespacedResourceResolver;
 use Autarky\Support\ArrayUtils;
 
+/**
+ * File-based config implementation.
+ *
+ * Reads files from one or multiple directories, with the possibility of
+ * cascading for different environments and overriding of namespaces.
+ */
 class FileStore implements ConfigInterface
 {
 	use NamespacedResourceResolver;
@@ -32,12 +38,14 @@ class FileStore implements ConfigInterface
 	protected $data = [];
 
 	/**
-	 * @param string $path Path to config files in the global namespace.
+	 * @param LoaderFactory $loaderFactory
+	 * @param string        $path          Path to config files in the global namespace.
+	 * @param string        $environment
 	 */
 	public function __construct(LoaderFactory $loaderFactory, $path, $environment)
 	{
-		$this->environment = $environment;
 		$this->loaderFactory = $loaderFactory;
+		$this->environment = $environment;
 		$this->setLocation($path);
 	}
 
@@ -136,6 +144,9 @@ class FileStore implements ConfigInterface
 		return $loader->load($path);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function setEnvironment($environment)
 	{
 		// do nothing - deprecated method

@@ -48,6 +48,10 @@ class Middleware implements HttpKernelInterface
 	 */
 	protected $cookies;
 
+	/**
+	 * @param HttpKernelInterface $kernel
+	 * @param Application         $app
+	 */
 	public function __construct(HttpKernelInterface $kernel, Application $app)
 	{
 		$this->kernel = $kernel;
