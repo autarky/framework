@@ -19,7 +19,7 @@ use ReflectionMethod;
 use ReflectionParameter;
 
 /**
- * Default implementation of the IoC container.
+ * Default implementation of the container.
  */
 class Container implements ContainerInterface
 {

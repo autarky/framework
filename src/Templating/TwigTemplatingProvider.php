@@ -13,8 +13,7 @@ namespace Autarky\Templating;
 use Autarky\Kernel\ServiceProvider;
 
 /**
- * Simple service provider to bind the twig templating engine onto the IoC
- * container.
+ * Provides the Twig templating engine.
  */
 class TwigTemplatingProvider extends ServiceProvider
 {
