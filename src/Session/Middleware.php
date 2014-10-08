@@ -89,7 +89,7 @@ class Middleware implements HttpKernelInterface
 
 		$sessionName = $this->session->getName();
 
-		if ($request->cookies->has($sessionName)) {
+		if ($request->cookies->has($sessionName) && !$this->session->isStarted()) {
 			$this->session->setId($request->cookies->get($sessionName));
 		} else {
 			$this->session->migrate(false);
