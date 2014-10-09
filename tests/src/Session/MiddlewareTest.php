@@ -20,10 +20,12 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 		return new \Autarky\Session\Middleware($kernel, $app);
 	}
 
-	public function makeKernel(Response $response)
+	public function makeKernel(Response $response = null)
 	{
 		$mock = m::mock('Symfony\Component\HttpKernel\HttpKernelInterface');
-		$mock->shouldReceive('handle')->andReturn($response)->byDefault();
+		if ($response) {
+			$mock->shouldReceive('handle')->andReturn($response)->byDefault();
+		}
 		return $mock;
 	}
 
@@ -44,13 +46,19 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function subRequestsArePassedRightThrough()
+	public function sessionIsNotClosedOnSubRequests()
 	{
-		$app = $this->makeApplication('fake_session');
+		$app = $this->makeApplication($session = $this->makeSession());
 		$kernel = $this->makeKernel(new Response('foo'));
 		$middleware = $this->makeMiddleware($kernel, $app);
+		$session->start();
+		$this->assertEquals(true, $session->isStarted());
 		$middleware->handle($request = Request::create('/'), HttpKernelInterface::SUB_REQUEST);
-		$this->assertEquals(null, $request->getSession());
+		$this->assertSame($session, $request->getSession());
+		$this->assertEquals(true, $session->isStarted());
+		$middleware->handle($request = Request::create('/'));
+		$this->assertSame($session, $request->getSession());
+		$this->assertEquals(false, $session->isStarted());
 	}
 
 	/** @test */
@@ -68,8 +76,11 @@ class MiddlewareTest extends PHPUnit_Framework_TestCase
 	public function sessionIsAttachedToResponseIfStarted()
 	{
 		$app = $this->makeApplication($session = $this->makeSession());
-		$session->start();
-		$kernel = $this->makeKernel(new Response('foo'));
+		$kernel = $this->makeKernel();
+		$kernel->shouldReceive('handle')->once()->andReturnUsing(function() use($session) {
+			$session->start();
+			return new Response('foo');
+		});
 		$middleware = $this->makeMiddleware($kernel, $app);
 		$response = $middleware->handle($request = Request::create('/'));
 		$cookies = $response->headers->getCookies();
