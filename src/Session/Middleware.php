@@ -68,16 +68,30 @@ class Middleware implements HttpKernelInterface
 	 */
 	public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
 	{
+		// always set the session onto the request object.
+		$request->setSession($this->session);
+
+		// we only need to manage the session for the master request.
+		// subrequests will have the session available anyways, but we will
+		// be closing and setting the cookie for the master request only.
 		if ($type !== HttpKernelInterface::MASTER_REQUEST) {
 			return $this->kernel->handle($request, $type, $catch);
 		}
 
-		$this->initSession($request);
+		// the session may have been manually started before the middleware is
+		// invoked - in this case, we cross our fingers and hope the session has
+		// properly initialised itself
+		if (!$this->session->isStarted()) {
+			$this->initSession($request);
+		}
 
 		$response = $this->kernel->handle($request, $type, $catch);
 
+		// if the session has started, save it and attach the session cookie. if
+		// the session has not started, there is nothing to save and there is no
+		// point in attaching a cookie to persist it.
 		if ($this->session->isStarted()) {
-			$this->attachSession($request, $response);
+			$this->closeSession($request, $response);
 		}
 
 		return $response;
@@ -85,32 +99,47 @@ class Middleware implements HttpKernelInterface
 
 	protected function initSession(Request $request)
 	{
-		$request->setSession($this->session);
-
+		// the name of the session cookie name.
 		$sessionName = $this->session->getName();
 
 		if ($request->cookies->has($sessionName)) {
+			// if a session cookie exists, load the appropriate session ID.
 			$this->session->setId($request->cookies->get($sessionName));
 		} else {
+			// if not, generate an ID and migrate existing session data onto
+			// the new ID.
 			$this->session->migrate(false);
 		}
 
+		// in some rare cases you may want to force the session to start on
+		// every request.
 		if ($this->forceStart) {
 			$this->session->start();
 		}
 	}
 
-	protected function attachSession(Request $request, Response $response)
+	protected function closeSession(Request $request, Response $response)
 	{
+		// save all session data
 		$this->session->save();
 
-		$params = array_merge(session_get_cookie_params(), $this->cookies);
+		// attach the session cookie
+		$response->headers->setCookie($this->makeCookie($request));
+	}
 
+	protected function makeCookie(Request $request)
+	{
+		// merge native PHP session cookie params with custom ones.
+		$params = array_replace(session_get_cookie_params(), $this->cookies);
+
+		// if the cookie lifetime is not 0 (closes when browser window closes),
+		// add the request time and the lifetime to get the expiration time of
+		// the cookie.
 		if ($params['lifetime'] !== 0) {
 			$params['lifetime'] = $request->server->get('REQUEST_TIME') + $params['lifetime'];
 		}
 
-		$cookie = new Cookie(
+		return new Cookie(
 			$this->session->getName(),
 			$this->session->getId(),
 			$params['lifetime'],
@@ -119,7 +148,5 @@ class Middleware implements HttpKernelInterface
 			$params['secure'],
 			$params['httponly']
 		);
-
-		$response->headers->setCookie($cookie);
 	}
 }
