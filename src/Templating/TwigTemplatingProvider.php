@@ -32,22 +32,26 @@ class TwigTemplatingProvider extends ServiceProvider
 	{
 		$config = $this->app->getConfig();
 		$loader = new Twig\FileLoader($config->get('path.templates'));
+		$options = ['debug' => $config->get('app.debug')];
 
-		$env = new Twig\Environment($loader, [
-			'cache' => $config->get('path.templates_cache'),
-			'debug' => $config->get('app.debug'),
-		]);
+		if ($config->has('path.templates_cache')) {
+			$options['cache'] = $config->get('path.templates_cache');
+		} else if ($config->has('path.storage')) {
+			$options['cache'] = $config->get('path.storage').'/templates';
+		}
 
-		$loader = new Twig\ExtensionLoader($env, $this->app);
+		$env = new Twig\Environment($loader, $options);
 
-		$loader->loadCoreExtensions([
-			'PartialExtension',
-			'Autarky\Routing\RoutingProvider' => 'UrlGenerationExtension',
-			'Autarky\Session\SessionProvider' => 'SessionExtension',
+		$extLoader = new Twig\ExtensionLoader($env, $this->app);
+
+		$extLoader->loadCoreExtensions([
+			'Autarky\Container\ContainerInterface' => 'PartialExtension',
+			'Autarky\Routing\UrlGenerator' => 'UrlGenerationExtension',
+			'Symfony\Component\HttpFoundation\Session\Session' => 'SessionExtension',
 		]);
 
 		if ($extensions = $this->app->getConfig()->get('twig.extensions')) {
-			$loader->loadUserExtensions($extensions);
+			$extLoader->loadUserExtensions($extensions);
 		}
 
 		return $env;

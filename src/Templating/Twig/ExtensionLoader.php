@@ -38,22 +38,26 @@ class ExtensionLoader
 
 	public function loadCoreExtensions(array $extensions)
 	{
-		$providers = $this->app->getProviders();
+		$dic = $this->app->getContainer();
 
 		foreach ($extensions as $dependency => $extension) {
-			if (is_string($dependency) && !in_array($dependency, $providers)) continue;
+			if (is_string($dependency) && !$dic->isBound($dependency)) {
+				continue;
+			}
 
-			$extension = $this->app->getContainer()
-				->resolve(__NAMESPACE__.'\\Extension\\'.$extension);
-			$this->twig->addExtension($extension);
+			$this->twig->addExtension(
+				$dic->resolve(__NAMESPACE__."\Extension\\$extension")
+			);
 		}
 	}
 
 	public function loadUserExtensions(array $extensions)
 	{
+		$dic = $this->app->getContainer();
+
 		foreach ($extensions as $extension) {
 			if (is_string($extension)) {
-				$extension = $this->app->getContainer()->resolve($extension);
+				$extension = $dic->resolve($extension);
 			}
 
 			$this->twig->addExtension($extension);
