@@ -24,7 +24,9 @@ class Diagnostic
 	{
 		foreach ($paths as $key => $value) {
 			if (!$value) {
-				echo "path.$key is empty, skipping\n";
+				if ($this->verbose) {
+					echo "path.$key is empty, skipping\n";
+				}
 				continue;
 			}
 
