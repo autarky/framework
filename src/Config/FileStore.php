@@ -77,7 +77,7 @@ class FileStore implements ConfigInterface
 	public function has($key)
 	{
 		list($namespace, $group, $key) = $this->parseKey($key);
-		
+
 		$dataKey = $this->getDataKeyAndLoadData($namespace, $group, $key);
 
 		return ArrayUtils::has($this->data, $dataKey);
