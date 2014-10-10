@@ -30,6 +30,14 @@ class RouteTest extends PHPUnit_Framework_TestCase
 		$path = $route->getPath(['v1', 'foo' => 'bar']);
 		$this->assertEquals('/v1?foo=bar', $path);
 	}
+
+	/** @test */
+	public function callableIsEqualWithStringAndArray()
+	{
+		$route1 = new Route([], '', __NAMESPACE__.'\RouteHandlerStub:handle');
+		$route2 = new Route([], '', [__NAMESPACE__.'\RouteHandlerStub', 'handle']);
+		$this->assertEquals($route1->getCallable(), $route2->getCallable());
+	}
 }
 
 class RouteHandlerStub
