@@ -11,6 +11,8 @@
 namespace Autarky\Config;
 
 use Autarky\Kernel\ServiceProvider;
+use Autarky\Config\Loaders\YamlFileLoader;
+use Symfony\Component\Yaml\Parser;
 
 /**
  * Provides config to the application.
@@ -33,13 +35,31 @@ class ConfigProvider extends ServiceProvider
 		$loaderFactory = new LoaderFactory($dic);
 		$dic->instance('Autarky\Config\Loaders\LoaderFactory', $loaderFactory);
 
-		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
-		$loaderFactory->addLoader(['yml', 'yaml'], 'Autarky\Config\Loaders\YamlFileLoader');
-
 		$store = new FileStore($loaderFactory, $this->configPath, $this->app->getEnvironment());
 		$dic->instance('Autarky\Config\FileStore', $store);
 		$dic->alias('Autarky\Config\FileStore', 'Autarky\Config\ConfigInterface');
 
+		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
+
+		$dic->define('Autarky\Config\Loaders\YamlFileLoader', function() {
+			return new YamlFileLoader(new Parser, $this->getYamlCachePath());
+		});
+		$dic->share('Autarky\Config\Loaders\YamlFileLoader');
+		$loaderFactory->addLoader(['yml', 'yaml'], 'Autarky\Config\Loaders\YamlFileLoader');
+
 		$this->app->setConfig($store);
+	}
+
+	protected function getYamlCachePath()
+	{
+		$config = $this->app->getConfig();
+
+		$path = $config->get('path.storage').'/yaml';
+
+		if (is_dir($path) && is_writable($path)) {
+			return $path;
+		}
+
+		return null;
 	}
 }

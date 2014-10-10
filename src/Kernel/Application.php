@@ -91,6 +91,11 @@ class Application implements HttpKernelInterface
 	/**
 	 * @var boolean
 	 */
+	protected $booting = false;
+
+	/**
+	 * @var boolean
+	 */
 	protected $booted = false;
 
 	/**
@@ -147,7 +152,7 @@ class Application implements HttpKernelInterface
 	 */
 	public function setEnvironment($environment)
 	{
-		if ($this->booted) {
+		if ($this->booting) {
 			throw new \RuntimeException('Cannot set environment after application has booted');
 		}
 
@@ -169,7 +174,7 @@ class Application implements HttpKernelInterface
 	 */
 	public function getEnvironment()
 	{
-		if (!$this->booted) {
+		if (!$this->booting) {
 			throw new \RuntimeException('Environment has not yet been resolved');
 		}
 
@@ -323,11 +328,13 @@ class Application implements HttpKernelInterface
 	{
 		if ($this->booted) return;
 
-		$this->booted = true;
+		$this->booting = true;
 
 		$this->registerProviders();
 		$this->callConfigCallbacks();
 		$this->resolveStack();
+
+		$this->booted = true;
 	}
 
 	protected function registerProviders()
