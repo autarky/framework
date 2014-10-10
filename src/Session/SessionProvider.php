@@ -47,7 +47,14 @@ class SessionProvider extends ServiceProvider
 						return new \SessionHandler;
 
 					case 'file':
-						$path = $this->app->getConfig()->get('path.session');
+						$config = $this->app->getConfig();
+						if ($config->has('path.session')) {
+							$path = $config->get('path.session');
+						} else if ($config->has('path.storage')) {
+							$path = $config->get('path.storage').'/session';
+						} else {
+							$path = null;
+						}
 						return new NativeFileSessionHandler($path);
 
 					case 'pdo':
