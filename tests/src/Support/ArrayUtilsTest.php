@@ -66,4 +66,25 @@ class ArrayUtilsTest extends TestCase
 			],
 		];
 	}
+
+	/**
+	 * @test
+	 * @dataProvider getHasData
+	 */
+	public function has(array $input, $key, $result)
+	{
+		$this->assertEquals($result, ArrayUtils::has($input, $key));
+	}
+
+	public function getHasData()
+	{
+		return [
+			[[], 'foo', false],
+			[['foo' => 'bar'], 'foo', true],
+			[['foo' => 'bar'], 'bar', false],
+			[['foo' => ['bar' => 'baz']], 'foo.bar', true],
+			[['foo' => ['bar' => 'baz']], 'foo.baz', false],
+			[['foo' => ['bar' => 'baz']], 'foo', true],
+		];
+	}
 }

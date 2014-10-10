@@ -46,6 +46,31 @@ class ArrayUtils
 	}
 
 	/**
+	 * Determine if an array has a given key.
+	 *
+	 * @param  array   $data
+	 * @param  string  $key
+	 *
+	 * @return boolean
+	 */
+	public static function has(array $data, $key)
+	{
+		foreach (explode('.', $key) as $segment) {
+			if (!array_key_exists($segment, $data)) {
+				return false;
+			}
+
+			if (!is_array($data)) {
+				return false;
+			}
+
+			$data = $data[$segment];
+		}
+
+		return true;
+	}
+
+	/**
 	 * Set an element of an array.
 	 *
 	 * @param array  $data

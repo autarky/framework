@@ -27,6 +27,14 @@ class ArrayStore implements ConfigInterface
 	/**
 	 * {@inheritdoc}
 	 */
+	public function has($key)
+	{
+		return ArrayUtils::has($this->data, $key);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function get($key, $default = null)
 	{
 		return ArrayUtils::get($this->data, $key, $default);

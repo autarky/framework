@@ -62,11 +62,37 @@ class FileStore implements ConfigInterface
 	/**
 	 * {@inheritdoc}
 	 */
+	public function addNamespace($namespace, $location)
+	{
+		if (!array_key_exists($namespace, $this->locations)) {
+			$this->locations[$namespace] = [];
+		}
+
+		$this->locations[$namespace][] = $location;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function has($key)
+	{
+		list($namespace, $group, $key) = $this->parseKey($key);
+		
+		$dataKey = $this->getDataKeyAndLoadData($namespace, $group, $key);
+
+		return ArrayUtils::has($this->data, $dataKey);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function get($key, $default = null)
 	{
 		list($namespace, $group, $key) = $this->parseKey($key);
 
-		return $this->getFromNamespace($namespace, $group, $key, $default);
+		$dataKey = $this->getDataKeyAndLoadData($namespace, $group, $key);
+
+		return ArrayUtils::get($this->data, $dataKey, $default);
 	}
 
 	/**
@@ -83,19 +109,7 @@ class FileStore implements ConfigInterface
 		ArrayUtils::set($this->data, $fullKey, $value);
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function addNamespace($namespace, $location)
-	{
-		if (!array_key_exists($namespace, $this->locations)) {
-			$this->locations[$namespace] = [];
-		}
-
-		$this->locations[$namespace][] = $location;
-	}
-
-	protected function getFromNamespace($namespace, $group, $key = null, $default = null)
+	protected function getDataKeyAndLoadData($namespace, $group, $key)
 	{
 		$dataKey = $namespace === null ? $group : $namespace.':'.$group;
 
@@ -103,9 +117,7 @@ class FileStore implements ConfigInterface
 			$this->loadData($namespace, $group, $dataKey);
 		}
 
-		$dataKey = $key === null ? $dataKey : $dataKey.'.'.$key;
-
-		return ArrayUtils::get($this->data, $dataKey, $default);
+		return $key === null ? $dataKey : $dataKey.'.'.$key;
 	}
 
 	protected function loadData($namespace, $group, $dataKey)
@@ -119,18 +131,7 @@ class FileStore implements ConfigInterface
 		foreach ($locations as $location) {
 			foreach ($extensions as $extension) {
 				$path = "{$location}/{$group}.{$extension}";
-
-				if (!file_exists($path)) {
-					continue;
-				}
-
-				if (!is_readable($path)) {
-					throw new \RuntimeException("File is not readable: $path");
-				}
-
-				$fileData = $this->getDataFromFile($path);
-				$data = array_replace($data, $fileData);
-				break;
+				$data = array_replace($data, $this->getDataFromFile($path));
 			}
 		}
 
@@ -139,6 +140,14 @@ class FileStore implements ConfigInterface
 
 	protected function getDataFromFile($path)
 	{
+		if (!file_exists($path)) {
+			return [];
+		}
+
+		if (!is_readable($path)) {
+			throw new \RuntimeException("File is not readable: $path");
+		}
+
 		$loader = $this->loaderFactory->getForPath($path);
 
 		return $loader->load($path);

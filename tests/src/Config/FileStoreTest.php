@@ -23,6 +23,14 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function canHas()
+	{
+		$config = $this->makeConfig();
+		$this->assertEquals(true, $config->has('testfile.foo'));
+		$this->assertEquals(false, $config->has('testfile.bar'));
+	}
+
+	/** @test */
 	public function canGet()
 	{
 		$config = $this->makeConfig();
