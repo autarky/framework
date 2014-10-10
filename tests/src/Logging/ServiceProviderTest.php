@@ -47,7 +47,7 @@ class ServiceProviderTest extends TestCase
 		$app->boot();
 		$logger = $app->getContainer()->resolve('Monolog\Logger');
 		$logger->debug('foo bar baz');
-		$pattern = '/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\] testing\.DEBUG\: foo bar baz \[\] \[\]\n$/';
+		$pattern = '/^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6} \+00\:00\] testing\.DEBUG\: foo bar baz \[\] \[\]\n$/';
 		$logfile = file_get_contents($logdir.'/cli.log');
 		$this->assertTrue(preg_match($pattern, $logfile) === 1, "Expected regex: $pattern\nActual: $logfile");
 	}

@@ -26,29 +26,8 @@ class LoggingProvider extends ServiceProvider
 	{
 		$dic = $this->app->getContainer();
 
-		$dic->define('Monolog\Logger', function() {
-			$logger = new Logger($this->app->getEnvironment());
-
-			if ($logdir = $this->app->getConfig()->get('path.logs')) {
-				if (!is_dir($logdir)) {
-					throw new \RuntimeException("Log directory $logdir does not exist or is not a directory.");
-				}
-
-				$logpath = rtrim($logdir, '\\/').'/'.PHP_SAPI.'.log';
-
-				if (file_exists($logpath) && !is_writable($logpath)) {
-					throw new \RuntimeException("Log file $logpath is not writeable.");
-				}
-
-				$handler = new StreamHandler($logpath, Logger::DEBUG);
-				$handler->setFormatter(new LineFormatter(null, null, true));
-				$logger->pushHandler($handler);
-			}
-
-			return $logger;
-		});
+		$dic->define('Monolog\Logger', [$this, 'makeLogger']);
 		$dic->share('Monolog\Logger');
-
 		$dic->alias('Monolog\Logger', 'Psr\Log\LoggerInterface');
 
 		if ($errorHandler = $this->app->getErrorHandler()) {
@@ -56,5 +35,48 @@ class LoggingProvider extends ServiceProvider
 				return $this->app->resolve('Psr\Log\LoggerInterface');
 			});
 		}
+	}
+
+	public function makeLogger()
+	{
+		$logger = new Logger($this->app->getEnvironment());
+
+		if ($logdir = $this->getLogDirectory()) {
+			if (!is_dir($logdir)) {
+				throw new \RuntimeException("Log directory $logdir does not exist or is not a directory.");
+			}
+
+			$logpath = rtrim($logdir, '\\/').'/'.PHP_SAPI.'.log';
+
+			if (file_exists($logpath) && !is_writable($logpath)) {
+				throw new \RuntimeException("Log file $logpath is not writeable.");
+			}
+
+			$logger->pushHandler($handler = new StreamHandler($logpath, Logger::DEBUG));
+			$handler->setFormatter(new LineFormatter(null, 'Y-m-d H:i:s.u P', true));
+		}
+
+		return $logger;
+	}
+
+	protected function getLogDirectory()
+	{
+		$config = $this->app->getConfig();
+
+		if ($config->has('path.logs')) {
+			return $config->get('path.logs');
+		}
+
+		if ($config->has('path.storage')) {
+			$path = $config->get('path.storage').'/logs';
+
+			// return null if the directory does not exist - no need to force
+			// users to log
+			if (is_dir($path)) {
+				return $path;
+			}
+		}
+
+		return null;
 	}
 }
