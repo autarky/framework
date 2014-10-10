@@ -82,14 +82,14 @@ class Diagnostic
 			$this->errors++;
 			echo "ERROR: $prefix: $dir is not readable\n";
 		} else if ($this->verbose) {
-			echo "OK: $prefix: $path is readable\n";
+			echo "OK: $prefix: $dir is readable\n";
 		}
 
 		if ($writeable && !is_writeable($dir)) {
 			$this->errors++;
 			echo "ERROR: $prefix: $dir is not writeable\n";
 		} else if ($this->verbose) {
-			echo "OK: $prefix: $path is writeable\n";
+			echo "OK: $prefix: $dir is writeable\n";
 		}
 	}
 
