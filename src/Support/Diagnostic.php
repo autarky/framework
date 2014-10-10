@@ -24,6 +24,7 @@ class Diagnostic
 	{
 		foreach ($paths as $key => $value) {
 			if (!$value) {
+				echo "path.$key is empty, skipping\n";
 				continue;
 			}
 
@@ -32,11 +33,18 @@ class Diagnostic
 				continue;
 			}
 
-			if ($key == 'vendor' || $key == 'base') {
+			if ($key == 'vendor' || $key == 'base' || $key == 'app') {
+				// don't recurse, only check readable
 				$this->checkDir("path.$key", $value, true, false, false);
+				if ($key == 'app') {
+					// recurse over the config directory
+					$this->checkDir("path.$key", "$value/config", true, false, true);
+				}
 			} else if ($key == 'storage') {
+				// recurse, check for writeable as well as readable
 				$this->checkDir("path.$key", $value, true, true, true);
 			} else {
+				// recurse, only check readable
 				$this->checkDir("path.$key", $value, true, false, true);
 			}
 		}
@@ -62,34 +70,42 @@ class Diagnostic
 					continue;
 				}
 
-				if ($readable && !is_readable($path)) {
-					$this->errors++;
-					echo "ERROR: $prefix: $path is not readable\n";
-				} else if ($this->verbose) {
-					echo "OK: $prefix: $path is readable\n";
+				if ($readable) {
+					$this->checkReadable($path, $prefix);
 				}
 
-				if ($writeable && !is_writeable($path)) {
-					$this->errors++;
-					echo "ERROR: $prefix: $path is not writeable\n";
-				} else if ($this->verbose) {
-					echo "OK: $prefix: $path is writeable\n";
+				if ($writeable) {
+					$this->checkWriteable($path, $prefix);
 				}
 			}
 		}
 
-		if ($readable && !is_readable($dir)) {
-			$this->errors++;
-			echo "ERROR: $prefix: $dir is not readable\n";
-		} else if ($this->verbose) {
-			echo "OK: $prefix: $dir is readable\n";
+		if ($readable) {
+			$this->checkReadable($dir, $prefix);
 		}
 
-		if ($writeable && !is_writeable($dir)) {
+		if ($writeable) {
+			$this->checkWriteable($dir, $prefix);
+		}
+	}
+
+	protected function checkReadable($path, $prefix)
+	{
+		if (!is_readable($path)) {
 			$this->errors++;
-			echo "ERROR: $prefix: $dir is not writeable\n";
+			echo "ERROR: $prefix: $path is not readable\n";
 		} else if ($this->verbose) {
-			echo "OK: $prefix: $dir is writeable\n";
+			echo "OK: $prefix: $path is readable\n";
+		}
+	}
+
+	protected function checkWriteable($path, $prefix)
+	{
+		if (!is_writeable($path)) {
+			$this->errors++;
+			echo "ERROR: $prefix: $path is not writeable\n";
+		} else if ($this->verbose) {
+			echo "OK: $prefix: $path is writeable\n";
 		}
 	}
 
