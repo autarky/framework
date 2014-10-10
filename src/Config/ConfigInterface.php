@@ -18,6 +18,15 @@ use Autarky\Support\NamespacedResourceResolverInterface;
 interface ConfigInterface extends NamespacedResourceResolverInterface
 {
 	/**
+	 * Determine if a key exists in the store.
+	 *
+	 * @param  string  $key
+	 *
+	 * @return boolean
+	 */
+	public function has($key);
+
+	/**
 	 * Get an item from the store.
 	 *
 	 * @param  string $key
