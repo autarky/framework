@@ -85,6 +85,16 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function setNamespaceLoadsData()
+	{
+		$config = $this->makeConfig();
+		$config->addNamespace('namespace', $this->getConfigPath().'/vendor/namespace');
+		$config->set('namespace:testfile.three', 'THREE');
+		$this->assertEquals('two', $config->get('namespace:testfile.two'));
+		$this->assertEquals('THREE', $config->get('namespace:testfile.three'));
+	}
+
+	/** @test */
 	public function overrideNamespace()
 	{
 		$config = $this->makeConfig();

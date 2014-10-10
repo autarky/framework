@@ -102,8 +102,10 @@ class FileStore implements ConfigInterface
 	{
 		list($namespace, $group, $key) = $this->parseKey($fullKey);
 
-		if (!array_key_exists($group, $this->data)) {
-			$this->loadData($namespace, $group, $key);
+		$dataKey = $namespace === null ? $group : $namespace.':'.$group;
+
+		if (!array_key_exists($dataKey, $this->data)) {
+			$this->loadData($namespace, $group, $dataKey);
 		}
 
 		ArrayUtils::set($this->data, $fullKey, $value);
