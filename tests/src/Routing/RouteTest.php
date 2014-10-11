@@ -32,11 +32,11 @@ class RouteTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function callableIsEqualWithStringAndArray()
+	public function controllerIsEqualWithStringAndArray()
 	{
 		$route1 = new Route([], '', __NAMESPACE__.'\RouteHandlerStub:handle');
 		$route2 = new Route([], '', [__NAMESPACE__.'\RouteHandlerStub', 'handle']);
-		$this->assertEquals($route1->getCallable(), $route2->getCallable());
+		$this->assertEquals($route1->getController(), $route2->getController());
 	}
 }
 

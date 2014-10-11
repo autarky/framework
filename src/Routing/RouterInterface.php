@@ -56,16 +56,6 @@ interface RouterInterface
 	public function getCurrentRoute();
 
 	/**
-	 * Define a filter.
-	 *
-	 * @param  string           $name
-	 * @param  \Closure|string  $handler
-	 *
-	 * @return void
-	 */
-	public function defineFilter($name, $handler);
-
-	/**
 	 * Define a route group.
 	 *
 	 * @param  array    $flags    Valid keys are 'before', 'after', 'prefix'
