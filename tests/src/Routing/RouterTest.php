@@ -153,7 +153,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	/**
 	 * @test
 	 * @dataProvider getPathData
-	 */	
+	 */
 	public function pathsAreNormalized($path, $expected)
 	{
 		$router = $this->makeRouter();

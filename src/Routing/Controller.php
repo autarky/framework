@@ -103,7 +103,7 @@ abstract class Controller implements ContainerAwareInterface
 	 *
 	 * @return void
 	 */
-	public function flashMessages($messages)
+	protected function flashMessages($messages)
 	{
 		$flashBag = $this->getSession()
 			->getFlashBag();

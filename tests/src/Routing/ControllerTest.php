@@ -30,8 +30,8 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 	{
 		$ctrl = $this->makeController($container = $this->mockContainer());
 		$container->shouldReceive('resolve')->with('Autarky\Templating\TemplatingEngine')
-			->once()->andReturn(m::self())->getMock()
-			->shouldReceive('render')->with('template', ['foo' => 'bar'])->once();
+			->once()->andReturn($mockTemplating = m::mock('Autarky\Templating\TemplatingEngine'));
+		$mockTemplating->shouldReceive('render')->with('template', ['foo' => 'bar'])->once();
 		$ctrl->call('render', ['template', ['foo' => 'bar']]);
 	}
 
@@ -40,8 +40,8 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 	{
 		$ctrl = $this->makeController($container = $this->mockContainer());
 		$container->shouldReceive('resolve')->with('Autarky\Routing\UrlGenerator')
-			->once()->andReturn(m::self())->getMock()
-			->shouldReceive('getRouteUrl')->with('route', ['foo' => 'bar'])->once();
+			->once()->andReturn($mockUrl = m::mock('Autarky\Routing\UrlGenerator'));
+		$mockUrl->shouldReceive('getRouteUrl')->with('route', ['foo' => 'bar'])->once();
 		$ctrl->call('url', ['route', ['foo' => 'bar']]);
 	}
 
@@ -59,7 +59,9 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 		$ctrl = $this->makeController($container = $this->mockContainer());
 		$container->shouldReceive('resolve')->with('Symfony\Component\HttpFoundation\Session\Session')
 			->once()->andReturn($session = m::mock('Symfony\Component\HttpFoundation\Session\Session'));
-		$session->shouldReceive('getFlashBag->set')->with('foo', 'bar')->once();
+		$session->shouldReceive('getFlashBag') ->once()
+			->andReturn($flashBag = m::mock('Symfony\Component\HttpFoundation\Session\Flash\FlashBag'));
+		$flashBag->shouldReceive('set')->with('foo', 'bar')->once();
 		$ctrl->call('flash', ['foo', 'bar']);
 	}
 
@@ -69,7 +71,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 		$ctrl = $this->makeController($container = $this->mockContainer());
 		$container->shouldReceive('resolve')->with('Symfony\Component\HttpFoundation\Session\Session')
 			->once()->andReturn($session = m::mock('Symfony\Component\HttpFoundation\Session\Session'));
-		$session->shouldReceive('getFlashBag')->once()->andReturn($flashBag = m::mock('Symfony\Component\HttpFoundation\Session\FlashBag'));
+		$session->shouldReceive('getFlashBag')->once()->andReturn($flashBag = m::mock('Symfony\Component\HttpFoundation\Session\Flash\FlashBag'));
 		$flashBag->shouldReceive('add')->with('_messages', 'message')->once();
 		$ctrl->call('flashMessages', ['message']);
 	}
@@ -80,7 +82,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 		$ctrl = $this->makeController($container = $this->mockContainer());
 		$container->shouldReceive('resolve')->with('Symfony\Component\HttpFoundation\Session\Session')
 			->once()->andReturn($session = m::mock('Symfony\Component\HttpFoundation\Session\Session'));
-		$session->shouldReceive('getFlashBag')->once()->andReturn($flashBag = m::mock('Symfony\Component\HttpFoundation\Session\FlashBag'));
+		$session->shouldReceive('getFlashBag')->once()->andReturn($flashBag = m::mock('Symfony\Component\HttpFoundation\Session\Flash\FlashBag'));
 		$flashBag->shouldReceive('add')->with('_messages', 'message1')->once();
 		$flashBag->shouldReceive('add')->with('_messages', 'message2')->once();
 		$ctrl->call('flashMessages', [['message1', 'message2']]);
@@ -96,7 +98,8 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 		$request->request->replace(['foo' => 'bar']);
 		$container->shouldReceive('resolve')->with('Symfony\Component\HttpFoundation\Session\Session')
 			->once()->andReturn($session = m::mock('Symfony\Component\HttpFoundation\Session\Session'));
-		$session->shouldReceive('getFlashBag->set')->with('_old_input', ['foo' => 'bar'])->once();
+		$session->shouldReceive('getFlashBag')->once()->andReturn($flashBag = m::mock('Symfony\Component\HttpFoundation\Session\Flash\FlashBag'));
+		$flashBag->shouldReceive('set')->with('_old_input', ['foo' => 'bar'])->once();
 		$ctrl->call('flashInput');
 	}
 
@@ -106,7 +109,8 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 		$ctrl = $this->makeController($container = $this->mockContainer());
 		$container->shouldReceive('resolve')->with('Symfony\Component\HttpFoundation\Session\Session')
 			->once()->andReturn($session = m::mock('Symfony\Component\HttpFoundation\Session\Session'));
-		$session->shouldReceive('getFlashBag->peek')->with('_old_input', [])->once();
+		$session->shouldReceive('getFlashBag')->once()->andReturn($flashBag = m::mock('Symfony\Component\HttpFoundation\Session\Flash\FlashBag'));
+		$flashBag->shouldReceive('peek')->with('_old_input', [])->once();
 		$ctrl->call('getOldInput');
 	}
 
@@ -162,8 +166,8 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 	{
 		$ctrl = $this->makeController($container = $this->mockContainer());
 		$container->shouldReceive('resolve')->with('Autarky\Routing\UrlGenerator')
-			->once()->andReturn(m::self())->getMock()
-			->shouldReceive('getRouteUrl')->with('foo', ['bar' => 'baz'])->once()
+			->once()->andReturn($urlGenerator = m::mock('Autarky\Routing\UrlGenerator'));
+		$urlGenerator->shouldReceive('getRouteUrl')->with('foo', ['bar' => 'baz'])->once()
 			->andReturn('fake_url');
 		$response = $ctrl->call('redirect', ['foo', ['bar' => 'baz']]);
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\RedirectResponse', $response);

@@ -17,7 +17,7 @@ class EventDispatcherTest extends PHPUnit_Framework_TestCase
 
 	protected function mockEvent()
 	{
-		return m::mock('Symfony\Component\EventDispatcher\Event')
+		return m::mock(__NAMESPACE__.'\StubEvent')
 			->makePartial();
 	}
 
@@ -69,4 +69,9 @@ class StubDependency
 	{
 		$event->doStuff();
 	}
+}
+
+class StubEvent extends \Symfony\Component\EventDispatcher\Event
+{
+	public function doStuff() {}
 }
