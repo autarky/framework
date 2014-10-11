@@ -30,6 +30,7 @@ class RoutingProvider extends ServiceProvider
 		$dic->define('Autarky\Routing\Router', function(ContainerInterface $container) {
 			return new Router(
 				$container->resolve('Autarky\Routing\Invoker'),
+				$container->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
 				$this->app->getConfig()->get('path.route_cache')
 			);
 		});

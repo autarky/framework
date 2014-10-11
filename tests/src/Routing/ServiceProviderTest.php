@@ -8,7 +8,10 @@ class ServiceProviderTest extends TestCase
 {
 	protected function checkResolve($class)
 	{
-		$app = $this->makeApplication('Autarky\Routing\RoutingProvider');
+		$app = $this->makeApplication([
+			'Autarky\Events\EventDispatcherProvider',
+			'Autarky\Routing\RoutingProvider'
+		]);
 		$app->boot();
 		$object = $app->getContainer()->resolve($class);
 		$this->assertInstanceOf($class, $object);

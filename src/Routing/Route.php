@@ -38,9 +38,9 @@ class Route
 	protected $pattern;
 
 	/**
-	 * @var string|\Closure
+	 * @var callable
 	 */
-	protected $handler;
+	protected $controller;
 
 	/**
 	 * @var null|string
@@ -58,17 +58,22 @@ class Route
 	protected $afterFilters = [];
 
 	/**
-	 * @param array  $methods HTTP methods allowed for this route
-	 * @param string $pattern
-	 * @param mixed  $handler
-	 * @param string $name
+	 * @param array    $methods    HTTP methods allowed for this route
+	 * @param string   $pattern
+	 * @param callable $controller
+	 * @param string   $name
 	 */
-	public function __construct(array $methods, $pattern, $handler, $name = null)
+	public function __construct(array $methods, $pattern, $controller, $name = null)
 	{
 		$this->methods = $methods;
 		$this->pattern = $pattern;
-		$this->handler = $handler;
 		$this->name = $name;
+
+		if (is_string($controller) && !is_callable($controller)) {
+			$controller = \Autarky\splitclm($controller, 'action');
+		}
+
+		$this->controller = $controller;
 	}
 
 	/**
@@ -100,16 +105,6 @@ class Route
 	}
 
 	/**
-	 * Get the handler for the route.
-	 *
-	 * @return \Closure|string
-	 */
-	public function getHandler()
-	{
-		return $this->handler;
-	}
-
-	/**
 	 * Get the route's name.
 	 *
 	 * @return string|null
@@ -122,7 +117,7 @@ class Route
 	/**
 	 * Add a before filter.
 	 *
-	 * @param mixed $filter
+	 * @param string $filter
 	 */
 	public function addBeforeFilter($filter)
 	{
@@ -132,7 +127,7 @@ class Route
 	/**
 	 * Add an after filter.
 	 *
-	 * @param mixed $filter
+	 * @param string $filter
 	 */
 	public function addAfterFilter($filter)
 	{
@@ -142,8 +137,8 @@ class Route
 	/**
 	 * Add a before or after filter.
 	 *
-	 * @param string $when   "before" or "after"
-	 * @param mixed  $filter
+	 * @param string  $when   "before" or "after"
+	 * @param string  $filter
 	 */
 	public function addFilter($when, $filter)
 	{
@@ -153,7 +148,7 @@ class Route
 	/**
 	 * Get the route's before filters.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public function getBeforeFilters()
 	{
@@ -163,25 +158,16 @@ class Route
 	/**
 	 * Get the route's after filters.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public function getAfterFilters()
 	{
 		return $this->afterFilters;
 	}
 
-	/**
-	 * Get the route callable.
-	 *
-	 * @return mixed
-	 */
-	public function getCallable()
+	public function getController()
 	{
-		if (is_callable($this->handler)) {
-			return $this->handler;
-		}
-
-		return \Autarky\splitclm($this->handler, 'action');
+		return $this->controller;
 	}
 
 	/**

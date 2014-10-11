@@ -28,14 +28,17 @@ use Autarky\Events\EventDispatcherAwareTrait;
 /**
  * FastRoute implementation of the router.
  */
-class Router implements RouterInterface, EventDispatcherAwareInterface
+class Router implements RouterInterface
 {
-	use EventDispatcherAwareTrait;
-
 	/**
 	 * @var \Autarky\Routing\InvokerInterface
 	 */
 	protected $invoker;
+
+	/**
+	 * @var EventDispatcherInterface
+	 */
+	protected $eventDispatcher;
 
 	/**
 	 * @var \FastRoute\RouteCollector
@@ -82,12 +85,17 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	protected $namedRoutes = [];
 
 	/**
-	 * @param InvokerInterface $invoker
-	 * @param string|null      $cachePath
+	 * @param InvokerInterface         $invoker
+	 * @param EventDispatcherInterface $eventDispatcher
+	 * @param string|null              $cachePath
 	 */
-	public function __construct(InvokerInterface $invoker, $cachePath = null)
-	{
+	public function __construct(
+		InvokerInterface $invoker,
+		EventDispatcherInterface $eventDispatcher,
+		$cachePath = null
+	) {
 		$this->invoker = $invoker;
+		$this->eventDispatcher = $eventDispatcher;
 
 		if ($cachePath) {
 			$this->cachePath = $cachePath;
@@ -111,16 +119,27 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		return $this->currentRoute;
 	}
 
+	public function addBeforeFilter($name, $handler, $priority = 0)
+	{
+		$this->addFilter($name, $handler, 'before', $priority);
+	}
+
+	public function addAfterFilter($name, $handler, $priority = 0)
+	{
+		$this->addFilter($name, $handler, 'after', $priority);
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
-	public function defineFilter($name, $handler)
+	public function addFilter($name, $handler, $when, $priority)
 	{
 		if (array_key_exists($name, $this->filters)) {
 			throw new \LogicException("Filter with name $name already defined");
 		}
 
-		$this->filters[$name] = $handler;
+		$this->filters[$name] = $name;
+		$this->eventDispatcher->addListener("route.$when.$name", $handler, $priority);
 	}
 
 	/**
@@ -257,11 +276,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 		switch ($result[0]) {
 			case \FastRoute\Dispatcher::FOUND:
-				$args = [];
-				foreach ($result[2] as $key => $value) {
-					$args["\$$key"] = $value;
-				}
-				return $this->getResponse($request, $result[1], $args);
+				return $this->getResponse($request, $result[1], $result[2]);
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
 				throw new NotFoundHttpException('No route match for path '.$request->getPathInfo() ?: '/');
@@ -275,8 +290,14 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		}
 	}
 
-	protected function getResponse(Request $request, Route $route, array $args)
+	protected function getResponse(Request $request, Route $route, array $originalArgs)
 	{
+		$params = [];
+		foreach ($originalArgs as $key => $value) {
+			$params["\$$key"] = $value;
+		}
+		$params['Symfony\Component\HttpFoundation\Request'] = $request;
+
 		if ($this->eventDispatcher !== null) {
 			$event = new Events\RouteMatchedEvent($request, $route);
 			$this->eventDispatcher->dispatch('route.match', $event);
@@ -284,16 +305,23 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 		$this->currentRoute = $route;
 
+		$event = new Events\BeforeFilterEvent($request, $route);
+		$this->eventDispatcher->dispatch("route.before", $event);
 		foreach ($route->getBeforeFilters() as $filter) {
-			if ($response = $this->callFilter($filter, $route, $request)) {
-				return $this->makeResponse($response);
-			}
+			$this->eventDispatcher->dispatch("route.before.$filter", $event);
 		}
 
-		$response = $this->makeResponse($this->callRoute($route, $request, $args));
+		if ($response = $event->getResponse()) {
+			$response = $this->makeResponse($response);
+		} else {
+			$callable = $event->getController() ?: $route->getController();
+			$response = $this->makeResponse($this->invoker->invoke($callable, $params));
+		}
 
+		$event = new Events\AfterFilterEvent($request, $route, $response);
+		$this->eventDispatcher->dispatch("route.after", $event);
 		foreach ($route->getAfterFilters() as $filter) {
-			$this->callFilter($filter, $route, $request, $response);
+			$this->eventDispatcher->dispatch("route.after.$filter", $event);
 		}
 
 		return $response;
@@ -302,42 +330,6 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	protected function makeResponse($result)
 	{
 		return $result instanceof Response ? $result : new Response($result);
-	}
-
-	protected function callRoute(Route $route, Request $request, array $args)
-	{
-		$args['Symfony\Component\HttpFoundation\Request'] = $request;
-
-		return $this->invoker->invoke($route->getCallable(), $args);
-	}
-
-	protected function callFilter($filter, Route $route, Request $request, Response $response = null)
-	{
-		$params = [
-			'Autarky\Routing\Route' => $route,
-			'Symfony\Component\HttpFoundation\Request' => $request,
-			'Symfony\Component\HttpFoundation\Response' => $response,
-		];
-
-		if (is_array($filter)) {
-			$responder = $this->getCallable($filter[1], 'respond');
-			$filter = $this->getCallable($filter[0], 'filter');
-			$shouldRespond = $this->invoker->invoke($filter, $params);
-			if ($shouldRespond) {
-				return $this->invoker->invoke($responder, $params);
-			}
-		} else {
-			$filter = $this->getCallable($filter, 'filter');
-			return $this->invoker->invoke($filter, $params);
-		}
-	}
-
-	protected function getCallable($callable, $defaultMethod)
-	{
-		if (is_string($callable) && !is_callable($callable)) {
-			return \Autarky\splitclm($callable, $defaultMethod);
-		}
-		return $callable;
 	}
 
 	protected function getDispatcher()

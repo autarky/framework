@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use Autarky\Container\Container;
+use Autarky\Events\EventDispatcher;
+use Autarky\Events\ListenerResolver;
 use Autarky\Routing\Route;
 use Autarky\Routing\Router;
 use Autarky\Routing\Invoker;
@@ -21,7 +23,11 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
 	public function makeRouter()
 	{
-		return new Router(new Invoker(new Container));
+		$container = new Container;
+		return new Router(
+			new Invoker($container),
+			new EventDispatcher(new ListenerResolver($container))
+		);
 	}
 
 	/** @test */
@@ -54,13 +60,29 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	public function routeGroupFilter()
 	{
 		$router = $this->makeRouter();
-		$router->defineFilter('foo', function() { return 'from filter'; });
+		$router->addBeforeFilter('foo', function($event) {
+			$event->setResponse('from filter');
+		});
 		$router->group(['before' => 'foo'], function(Router $router) use(&$route) {
-			$route = $router->addRoute('get', '/foo', function() {});
+			$route = $router->addRoute('get', '/foo', function() { return 'from route'; });
 		});
 		$response = $router->dispatch(Request::create('/foo'));
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
 		$this->assertEquals('from filter', $response->getContent());
+	}
+
+	/** @test */
+	public function routeFilterCanChangeController()
+	{
+		$router = $this->makeRouter();
+		$route = $router->addRoute('get', '/foo', function() { return 'old controller'; });
+		$router->addBeforeFilter('bar', function($event) {
+			$event->setController(function() { return 'new controller'; });
+		});
+		$route->addBeforeFilter('bar');
+		$response = $router->dispatch(Request::create('/foo'));
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
+		$this->assertEquals('new controller', $response->getContent());
 	}
 
 	/** @test */
@@ -71,83 +93,6 @@ class RouterTest extends PHPUnit_Framework_TestCase
 			$route = $router->addRoute('get', '/bar', function() {});
 		});
 		$this->assertEquals('/foo/bar', $route->getPath([]));
-	}
-
-	/** @test */
-	public function beforeFiltersAreCalled()
-	{
-		$router = $this->makeRouter();
-		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
-		$route->addBeforeFilter(function() { return; });
-		$route->addBeforeFilter(function() { return 'bar'; });
-		$response = $router->dispatch(Request::create('/foo'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-		$this->assertEquals('bar', $response->getContent());
-	}
-
-	/** @test */
-	public function afterFiltersAreCalled()
-	{
-		$router = $this->makeRouter();
-		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
-		$route->addAfterFilter(function() { return; });
-		$route->addAfterFilter(function(Response $r) { $r->setContent('baz'); });
-		$response = $router->dispatch(Request::create('/foo'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-		$this->assertEquals('baz', $response->getContent());
-	}
-
-	/** @test */
-	public function filtersArePassedRouteRequestAndResponse()
-	{
-		$router = $this->makeRouter();
-		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
-		$route->addBeforeFilter(function(Route $route, Request $request) {
-
-		});
-		$route->addAfterFilter(function(Route $route, Request $request, Response $response) {
-
-		});
-		$response = $router->dispatch(Request::create('/foo'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-		$this->assertEquals('foo', $response->getContent());
-	}
-
-	/** @test */
-	public function filtersAreResolvedFromContainer()
-	{
-		$router = new Router(new Invoker($container = new Container));
-		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
-		$route->addBeforeFilter('StubFilter:f');
-		$container->instance('StubFilter', new StubFilter);
-		$response = $router->dispatch(Request::create('/foo'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-		$this->assertEquals('f', $response->getContent());
-	}
-
-	/** @test */
-	public function filtersResolvedFromTheContainerCallFilterMethodByDefault()
-	{
-		$router = new Router(new Invoker($container = new Container));
-		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
-		$route->addBeforeFilter('StubFilter');
-		$container->instance('StubFilter', new StubFilter);
-		$response = $router->dispatch(Request::create('/foo'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-		$this->assertEquals('filter', $response->getContent());
-	}
-
-	/** @test */
-	public function filtersAndRespondersCanBeSeparate()
-	{
-		$router = new Router(new Invoker($container = new Container));
-		$route = $router->addRoute(['get'], '/foo', function() { return 'foo'; });
-		$route->addBeforeFilter(['StubFilter', 'StubResponder']);
-		$container->instance('StubFilter', new StubFilter);
-		$container->instance('StubResponder', new StubResponder);
-		$response = $router->dispatch(Request::create('/foo'));
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-		$this->assertEquals('respond', $response->getContent());
 	}
 
 	/**
