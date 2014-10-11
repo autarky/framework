@@ -27,11 +27,6 @@ class CachingYamlFileLoader implements LoaderInterface
 		$this->cacheDir = $cacheDir;
 	}
 
-	public function setCacheDir($cacheDir)
-	{
-		$this->cacheDir = $cacheDir;
-	}
-
 	/**
 	 * {@inheritdoc}
 	 */

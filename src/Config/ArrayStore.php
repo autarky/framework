@@ -14,6 +14,8 @@ use Autarky\Support\ArrayUtils;
 
 /**
  * Simple array-based store primarily for testing purposes.
+ *
+ * @codeCoverageIgnore
  */
 class ArrayStore implements ConfigInterface
 {

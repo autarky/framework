@@ -17,6 +17,8 @@ use Autarky\Kernel\Application;
  * Stub error handler that simply re-throws the exceptions given.
  *
  * Written primarily for testing purposes.
+ *
+ * @codeCoverageIgnore
  */
 class StubErrorHandler implements ErrorHandlerManagerInterface
 {
