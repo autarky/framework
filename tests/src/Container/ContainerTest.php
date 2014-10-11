@@ -70,8 +70,16 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function externalClassFactory()
 	{
 		$c = $this->makeContainer();
-		$c->define('foo.factory', function() { return new StubFactory; });
-		$c->define('foo', ['foo.factory', 'makeFoo']);
+		$c->define('foo', [__NAMESPACE__.'\\StubFactory', 'makeFoo']);
+		$this->assertEquals('foo', $c->resolve('foo'));
+	}
+
+	/** @test */
+	public function aliasedInterfaceFactory()
+	{
+		$c = $this->makeContainer();
+		$c->define('foo', [__NAMESPACE__.'\\StubFactoryInterface', 'makeFoo']);
+		$c->alias(__NAMESPACE__.'\\StubFactory', __NAMESPACE__.'\\StubFactoryInterface');
 		$this->assertEquals('foo', $c->resolve('foo'));
 	}
 
@@ -388,7 +396,10 @@ class DefaultValueStub {
 		$this->value = $value;
 	}
 }
-class StubFactory {
+interface StubFactoryInterface {
+	public function makeFoo($suffix = '');
+}
+class StubFactory implements StubFactoryInterface {
 	public function makeFoo($suffix = '') {
 		return 'foo' . $suffix;
 	}
