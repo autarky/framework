@@ -269,8 +269,6 @@ class Router implements RouterInterface
 	 */
 	public function dispatch(Request $request)
 	{
-		$this->currentRoute = null;
-
 		$result = $this->getDispatcher()
 			->dispatch($request->getMethod(), $request->getPathInfo());
 
@@ -279,24 +277,21 @@ class Router implements RouterInterface
 				return $this->getResponse($request, $result[1], $result[2]);
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
-				throw new NotFoundHttpException('No route match for path '.$request->getPathInfo() ?: '/');
+				$message = 'No route match for path '.($request->getPathInfo() ?: '/');
+				throw new NotFoundHttpException($message);
 
 			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
 				throw new MethodNotAllowedHttpException($result[1], 'Method '.$request->getMethod()
-					.' not allowed for path '.$request->getPathInfo() ?: '/');
+					.' not allowed for path '.($request->getPathInfo() ?: '/'));
 
 			default:
 				throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
 		}
 	}
 
-	protected function getResponse(Request $request, Route $route, array $originalArgs)
+	protected function getResponse(Request $request, Route $route, array $params)
 	{
-		$params = [];
-		foreach ($originalArgs as $key => $value) {
-			$params["\$$key"] = $value;
-		}
-		$params['Symfony\Component\HttpFoundation\Request'] = $request;
+		$params = $this->getContainerParams($params, $request);
 
 		if ($this->eventDispatcher !== null) {
 			$event = new Events\RouteMatchedEvent($request, $route);
@@ -311,11 +306,13 @@ class Router implements RouterInterface
 			$this->eventDispatcher->dispatch("route.before.$filter", $event);
 		}
 
-		if ($response = $event->getResponse()) {
-			$response = $this->makeResponse($response);
-		} else {
+		if (!$response = $event->getResponse()) {
 			$callable = $event->getController() ?: $route->getController();
-			$response = $this->makeResponse($this->invoker->invoke($callable, $params));
+			$response = $this->invoker->invoke($callable, $params);
+		}
+
+		if (!$response instanceof Response) {
+			$response = new Response($response);
 		}
 
 		$event = new Events\AfterFilterEvent($request, $route, $response);
@@ -324,12 +321,22 @@ class Router implements RouterInterface
 			$this->eventDispatcher->dispatch("route.after.$filter", $event);
 		}
 
+		$this->currentRoute = null;
+
 		return $response;
 	}
 
-	protected function makeResponse($result)
+	protected function getContainerParams(array $routeParams, Request $request)
 	{
-		return $result instanceof Response ? $result : new Response($result);
+		$params = [];
+
+		foreach ($routeParams as $key => $value) {
+			$params["\$$key"] = $value;
+		}
+
+		$params['Symfony\Component\HttpFoundation\Request'] = $request;
+
+		return $params;
 	}
 
 	protected function getDispatcher()

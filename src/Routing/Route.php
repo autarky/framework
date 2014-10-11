@@ -91,14 +91,14 @@ class Route
 			if (count($params) < 1) {
 				throw new \InvalidArgumentException('Too few parameters given');
 			}
+
 			return array_shift($params);
 		};
 
 		$path = preg_replace_callback('/\{\w+\}/', $callback, $this->pattern);
 
 		if (count($params) > 0) {
-			$path .= '?';
-			$path .= http_build_query($params);
+			$path .= '?' . http_build_query($params);
 		}
 
 		return $path;
@@ -165,6 +165,11 @@ class Route
 		return $this->afterFilters;
 	}
 
+	/**
+	 * Get the callable controller for the route.
+	 *
+	 * @return callable
+	 */
 	public function getController()
 	{
 		return $this->controller;
@@ -191,7 +196,7 @@ class Route
 	 */
 	public static function __set_state($data)
 	{
-		$route = new static($data['methods'], $data['pattern'], $data['handler'], $data['name']);
+		$route = new static($data['methods'], $data['pattern'], $data['controller'], $data['name']);
 		$route->beforeFilters = $data['beforeFilters'];
 		$route->afterFilters = $data['afterFilters'];
 		if (static::$router !== null && array_key_exists('name', $data) && $data['name']) {
