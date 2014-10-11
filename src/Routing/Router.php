@@ -179,10 +179,7 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		}
 
 		$methods = (array) $methods;
-
-		if (substr($url, 0, 1) !== '/') {
-			$url = '/' . $url;
-		}
+		$url = $this->makePath($url);
 
 		$route = $this->createRoute($methods, $url, $handler, $name);
 
@@ -195,6 +192,19 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 		}
 
 		return $route;
+	}
+
+	protected function makePath($path)
+	{
+		if ($this->currentPrefix !== null) {
+			$path = rtrim($this->currentPrefix, '/') .'/'. ltrim($path, '/');
+		}
+
+		if (substr($path, 0, 1) !== '/') {
+			$path = '/' . $path;
+		}
+
+		return rtrim($path, '/');
 	}
 
 	/**
@@ -214,12 +224,6 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 
 	protected function createRoute($methods, $url, $handler, $name)
 	{
-		if ($this->currentPrefix !== null) {
-			$url = rtrim($this->currentPrefix, '/') .'/'. ltrim($url, '/');
-		}
-
-		$url = rtrim($url, '/');
-
 		$route = new Route($methods, $url, $handler, $name);
 
 		foreach ($this->currentFilters as $filter) {
