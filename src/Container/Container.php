@@ -110,15 +110,19 @@ class Container implements ContainerInterface
 	 */
 	public function define($class, $factory, array $params = array())
 	{
-		if (!is_callable($factory)) {
-			if (!is_array($factory)) {
-				$type = is_object($factory) ? get_class($factory) : gettype($factory);
-				throw new \InvalidArgumentException("Factory must be a callable or array, $type given");
-			}
+		if (is_string($factory) && !is_callable($factory)) {
+			$factory = \Autarky\splitclm($factory, 'make');
+		}
 
+		if (is_array($factory) && is_string($factory[0])) {
 			$factory = function($container) use($factory) {
 				return $container->invoke($factory);
 			};
+		}
+
+		if (!is_callable($factory)) {
+			$type = is_object($factory) ? get_class($factory) : gettype($factory);
+			throw new \InvalidArgumentException("Factory for class $class must be callable, $type given");
 		}
 
 		if ($params) {
@@ -186,6 +190,10 @@ class Container implements ContainerInterface
 	 */
 	public function invoke($callable, array $params = array())
 	{
+		if (is_string($callable) && !is_callable($callable)) {
+			$callable = \Autarky\splitclm($callable, 'invoke');
+		}
+
 		if (is_string($callable) && strpos($callable, '::') !== false) {
 			$callable = explode('::', $callable);
 		}

@@ -135,7 +135,9 @@ interface ContainerInterface
 	 *
 	 * Callable can be anything that passes is_callable() in PHP, including an
 	 * array of ['ClassName', 'method'], in which case the class will first be
-	 * resolved from the container.
+	 * resolved from the container. Callable can also be some things that don't
+	 * pass is_callable(), for example ['InterfaceName', 'method'], but only if
+	 * 'InterfaceName' is bound to the container somehow.
 	 *
 	 * @param  callable $callable
 	 * @param  array    $params   See ContainerInterface::params()
