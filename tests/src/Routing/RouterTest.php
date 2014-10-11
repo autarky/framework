@@ -152,15 +152,40 @@ class RouterTest extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @test
+	 * @dataProvider getPathData
+	 */	
+	public function pathsAreNormalized($path, $expected)
+	{
+		$router = $this->makeRouter();
+		$route = $router->addRoute(['get'], $path, function() {});
+		$this->assertEquals($expected, $route->getPath());
+		// throws an exception if no route was found
+		$router->dispatch(Request::create($expected));
+	}
+
+	public function getPathData()
+	{
+		return [
+			['foo', '/foo'],
+			['foo/', '/foo'],
+			['/foo', '/foo'],
+			['/foo/', '/foo'],
+		];
+	}
+
+	/**
+	 * @test
 	 * @dataProvider getPrefixPathData
 	 */
-	public function prefixesCannotMessUpUris($prefix, $path, $expectedPath)
+	public function prefixesCannotMessUpUris($prefix, $path, $expected)
 	{
 		$router = $this->makeRouter();
 		$router->group(['prefix' => $prefix], function(Router $router) use($path, &$route) {
 			$route = $router->addRoute(['get'], $path, function() { return; });
 		});
-		$this->assertEquals($expectedPath, $route->getPath());
+		$this->assertEquals($expected, $route->getPath());
+		// throws an exception if no route was found
+		$router->dispatch(Request::create($expected));
 	}
 
 	public function getPrefixPathData()
