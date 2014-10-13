@@ -59,6 +59,18 @@ class ArrayUtilsTest extends TestCase
 				['foo' => ['bar' => 'baz']],
 			],
 			[
+				['foo' => ['bar' => 'baz']],
+				'foo.baz',
+				'foo',
+				['foo' => ['bar' => 'baz', 'baz' => 'foo']],
+			],
+			[
+				['foo' => ['bar' => 'baz']],
+				'foo.baz.bar',
+				'baz',
+				['foo' => ['bar' => 'baz', 'baz' => ['bar' => 'baz']]],
+			],
+			[
 				[],
 				'foo.bar.baz',
 				'foo',
