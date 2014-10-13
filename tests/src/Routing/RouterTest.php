@@ -60,7 +60,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	public function routeGroupFilter()
 	{
 		$router = $this->makeRouter();
-		$router->addBeforeFilter('foo', function($event) {
+		$router->onBefore('foo', function($event) {
 			$event->setResponse('from filter');
 		});
 		$router->group(['before' => 'foo'], function(Router $router) use(&$route) {
@@ -76,7 +76,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	{
 		$router = $this->makeRouter();
 		$route = $router->addRoute('get', '/foo', function() { return 'old controller'; });
-		$router->addBeforeFilter('bar', function($event) {
+		$router->onBefore('bar', function($event) {
 			$event->setController(function() { return 'new controller'; });
 		});
 		$route->addBeforeFilter('bar');

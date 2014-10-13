@@ -119,27 +119,72 @@ class Router implements RouterInterface
 		return $this->currentRoute;
 	}
 
-	public function addBeforeFilter($name, $handler, $priority = 0)
+	/**
+	 * Add a "before" event listener.
+	 *
+	 * @param  string   $name
+	 * @param  callable $handler
+	 * @param  integer  $priority
+	 *
+	 * @return void
+	 */
+	public function onBefore($name, $handler, $priority = 0)
 	{
-		$this->addFilter($name, $handler, 'before', $priority);
-	}
-
-	public function addAfterFilter($name, $handler, $priority = 0)
-	{
-		$this->addFilter($name, $handler, 'after', $priority);
+		$this->addEventListener($name, $handler, 'before', $priority);
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * Add an "after" event listener.
+	 *
+	 * @param  string   $name
+	 * @param  callable $handler
+	 * @param  integer  $priority
+	 *
+	 * @return void
 	 */
-	public function addFilter($name, $handler, $when, $priority)
+	public function onAfter($name, $handler, $priority = 0)
 	{
-		if (array_key_exists($name, $this->filters)) {
-			throw new \LogicException("Filter with name $name already defined");
+		$this->addEventListener($name, $handler, 'after', $priority);
+	}
+
+	/**
+	 * Add a global "before" event listener.
+	 *
+	 * @param  callable $handler
+	 * @param  integer  $priority
+	 *
+	 * @return void
+	 */
+	public function globalOnBefore($handler, $priority = 0)
+	{
+		$this->addEventListener(null, $handler, 'before', $priority);
+	}
+
+	/**
+	 * Add a global "after" event listener.
+	 *
+	 * @param  callable $handler
+	 * @param  integer  $priority
+	 *
+	 * @return void
+	 */
+	public function globalOnAfter($handler, $priority = 0)
+	{
+		$this->addEventListener(null, $handler, 'after', $priority);
+	}
+
+	protected function addEventListener($name, $handler, $when, $priority)
+	{
+		if ($name) {
+			if (array_key_exists($name, $this->filters)) {
+				throw new \LogicException("Filter with name $name already defined");
+			}
+
+			$this->filters[$name] = $name;
 		}
 
-		$this->filters[$name] = $name;
-		$this->eventDispatcher->addListener("route.$when.$name", $handler, $priority);
+		$name = $name ? "route.$when.$name" : "route.$when";
+		$this->eventDispatcher->addListener($name, $handler, $priority);
 	}
 
 	/**
