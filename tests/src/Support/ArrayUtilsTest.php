@@ -85,6 +85,8 @@ class ArrayUtilsTest extends TestCase
 			[['foo' => ['bar' => 'baz']], 'foo.bar', true],
 			[['foo' => ['bar' => 'baz']], 'foo.baz', false],
 			[['foo' => ['bar' => 'baz']], 'foo', true],
+			[['foo' => null], 'foo', true],
+			[['foo' => ['bar' => null]], 'foo.bar', true],
 		];
 	}
 }
