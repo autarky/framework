@@ -204,6 +204,10 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 			$path = '/' . $path;
 		}
 
+		if ($path == '/') {
+			return $path;
+		}
+
 		return rtrim($path, '/');
 	}
 
@@ -252,8 +256,11 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 	{
 		$this->currentRoute = null;
 
+		$method = $request->getMethod();
+		$path = $request->getPathInfo() ?: '/';
+
 		$result = $this->getDispatcher()
-			->dispatch($request->getMethod(), $request->getPathInfo());
+			->dispatch($method, $path);
 
 		switch ($result[0]) {
 			case \FastRoute\Dispatcher::FOUND:
@@ -264,11 +271,11 @@ class Router implements RouterInterface, EventDispatcherAwareInterface
 				return $this->getResponse($request, $result[1], $args);
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
-				throw new NotFoundHttpException('No route match for path '.$request->getPathInfo() ?: '/');
+				throw new NotFoundHttpException("No route match for path $path");
 
 			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-				throw new MethodNotAllowedHttpException($result[1], 'Method '.$request->getMethod()
-					.' not allowed for path '.$request->getPathInfo() ?: '/');
+				throw new MethodNotAllowedHttpException($result[1],
+					"Method $method not allowed for path $path");
 
 			default:
 				throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
