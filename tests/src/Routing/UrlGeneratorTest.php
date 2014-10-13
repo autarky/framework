@@ -65,7 +65,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	public function canGenerateRelativeAssetUrlInSubdirectory()
 	{
 		$server = [
-			'PHP_SELV' => '/path/to/subdir/index.php',
+			'PHP_SELF' => '/path/to/subdir/index.php',
 			'SCRIPT_FILENAME' => '/subdir/index.php',
 			'SCRIPT_NAME' => '/subdir/index.php',
 		];

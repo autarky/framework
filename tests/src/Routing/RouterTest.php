@@ -111,10 +111,43 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	public function getPathData()
 	{
 		return [
+			['', '/'],
+			['/', '/'],
 			['foo', '/foo'],
 			['foo/', '/foo'],
 			['/foo', '/foo'],
 			['/foo/', '/foo'],
+		];
+	}
+
+	/**
+	 * @test
+	 * @dataProvider getRootPathData
+	 */	
+	public function rootPathAlwaysWorks($requestPath, $scriptName = null)
+	{
+		$server = [
+			'SCRIPT_FILENAME' => $scriptName,
+			'SCRIPT_NAME' => $scriptName,
+		];
+		$request = Request::create($requestPath, 'GET', [], [], [], $server);
+		$router = $this->makeRouter();
+		$route = $router->addRoute(['get'], '/', function() {});
+		// throws an exception if no route was found
+		$router->dispatch($request);
+	}
+
+	public function getRootPathData()
+	{
+		return [
+			[''],
+			['/'],
+			['http://localhost'],
+			['http://localhost/'],
+			['http://sub.localhost'],
+			['http://sub.localhost/'],
+			['/foo', '/foo/index.php'],
+			['/foo/', '/foo/index.php'],
 		];
 	}
 
