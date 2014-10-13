@@ -34,7 +34,9 @@ class TwigTemplatingProvider extends ServiceProvider
 		$loader = new Twig\FileLoader($config->get('path.templates'));
 		$options = ['debug' => $config->get('app.debug')];
 
-		if ($config->has('path.storage')) {
+		if ($config->has('path.templates_cache')) {
+			$options['cache'] = $config->get('path.templates_cache');
+		} else if ($config->has('path.storage')) {
 			$options['cache'] = $config->get('path.storage').'/twig';
 		}
 
