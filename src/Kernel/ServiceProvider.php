@@ -22,6 +22,8 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 abstract class ServiceProvider
 {
 	/**
+	 * The application instance.
+	 *
 	 * @var \Autarky\Kernel\Application
 	 */
 	protected $app;

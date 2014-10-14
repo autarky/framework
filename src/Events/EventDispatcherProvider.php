@@ -21,6 +21,9 @@ use Autarky\Kernel\ServiceProvider;
  */
 class EventDispatcherProvider extends ServiceProvider
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		$dic = $this->app->getContainer();

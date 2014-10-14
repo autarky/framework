@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+	<title>Autarky</title>
+	<parser>
+		<target>build/phpdoc-parser</target>
+		<encoding>utf8</encoding>
+		<markers>
+			<item>TODO</item>
+			<item>FIXME</item>
+		</markers>
+		<extensions>
+			<extension>php</extension>
+		</extensions>
+	</parser>
+	<logging>
+		<level>warn</level>
+		<paths>
+			<default>build/logs/{DATE}.log</default>
+			<errors>build/logs/{DATE}.errors.log</errors>
+		</paths>
+	</logging>
+	<transformer>
+		<target>build/phpdoc</target>
+	</transformer>
+	<transformations>
+		<template name="clean" />
+	</transformations>
+	<files>
+		<directory>src</directory>
+	</files>
+</phpdoc>

@@ -18,8 +18,16 @@ use Symfony\Component\Yaml\Parser;
  */
 class YamlFileLoader implements LoaderInterface
 {
+	/**
+	 * The symfony YAML parser instance.
+	 *
+	 * @var Parser
+	 */
 	protected $parser;
 
+	/**
+	 * @param Parser $parser
+	 */
 	public function __construct(Parser $parser)
 	{
 		$this->parser = $parser;

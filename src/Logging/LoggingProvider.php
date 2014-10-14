@@ -22,6 +22,9 @@ use Autarky\Kernel\ServiceProvider;
  */
 class LoggingProvider extends ServiceProvider
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		$dic = $this->app->getContainer();

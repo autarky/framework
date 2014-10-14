@@ -30,8 +30,14 @@ use Autarky\Container\ContainerInterface;
  */
 class SessionProvider extends ServiceProvider
 {
+	/**
+	 * @var \Autarky\Config\ConfigInterface
+	 */
 	protected $config;
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		$this->config = $this->app->getConfig();
@@ -71,6 +77,13 @@ class SessionProvider extends ServiceProvider
 		$this->app->addMiddleware(['Autarky\Session\Middleware', $this->app]);
 	}
 
+	/**
+	 * Make the session handler.
+	 *
+	 * @param  ContainerInterface $container
+	 *
+	 * @return \SessionHandlerInterface
+	 */
 	public function makeSessionHandler(ContainerInterface $container)
 	{
 		switch ($this->config->get('session.handler')) {
@@ -115,6 +128,13 @@ class SessionProvider extends ServiceProvider
 		}
 	}
 
+	/**
+	 * Make the session storage.
+	 *
+	 * @param  ContainerInterface $container
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface
+	 */
 	public function makeSessionStorage(ContainerInterface $container)
 	{
 		if ($this->config->get('session.mock') === true) {
@@ -127,6 +147,13 @@ class SessionProvider extends ServiceProvider
 		return new NativeSessionStorage($options, $handler);
 	}
 
+	/**
+	 * Make the session object.
+	 *
+	 * @param  ContainerInterface $container
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Session\Session
+	 */
 	public function makeSession(ContainerInterface $container)
 	{
 		$session = new Session(

@@ -27,6 +27,10 @@ class AbstractRouteEvent extends Event
 	 */
 	protected $route;
 
+	/**
+	 * @param Request $request
+	 * @param Route   $route
+	 */
 	public function __construct(Request $request, Route $route)
 	{
 		$this->request = $request;

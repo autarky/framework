@@ -19,6 +19,9 @@ use Autarky\Kernel\ServiceProvider;
  */
 class DatabaseProvider extends ServiceProvider
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		$dic = $this->app->getContainer();

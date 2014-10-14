@@ -14,13 +14,29 @@ use Autarky\Config\LoaderInterface;
 use Symfony\Component\Yaml\Parser;
 
 /**
- * YAML/YML config file loader.
+ * Caching wrapper for the YAML/YML config file loader.
  */
 class CachingYamlFileLoader implements LoaderInterface
 {
+	/**
+	 * The internal YAML file loader instance. It will be responsible for
+	 * parsing files that haven't been cached.
+	 *
+	 * @var YamlFileLoader
+	 */
 	protected $loader;
+
+	/**
+	 * The directory in which to look for cached files.
+	 *
+	 * @var string|null
+	 */
 	protected $cacheDir;
 
+	/**
+	 * @param YamlFileLoader $loader
+	 * @param string|null    $cacheDir
+	 */
 	public function __construct(YamlFileLoader $loader, $cacheDir = null)
 	{
 		$this->loader = $loader;

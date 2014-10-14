@@ -25,10 +25,12 @@ use Autarky\Container\ContainerAwareInterface;
  * If you are unable to extend the controller class for any reason, you can just
  * use the trait instead:
  *
+ * <pre>
  * class MyController extends SomethingElse
  * {
  *     use \Autarky\Routing\ControllerTrait;
  * }
+ * </pre>
  */
 abstract class Controller implements ContainerAwareInterface
 {

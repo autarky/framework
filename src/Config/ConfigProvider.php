@@ -22,13 +22,24 @@ use Symfony\Component\Yaml\Parser;
  */
 class ConfigProvider extends ServiceProvider
 {
+	/**
+	 * The path in which config files are located.
+	 *
+	 * @var string
+	 */
 	protected $configPath;
 
+	/**
+	 * @param string $configPath The path in which config files are located.
+	 */
 	public function __construct($configPath)
 	{
 		$this->configPath = $configPath;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		$dic = $this->app->getContainer();

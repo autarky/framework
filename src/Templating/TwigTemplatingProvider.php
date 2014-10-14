@@ -17,6 +17,9 @@ use Autarky\Kernel\ServiceProvider;
  */
 class TwigTemplatingProvider extends ServiceProvider
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		$dic = $this->app->getContainer();
@@ -28,6 +31,11 @@ class TwigTemplatingProvider extends ServiceProvider
 		$dic->alias('Autarky\Templating\Twig\Environment', 'Twig_Environment');
 	}
 
+	/**
+	 * Make the twig environment.
+	 *
+	 * @return \Autarky\Templating\Twig\Environment
+	 */
 	public function makeTwigEnvironment()
 	{
 		$config = $this->app->getConfig();

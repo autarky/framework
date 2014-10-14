@@ -20,6 +20,8 @@ interface ConfigInterface extends NamespacedResourceResolverInterface
 	/**
 	 * Determine if a key exists in the store.
 	 *
+	 * Should return true even if the value is null.
+	 *
 	 * @param  string  $key
 	 *
 	 * @return boolean
