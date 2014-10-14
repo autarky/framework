@@ -34,7 +34,7 @@ class Application implements HttpKernelInterface
 	/**
 	 * The framework version.
 	 */
-	const VERSION = '0.6.x';
+	const VERSION = '0.6.0';
 
 	/**
 	 * The application's service providers.
