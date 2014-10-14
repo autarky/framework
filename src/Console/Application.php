@@ -12,6 +12,7 @@ namespace Autarky\Console;
 
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
+
 use Autarky\Console\Command as AutarkyCommand;
 
 /**

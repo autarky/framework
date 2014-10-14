@@ -11,6 +11,7 @@
 namespace Autarky\Errors;
 
 use Exception;
+
 use Autarky\Kernel\Application;
 
 /**

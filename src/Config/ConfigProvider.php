@@ -10,10 +10,11 @@
 
 namespace Autarky\Config;
 
+use Symfony\Component\Yaml\Parser;
+
 use Autarky\Kernel\ServiceProvider;
 use Autarky\Config\Loaders\YamlFileLoader;
 use Autarky\Config\Loaders\CachingYamlFileLoader;
-use Symfony\Component\Yaml\Parser;
 
 /**
  * Provides config to the application.

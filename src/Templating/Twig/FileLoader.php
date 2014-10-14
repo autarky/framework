@@ -11,6 +11,7 @@
 namespace Autarky\Templating\Twig;
 
 use Twig_Loader_Filesystem;
+
 use Autarky\Support\NamespacedResourceResolverInterface;
 
 /**

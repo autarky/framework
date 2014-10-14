@@ -10,7 +10,6 @@
 
 namespace Autarky\Testing;
 
-use Autarky\Kernel\Application;
 use Symfony\Component\HttpKernel\Client as BaseClient;
 
 /**
