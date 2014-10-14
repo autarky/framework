@@ -46,21 +46,6 @@ trait ControllerTrait
 	}
 
 	/**
-	 * Render a template.
-	 *
-	 * @param  string $name Name of the view.
-	 * @param  array  $data Data to pass to the view.
-	 *
-	 * @return string
-	 *
-	 * @deprecated Deprecated in favour of render()
-	 */
-	protected function view($name, array $data = array())
-	{
-		return $this->render($name, $data);
-	}
-
-	/**
 	 * Generate the URL to a route.
 	 *
 	 * @param  string $name   Name of the route.
