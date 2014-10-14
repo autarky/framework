@@ -211,14 +211,15 @@ trait ControllerTrait
 	/**
 	 * Create a redirect response.
 	 *
-	 * @param  string $name   Name of the route to redirect to
-	 * @param  array  $params Route parameters
+	 * @param  string  $name       Name of the route to redirect to
+	 * @param  array   $params     Route parameters
+	 * @param  integer $statusCode Default: 302
 	 *
 	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
 	 */
-	protected function redirect($name, array $params = array())
+	protected function redirect($name, array $params = array(), $statusCode = 302)
 	{
-		return new RedirectResponse($this->url($name, $params));
+		return new RedirectResponse($this->url($name, $params), $statusCode);
 	}
 
 	/**
