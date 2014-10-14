@@ -347,6 +347,7 @@ class Router implements RouterInterface
 		if ($this->eventDispatcher !== null) {
 			$event = new Events\RouteMatchedEvent($request, $route);
 			$this->eventDispatcher->dispatch('route.match', $event);
+			$route = $event->getRoute();
 		}
 
 		$this->currentRoute = $route;

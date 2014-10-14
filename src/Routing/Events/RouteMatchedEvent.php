@@ -10,6 +10,20 @@
 
 namespace Autarky\Routing\Events;
 
+use Autarky\Routing\Route;
+
+/**
+ * Event that is fired when an URL is matched with a route.
+ */
 class RouteMatchedEvent extends AbstractRouteEvent
 {
+	/**
+	 * Set the route, replacing the original one.
+	 *
+	 * @param Route $route
+	 */
+	public function setRoute(Route $route)
+	{
+		$this->route = $route;
+	}
 }

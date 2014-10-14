@@ -29,7 +29,7 @@ class Application extends SymfonyApplication
 	/**
 	 * Set the Autarky application instance.
 	 *
-	 * @param Autarky\Kernel\Application $app
+	 * @param \Autarky\Kernel\Application $app
 	 */
 	public function setAutarkyApplication(\Autarky\Kernel\Application $app)
 	{
