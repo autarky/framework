@@ -36,10 +36,8 @@ class ProviderTest extends TestCase
 	 */
 	public function resolvesCorrectHandler($handler, $class, $depends = null)
 	{
-		if ($depends) {
-			if (!class_exists($depends)) {
-				$this->markTestSkipped("Class $depends must be present for session handler $class to be resolved");
-			}
+		if ($depends && !class_exists($depends)) {
+			$this->markTestSkipped("Class $depends must be present for session handler $class to be resolved");
 		}
 		$app = $this->makeApplication([new SessionProvider]);
 		$app->getConfig()->set('session.handler', $handler);
