@@ -22,5 +22,8 @@ before_install:
 install:
   - composer install --dev --no-interaction
 
+before_script:
+  - phpenv config-add php-travis.ini
+
 script:
   - ./vendor/bin/phpunit
