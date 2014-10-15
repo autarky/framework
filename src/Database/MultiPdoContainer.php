@@ -89,6 +89,10 @@ class MultiPdoContainer
 		$config = $this->config->get("database.connections.$connection");
 
 		if (!$config) {
+			if (!is_string($connection)) {
+				$connection = gettype($connection);
+			}
+
 			throw new \InvalidArgumentException("Connection $connection not defined");
 		}
 

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
@@ -90,36 +91,49 @@ class SessionProvider extends ServiceProvider
 	{
 		switch ($this->config->get('session.handler')) {
 			case 'native':
-				return new \SessionHandler;
+				$handler = new \SessionHandler;
+				break;
 
 			case 'file':
-				return new NativeFileSessionHandler($this->getSessionPath());
+				$handler = new NativeFileSessionHandler($this->getSessionPath());
+				break;
 
 			case 'pdo':
 				$pdo = $container->resolve('Autarky\Database\MultiPdoContainer')
 					->getPdo($this->config->get('session.db_connection'));
 				$options = $this->config->get('session.handler_options', []);
-				return new PdoSessionHandler($pdo, $options);
+				$handler = new PdoSessionHandler($pdo, $options);
+				break;
 
 			case 'mongo':
-				return new MongoDbSessionHandler($container->resolve('MongoClient'),
+				$handler = new MongoDbSessionHandler($container->resolve('MongoClient'),
 					$this->config->get('session.handler_options', []));
+				break;
 
 			case 'memcache':
-				return new MemcacheSessionHandler($container->resolve('Memcache'),
+				$handler = new MemcacheSessionHandler($container->resolve('Memcache'),
 					$this->config->get('session.handler_options', []));
+				break;
 
 			case 'memcached':
-				return new MemcachedSessionHandler($container->resolve('Memcached'),
+				$handler = new MemcachedSessionHandler($container->resolve('Memcached'),
 					$this->config->get('session.handler_options', []));
+				break;
 
 			case 'null':
-				return new NullSessionHandler;
+				$handler = new NullSessionHandler;
+				break;
 
 			default:
 				throw new \RuntimeException('Unknown session handler type: '.
 					$this->config->get('session.handler'));
 		}
+
+		if ($this->config->get('session.write_check') === true) {
+			$handler = new WriteCheckSessionHandler($handler);
+		}
+
+		return $handler;
 	}
 
 	/**
