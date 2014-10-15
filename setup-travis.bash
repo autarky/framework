@@ -4,7 +4,9 @@
 
 PHP_VER=$(phpenv version-name)
 
-if [[ $PHP_VER != "hhvm" ]]; then
+if [[ $PHP_VER == "hhvm" ]]; then
+	sudo echo "extension = mongo.so" >> /etc/hhvm/php.ini
+else
 	echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 	echo "extension = memcache.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 	echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
