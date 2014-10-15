@@ -49,7 +49,9 @@ class ProviderTest extends TestCase
 			$app->getConfig()->set('database.connections.default', ['dsn' => 'sqlite::memory:']);
 		}
 		if ($handler == 'mongo') {
-			$app->getContainer()->define('MongoClient', function() { return new \MongoClient(); });
+			$app->getContainer()->define('MongoClient', function() {
+				return new \MongoClient('mongodb://localhost:27017', ['connect' => false]);
+			});
 		}
 		if ($handler == 'memcached') {
 			$app->getContainer()->define('Memcached', function() { return new \Memcached(); });
