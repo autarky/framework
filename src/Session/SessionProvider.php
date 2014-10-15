@@ -19,8 +19,10 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandl
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 
 use Autarky\Kernel\ServiceProvider;
 use Autarky\Container\ContainerInterface;
@@ -91,15 +93,7 @@ class SessionProvider extends ServiceProvider
 				return new \SessionHandler;
 
 			case 'file':
-				if ($this->config->has('path.session')) {
-					$path = $this->config->get('path.session');
-				} else if ($this->config->has('path.storage')) {
-					$path = $this->config->get('path.storage').'/session';
-				} else {
-					$path = null;
-				}
-
-				return new NativeFileSessionHandler($path);
+				return new NativeFileSessionHandler($this->getSessionPath());
 
 			case 'pdo':
 				$pdo = $container->resolve('Autarky\Database\MultiPdoContainer')
@@ -137,6 +131,48 @@ class SessionProvider extends ServiceProvider
 	 */
 	public function makeSessionStorage(ContainerInterface $container)
 	{
+		if (!$this->config->has('session.storage')) {
+			return $this->legacyMakeSessionStorage($container);
+		}
+
+		$storage = $this->config->get('session.storage');
+
+		if ($storage == 'mock_array') {
+			return new MockArraySessionStorage;
+		}
+		if ($storage == 'mock_file') {
+			return new MockFileSessionStorage;
+		}
+
+		$handler = $container->resolve('SessionHandlerInterface');
+
+		if ($storage == 'bridge') {
+			return new PhpBridgeSessionStorage($handler);
+		}
+
+		$options = $this->config->get('session.storage_options', []);
+
+		if ($storage == 'native') {
+			return new NativeSessionStorage($options, $handler);
+		}
+
+		if (!is_string($storage)) {
+			$storage = gettype($storage);
+		}
+
+		throw new \RuntimeException("Unknown session storage driver: $storage");
+	}
+
+	/**
+	 * Legacy method for making the session storage, for installations that have
+	 * not updated their config to the 0.7 structure.
+	 *
+	 * @param  ContainerInterface $container
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface
+	 */
+	public function legacyMakeSessionStorage(ContainerInterface $container)
+	{
 		if ($this->config->get('session.mock') === true) {
 			return new MockArraySessionStorage;
 		}
@@ -165,5 +201,16 @@ class SessionProvider extends ServiceProvider
 		$session->setName($this->config->get('session.cookie.name', 'autarky_session'));
 
 		return $session;
+	}
+
+	protected function getSessionPath()
+	{
+		if ($this->config->has('path.session')) {
+			return $this->config->get('path.session');
+		} else if ($this->config->has('path.storage')) {
+			return $this->config->get('path.storage').'/session';
+		} else {
+			return null;
+		}
 	}
 }
