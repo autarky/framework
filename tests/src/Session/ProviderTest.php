@@ -48,6 +48,12 @@ class ProviderTest extends TestCase
 			$app->getConfig()->set('session.db_connection', 'default');
 			$app->getConfig()->set('database.connections.default', ['dsn' => 'sqlite::memory:']);
 		}
+		if ($handler == 'mongo') {
+			$app->getContainer()->define('MongoClient', function() { return new \MongoClient(); });
+		}
+		if ($handler == 'memcached') {
+			$app->getContainer()->define('Memcached', function() { return new \Memcached(); });
+		}
 		$app->boot();
 		$this->assertInstanceOf($class, $app->resolve('SessionHandlerInterface'));
 	}
