@@ -32,11 +32,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	protected $resolver;
 
 	/**
-	 * @var \Autarky\Errors\ContextCollectorInterface
-	 */
-	protected $contextCollector;
-
-	/**
 	 * @var \SplDoublyLinkedList
 	 */
 	protected $handlers;
@@ -55,14 +50,10 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 
 	/**
 	 * @param HandlerResolver           $resolver
-	 * @param ContextCollectorInterface $contextCollector
 	 */
-	public function __construct(
-		HandlerResolver $resolver,
-		ContextCollectorInterface $contextCollector
-	) {
+	public function __construct(HandlerResolver $resolver)
+	{
 		$this->resolver = $resolver;
-		$this->contextCollector = $contextCollector;
 		$this->handlers = new SplDoublyLinkedList;
 	}
 

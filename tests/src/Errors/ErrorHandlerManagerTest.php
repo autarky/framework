@@ -19,11 +19,8 @@ class ErrorHandlerManagerTest extends PHPUnit_Framework_TestCase
 
 	protected function makeHandler()
 	{
-		$mockContextCollector = m::mock('Autarky\Errors\ApplicationContextCollector');
-		$mockContextCollector->shouldReceive('getContext')->andReturn([])->byDefault();
 		return new ErrorHandlerManager(
-			new HandlerResolver(new Container),
-			$mockContextCollector
+			new HandlerResolver(new Container)
 		);
 	}
 
@@ -87,11 +84,8 @@ class ErrorHandlerManagerTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function handlersAreResolved()
 	{
-		$mockContextCollector = m::mock('Autarky\Errors\ApplicationContextCollector');
-		$mockContextCollector->shouldReceive('getContext')->andReturn([])->byDefault();
 		$manager = new ErrorHandlerManager(
-			new HandlerResolver($container = new Container),
-			$mockContextCollector
+			new HandlerResolver($container = new Container)
 		);
 		$manager->prependHandler(__NAMESPACE__.'\\StubHandler');
 		$container->params(__NAMESPACE__.'\\StubHandler', ['$ret' => 'resolved handler']);

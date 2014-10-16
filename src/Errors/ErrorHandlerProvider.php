@@ -36,8 +36,7 @@ class ErrorHandlerProvider extends ServiceProvider
 		$debug = $this->app->getConfig()->get('app.debug');
 
 		$manager = new ErrorHandlerManager(
-			new HandlerResolver($dic),
-			new ApplicationContextCollector($this->app)
+			new HandlerResolver($dic)
 		);
 
 		$manager->setDefaultHandler(new DefaultErrorHandler($debug));
