@@ -166,19 +166,23 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		$this->logException($exception);
 
 		foreach ($this->handlers as $index => $handler) {
-			if (is_string($handler)) {
-				$handler = $this->resolver->resolve($handler);
-				$this->handlers->offsetSet($index, $handler);
-			}
+			try {
+				if (is_string($handler)) {
+					$handler = $this->resolver->resolve($handler);
+					$this->handlers->offsetSet($index, $handler);
+				}
 
-			if (!$this->matchesTypehint($handler, $exception)) {
-				continue;
-			}
+				if (!$this->matchesTypehint($handler, $exception)) {
+					continue;
+				}
 
-			$result = $this->callHandler($handler, $exception);
+				$result = $this->callHandler($handler, $exception);
 
-			if ($result !== null) {
-				return $this->makeResponse($result, $exception);
+				if ($result !== null) {
+					return $this->makeResponse($result, $exception);
+				}
+			} catch (Exception $newException) {
+				return $this->handle($newException);
 			}
 		}
 

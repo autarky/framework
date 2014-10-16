@@ -98,6 +98,18 @@ class ErrorHandlerManagerTest extends PHPUnit_Framework_TestCase
 		$response = $manager->handle(new Exception);
 		$this->assertEquals('resolved handler', $response->getContent());
 	}
+
+	/** @test */
+	public function handlersCanThrowExceptions()
+	{
+		$handler = $this->makeHandler();
+		$handler->appendHandler(function(\InvalidArgumentException $e) { return 'foo'; });
+		$handler->appendHandler(function(\RuntimeException $e) { throw new \InvalidArgumentException; });
+		$result = $handler->handle(new \RuntimeException);
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $result);
+		$this->assertEquals('foo', $result->getContent());
+		$this->assertEquals(500, $result->getStatusCode());
+	}
 }
 
 class StubHandler implements \Autarky\Errors\ErrorHandlerInterface {
