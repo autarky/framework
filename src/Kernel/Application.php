@@ -74,11 +74,6 @@ class Application implements HttpKernelInterface
 	protected $errorHandler;
 
 	/**
-	 * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|false
-	 */
-	protected $eventDispatcher;
-
-	/**
 	 * @var \Symfony\Component\Console\Application
 	 */
 	protected $console;
@@ -264,25 +259,6 @@ class Application implements HttpKernelInterface
 	}
 
 	/**
-	 * Get the application's event dispatcher.
-	 *
-	 * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface|null
-	 */
-	public function getEventDispatcher()
-	{
-		if ($this->eventDispatcher === null) {
-			$class = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
-			if ($this->container->isBound($class)) {
-				$this->eventDispatcher = $this->container->resolve($class);
-			} else {
-				$this->eventDispatcher = false;
-			}
-		}
-
-		return $this->eventDispatcher ?: null;
-	}
-
-	/**
 	 * Get the application's request stack.
 	 *
 	 * @return \Symfony\Component\HttpFoundation\RequestStack
@@ -384,8 +360,12 @@ class Application implements HttpKernelInterface
 	{
 		if ($this->kernel !== null) return $this->kernel;
 
+		$class = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
+		$eventDispatcher = $this->container->isBound($class) ?
+			$this->container->resolve($class) : null;
+
 		$kernel = new HttpKernel(
-			$this->getRouter(), $this->errorHandler, $this->requests, $this->getEventDispatcher()
+			$this->getRouter(), $this->errorHandler, $this->requests, $eventDispatcher
 		);
 
 		return $this->kernel = $this->resolveStack()
