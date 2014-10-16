@@ -37,11 +37,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	protected $contextCollector;
 
 	/**
-	 * @var \Closure|\Psr\Log\LoggerInterface
-	 */
-	protected $logger;
-
-	/**
 	 * @var \SplDoublyLinkedList
 	 */
 	protected $handlers;
@@ -83,23 +78,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		} else {
 			$this->rethrow = false;
 		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setLogger($logger)
-	{
-		$this->logger = $logger;
-	}
-
-	protected function getLogger()
-	{
-		if ($this->logger instanceof \Closure) {
-			$this->logger = call_user_func($this->logger);
-		}
-
-		return $this->logger;
 	}
 
 	/**
@@ -163,8 +141,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	{
 		if ($this->rethrow) throw $exception;
 
-		$this->logException($exception);
-
 		foreach ($this->handlers as $index => $handler) {
 			try {
 				if (is_string($handler)) {
@@ -195,20 +171,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	public function handles(Exception $exception)
 	{
 		return true;
-	}
-
-	/**
-	 * Log an exception if a logger has been set.
-	 *
-	 * @param  \Exception $exception
-	 *
-	 * @return void
-	 */
-	protected function logException(Exception $exception)
-	{
-		if ($this->logger === null) return;
-
-		$this->getLogger()->error($exception, $this->contextCollector->getContext());
 	}
 
 	/**
