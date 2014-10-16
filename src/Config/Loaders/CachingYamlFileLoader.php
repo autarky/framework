@@ -28,18 +28,27 @@ class CachingYamlFileLoader implements LoaderInterface
 	/**
 	 * The directory in which to look for cached files.
 	 *
-	 * @var string|null
+	 * @var string
 	 */
 	protected $cacheDir;
 
 	/**
-	 * @param YamlFileLoader $loader
-	 * @param string|null    $cacheDir
+	 * Whether or not to check if cache files are outdated.
+	 *
+	 * @var bool
 	 */
-	public function __construct(YamlFileLoader $loader, $cacheDir = null)
+	protected $stat;
+
+	/**
+	 * @param YamlFileLoader $loader
+	 * @param string         $cacheDir
+	 * @param bool           $stat
+	 */
+	public function __construct(YamlFileLoader $loader, $cacheDir, $stat = true)
 	{
 		$this->loader = $loader;
 		$this->cacheDir = $cacheDir;
+		$this->stat = (bool) $stat;
 	}
 
 	/**
@@ -47,20 +56,29 @@ class CachingYamlFileLoader implements LoaderInterface
 	 */
 	public function load($path)
 	{
-		if ($this->cacheDir !== null) {
-			$cachePath = $this->cacheDir.'/'.md5($path);
-			if (file_exists($cachePath) && filemtime($cachePath) >= filemtime($path)) {
-				return require $cachePath;
-			}
+		$cachePath = $this->cacheDir.'/'.md5($path);
+
+		if ($this->shouldLoadCache($path, $cachePath)) {
+			return require $cachePath;
 		}
 
 		$data = $this->loader->load($path);
 
-		if ($this->cacheDir !== null) {
-			$cachePath = isset($cachePath) ? $cachePath : $this->cacheDir.'/'.md5($path);
-			file_put_contents($cachePath, '<?php return '.var_export($data, true).";\n");
-		}
+		file_put_contents($cachePath, '<?php return '.var_export($data, true).";\n");
 
 		return $data;
+	}
+
+	protected function shouldLoadCache($path, $cachePath)
+	{
+		if (!file_exists($cachePath)) {
+			return false;
+		}
+
+		if (!$this->stat) {
+			return true;
+		}
+
+		return filemtime($cachePath) >= filemtime($path);
 	}
 }
