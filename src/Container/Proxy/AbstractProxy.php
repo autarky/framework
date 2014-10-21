@@ -14,7 +14,14 @@ use Autarky\Container\ContainerInterface;
 
 abstract class AbstractProxy
 {
+	/**
+	 * @var array
+	 */
 	protected static $instances = [];
+
+	/**
+	 * @var ContainerInterface
+	 */
 	protected static $container;
 
 	public static function setProxyContainer(ContainerInterface $container = null)
@@ -25,17 +32,17 @@ abstract class AbstractProxy
 
 	public static function setProxyInstance($instance = null)
 	{
-		static::$instances[static::getProxyIocKey()] = $instance;
+		static::$instances[static::getProxyContainerKey()] = $instance;
 	}
 
 	protected static function resolveProxyInstance()
 	{
-		return static::$container->resolve(static::getProxyIocKey());
+		return static::$container->resolve(static::getProxyContainerKey());
 	}
 
 	public static function __callStatic($method, array $args)
 	{
-		$key = static::getProxyIocKey();
+		$key = static::getProxyContainerKey();
 
 		if (!array_key_exists($key, static::$instances)) {
 			static::$instances[$key] = static::resolveProxyInstance();
@@ -44,6 +51,9 @@ abstract class AbstractProxy
 		return call_user_func_array([static::$instances[$key], $method], $args);
 	}
 
+	/**
+	 * @return string
+	 */
 	protected static function getProxyContainerKey()
 	{
 		// abstract static methods are not allowed, so do this instead

@@ -10,13 +10,6 @@
 
 namespace Autarky\Routing;
 
-use Closure;
-use ReflectionMethod;
-use ReflectionFunction;
-use Symfony\Component\HttpFoundation\Request;
-
-use Autarky\Container\ContainerInterface;
-
 /**
  * Class that represents a single route in the application.
  */

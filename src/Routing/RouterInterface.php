@@ -30,8 +30,8 @@ interface RouterInterface
 	/**
 	 * Add a route to the router.
 	 *
-	 * @param string|array $methods HTTP methods the route should respond to
-	 * @param string       $url     Relative URL the route should respond to. Parameters wrapped in {}
+	 * @param string|array $method  HTTP methods the route should respond to
+	 * @param string       $path    Relative URL the route should respond to. Parameters wrapped in {}
 	 * @param string       $handler string of "class:method" or "global_function"
 	 * @param string       $name    Route name (optional)
 	 */

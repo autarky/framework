@@ -12,8 +12,6 @@ namespace Autarky\Testing;
 
 use PHPUnit_Framework_TestCase;
 
-use Autarky\Kernel\Application;
-
 /**
  * Abstract test case that makes for easy functional testing of your application
  * at the controller level.

@@ -11,7 +11,6 @@
 namespace Autarky\Kernel;
 
 use Closure;
-use Exception;
 use SplPriorityQueue;
 use SplStack;
 use Stack\Builder as StackBuilder;
@@ -24,7 +23,6 @@ use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
 use Autarky\Container\ContainerInterface;
 use Autarky\Errors\ErrorHandlerManagerInterface;
-use Autarky\Routing\RouterInterface;
 
 /**
  * The main application of the framework.

@@ -23,7 +23,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 use Autarky\Kernel\ServiceProvider;
-use Autarky\Container\ContainerInterface;
 
 /**
  * Service provider for symfony's session classes.
@@ -36,40 +35,45 @@ class SessionProvider extends ServiceProvider
 	protected $config;
 
 	/**
+	 * @var \Autarky\Container\ContainerInterface
+	 */
+	protected $dic;
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public function register()
 	{
 		$this->config = $this->app->getConfig();
-		$container = $this->app->getContainer();
+		$this->dic = $this->app->getContainer();
 
-		$container->define('SessionHandlerInterface', [$this, 'makeSessionHandler']);
-		$container->share('SessionHandlerInterface');
+		$this->dic->define('SessionHandlerInterface', [$this, 'makeSessionHandler']);
+		$this->dic->share('SessionHandlerInterface');
 
-		$container->define('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface',
+		$this->dic->define('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface',
 			[$this, 'makeSessionStorage']);
-		$container->share('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface');
+		$this->dic->share('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface');
 
-		$container->define('Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag', function() {
+		$this->dic->define('Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag', function() {
 			return new AttributeBag('_autarky_attributes');
 		});
-		$container->alias(
+		$this->dic->alias(
 			'Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag',
 			'Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface'
 		);
 
-		$container->define('Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag', function() {
+		$this->dic->define('Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag', function() {
 			return new AutoExpireFlashBag('_autarky_flashes');
 		});
-		$container->alias(
+		$this->dic->alias(
 			'Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag',
 			'Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface'
 		);
 
-		$container->define('Symfony\Component\HttpFoundation\Session\Session',
+		$this->dic->define('Symfony\Component\HttpFoundation\Session\Session',
 			[$this, 'makeSession']);
-		$container->share('Symfony\Component\HttpFoundation\Session\Session');
-		$container->alias(
+		$this->dic->share('Symfony\Component\HttpFoundation\Session\Session');
+		$this->dic->alias(
 			'Symfony\Component\HttpFoundation\Session\Session',
 			'Symfony\Component\HttpFoundation\Session\SessionInterface'
 		);
@@ -80,11 +84,9 @@ class SessionProvider extends ServiceProvider
 	/**
 	 * Make the session handler.
 	 *
-	 * @param  ContainerInterface $container
-	 *
 	 * @return \SessionHandlerInterface
 	 */
-	public function makeSessionHandler(ContainerInterface $container)
+	public function makeSessionHandler()
 	{
 		switch ($this->config->get('session.handler')) {
 			case 'native':
@@ -102,21 +104,21 @@ class SessionProvider extends ServiceProvider
 				return new NativeFileSessionHandler($path);
 
 			case 'pdo':
-				$pdo = $container->resolve('Autarky\Database\MultiPdoContainer')
+				$pdo = $this->dic->resolve('Autarky\Database\MultiPdoContainer')
 					->getPdo($this->config->get('session.db_connection'));
 				$options = $this->config->get('session.handler_options', []);
 				return new PdoSessionHandler($pdo, $options);
 
 			case 'mongo':
-				return new MongoDbSessionHandler($container->resolve('MongoClient'),
+				return new MongoDbSessionHandler($this->dic->resolve('MongoClient'),
 					$this->config->get('session.handler_options', []));
 
 			case 'memcache':
-				return new MemcacheSessionHandler($container->resolve('Memcache'),
+				return new MemcacheSessionHandler($this->dic->resolve('Memcache'),
 					$this->config->get('session.handler_options', []));
 
 			case 'memcached':
-				return new MemcachedSessionHandler($container->resolve('Memcached'),
+				return new MemcachedSessionHandler($this->dic->resolve('Memcached'),
 					$this->config->get('session.handler_options', []));
 
 			case 'null':
@@ -131,18 +133,16 @@ class SessionProvider extends ServiceProvider
 	/**
 	 * Make the session storage.
 	 *
-	 * @param  ContainerInterface $container
-	 *
 	 * @return \Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface
 	 */
-	public function makeSessionStorage(ContainerInterface $container)
+	public function makeSessionStorage()
 	{
 		if ($this->config->get('session.mock') === true) {
 			return new MockArraySessionStorage;
 		}
 
 		$options = $this->config->get('session.storage_options', []);
-		$handler = $container->resolve('SessionHandlerInterface');
+		$handler = $this->dic->resolve('SessionHandlerInterface');
 
 		return new NativeSessionStorage($options, $handler);
 	}
@@ -150,16 +150,14 @@ class SessionProvider extends ServiceProvider
 	/**
 	 * Make the session object.
 	 *
-	 * @param  ContainerInterface $container
-	 *
 	 * @return \Symfony\Component\HttpFoundation\Session\Session
 	 */
-	public function makeSession(ContainerInterface $container)
+	public function makeSession()
 	{
 		$session = new Session(
-			$container->resolve('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface'),
-			$container->resolve('Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface'),
-			$container->resolve('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface')
+			$this->dic->resolve('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface'),
+			$this->dic->resolve('Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface'),
+			$this->dic->resolve('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface')
 		);
 
 		$session->setName($this->config->get('session.cookie.name', 'autarky_session'));

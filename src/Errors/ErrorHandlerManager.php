@@ -18,8 +18,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-use Autarky\Kernel\Application;
-
 /**
  * Manager that can handle exceptions as well as keep track of multiple other
  * exception handlers.
@@ -210,7 +208,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	/**
 	 * Transform an exception handler's response into a Response object.
 	 *
-	 * @param  mixed      $result
+	 * @param  mixed      $response
 	 * @param  \Exception $exception
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response
@@ -356,5 +354,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 			return new FatalErrorException($error['message'],
 				$error['type'], 0, $error['file'], $error['line']);
 		}
+
+		return null;
 	}
 }
