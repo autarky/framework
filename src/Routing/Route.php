@@ -61,11 +61,6 @@ class Route
 		$this->methods = $methods;
 		$this->pattern = $pattern;
 		$this->name = $name;
-
-		if (is_string($controller) && !is_callable($controller)) {
-			$controller = \Autarky\splitclm($controller, 'action');
-		}
-
 		$this->controller = $controller;
 	}
 

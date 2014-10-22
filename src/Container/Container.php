@@ -110,7 +110,7 @@ class Container implements ContainerInterface
 	public function define($class, $factory, array $params = array())
 	{
 		if (is_string($factory) && !is_callable($factory)) {
-			$factory = \Autarky\splitclm($factory, 'make');
+			$factory = [$factory, 'make'];
 		}
 
 		if (is_array($factory) && is_string($factory[0])) {
@@ -190,7 +190,7 @@ class Container implements ContainerInterface
 	public function invoke($callable, array $params = array())
 	{
 		if (is_string($callable) && !is_callable($callable)) {
-			$callable = \Autarky\splitclm($callable, 'invoke');
+			$factory = [$factory, 'invoke'];
 		}
 
 		if (is_string($callable) && strpos($callable, '::') !== false) {

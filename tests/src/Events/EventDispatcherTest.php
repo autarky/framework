@@ -27,21 +27,10 @@ class EventDispatcherTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function simpleDispatchWithString()
-	{
-		$this->simpleDispatch(__NAMESPACE__.'\StubListener:bar');
-	}
-
-	/** @test */
-	public function simpleDispatchWithArray()
-	{
-		$this->simpleDispatch([__NAMESPACE__.'\StubListener', 'bar']);
-	}
-
-	protected function simpleDispatch($listener)
+	public function simpleDispatch()
 	{
 		$events = $this->makeDispatcher();
-		$events->addListener('foo', $listener);
+		$events->addListener('foo', [__NAMESPACE__.'\StubListener', 'bar']);
 		$mockEvent = $this->mockEvent();
 		$mockEvent->shouldReceive('doStuff')->once();
 		$event = $events->dispatch('foo', $mockEvent);
