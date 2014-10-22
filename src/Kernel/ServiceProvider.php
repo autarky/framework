@@ -51,4 +51,36 @@ abstract class ServiceProvider
 	 * @return void
 	 */
 	public function registerConsole(ConsoleApplication $console) {}
+
+	/**
+	 * Get the class(es) that must exist for this provider to function.
+	 *
+	 * @return array
+	 */
+	public function getClassDependencies()
+	{
+		return [];
+	}
+
+	/**
+	 * Get the class(es) that must be bound to the container for this provider
+	 * to function.
+	 *
+	 * @return array
+	 */
+	public function getContainerDependencies()
+	{
+		return [];
+	}
+
+	/**
+	 * Get the provider(s) that must be loaded in order for this one to
+	 * function.
+	 *
+	 * @return array
+	 */
+	public function getProviderDependencies()
+	{
+		return [];
+	}
 }
