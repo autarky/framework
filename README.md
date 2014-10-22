@@ -1,10 +1,15 @@
-# Autarky [![Build Status](https://travis-ci.org/autarky/framework.png?branch=master)](https://travis-ci.org/autarky/framework) [![Latest Version](http://img.shields.io/github/release/autarky/framework.svg)](https://github.com/autarky/framework/releases)
+# Autarky
 
-Autarky is a PHP framework for experienced developers and/or quick learners.
+[![Build Status](https://travis-ci.org/autarky/framework.png?branch=master)](https://travis-ci.org/autarky/framework)
+[![Latest Stable Version](https://poser.pugx.org/autarky/framework/v/stable.svg)](https://github.com/autarky/framework/releases)
+![Latest Unstable Version](https://poser.pugx.org/autarky/framework/v/unstable.svg)
+![License](https://poser.pugx.org/autarky/framework/license.svg)
 
-Documentation is available in the [wiki](https://github.com/autarky/framework/wiki).
+Autarky is a PHP framework for experienced developers and/or quick learners, with a focus on developer freedom of choice, configuration over convention and the right mix of rapid/pleasant development and sturdy application architecture.
 
-Changes and upgrade instructions are documented in [releases](https://github.com/autarky/framework/releases).
+Documentation is available in the [wiki](https://github.com/autarky/framework/wiki). [API docs](http://autarky.lutro.me/api/) are also available.
+
+Changelog and upgrade instructions are available in Github's [releases](https://github.com/autarky/framework/releases).
 
 ### Installation
 
