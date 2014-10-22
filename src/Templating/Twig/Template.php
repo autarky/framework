@@ -10,8 +10,6 @@
 
 namespace Autarky\Templating\Twig;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-
 use Autarky\Templating\TemplateEvent;
 use Autarky\Events\EventDispatcherAwareInterface;
 use Autarky\Events\EventDispatcherAwareTrait;

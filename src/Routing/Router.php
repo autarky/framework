@@ -22,9 +22,6 @@ use FastRoute\RouteParser\Std as RouteParser;
 use FastRoute\Dispatcher\GroupCountBased as Dispatcher;
 use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 
-use Autarky\Events\EventDispatcherAwareInterface;
-use Autarky\Events\EventDispatcherAwareTrait;
-
 /**
  * FastRoute implementation of the router.
  */

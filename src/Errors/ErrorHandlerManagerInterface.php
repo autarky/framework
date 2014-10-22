@@ -10,10 +10,6 @@
 
 namespace Autarky\Errors;
 
-use Exception;
-
-use Autarky\Kernel\Application;
-
 /**
  * The framework's error handler that takes care of caught and uncaught
  * exceptions as well as fatal PHP errors.

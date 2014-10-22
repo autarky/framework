@@ -59,6 +59,7 @@ class UrlGenerator
 	 *
 	 * @param  string $name
 	 * @param  array  $params
+	 * @param  bool   $relative
 	 *
 	 * @return string
 	 */

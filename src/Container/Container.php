@@ -10,7 +10,6 @@
 
 namespace Autarky\Container;
 
-use Closure;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
@@ -115,7 +114,7 @@ class Container implements ContainerInterface
 		}
 
 		if (is_array($factory) && is_string($factory[0])) {
-			$factory = function($container) use($factory) {
+			$factory = function(ContainerInterface $container) use($factory) {
 				return $container->invoke($factory);
 			};
 		}

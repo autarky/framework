@@ -12,8 +12,6 @@ namespace Autarky\Errors;
 
 use Exception;
 
-use Autarky\Kernel\Application;
-
 /**
  * Stub error handler that simply re-throws the exceptions given.
  *

@@ -29,14 +29,14 @@ class ProxyTest extends TestCase
 
 class StubProxy extends AbstractProxy
 {
-	protected static function getProxyIocKey()
+	protected static function getProxyContainerKey()
 	{
 		return 'foo';
 	}
 }
 class StubProxyTwo extends AbstractProxy
 {
-	protected static function getProxyIocKey()
+	protected static function getProxyContainerKey()
 	{
 		return 'baz';
 	}

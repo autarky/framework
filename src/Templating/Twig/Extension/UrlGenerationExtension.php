@@ -10,7 +10,6 @@
 
 namespace Autarky\Templating\Twig\Extension;
 
-use Symfony\Component\HttpFoundation\RequestStack;
 use Twig_Extension;
 use Twig_SimpleFunction;
 
