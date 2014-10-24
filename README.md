@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/autarky/framework.png?branch=master)](https://travis-ci.org/autarky/framework)
 [![Latest Stable Version](https://poser.pugx.org/autarky/framework/v/stable.svg)](https://github.com/autarky/framework/releases)
-![Latest Unstable Version](https://poser.pugx.org/autarky/framework/v/unstable.svg)
-![License](https://poser.pugx.org/autarky/framework/license.svg)
+[![Latest Unstable Version](https://poser.pugx.org/autarky/framework/v/unstable.svg)](https://github.com/autarky/framework/branches/active)
+[![License](https://poser.pugx.org/autarky/framework/license.svg)](http://opensource.org/licenses/MIT)
 
 Autarky is a PHP framework for experienced developers and/or quick learners, with a focus on developer freedom of choice, configuration over convention and the right mix of rapid/pleasant development and sturdy application architecture.
 
