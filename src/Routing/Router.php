@@ -320,26 +320,9 @@ class Router implements RouterInterface
 	 */
 	public function dispatch(Request $request)
 	{
-		$method = $request->getMethod();
-		$path = $request->getPathInfo() ?: '/';
+		$route = $this->getRouteForRequest($request);
 
-		$result = $this->getDispatcher()
-			->dispatch($method, $path);
-
-		switch ($result[0]) {
-			case \FastRoute\Dispatcher::FOUND:
-				return $this->getResponse($request, $result[1], $result[2]);
-
-			case \FastRoute\Dispatcher::NOT_FOUND:
-				throw new NotFoundHttpException("No route match for path $path");
-
-			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-				throw new MethodNotAllowedHttpException($result[1],
-					"Method $method not allowed for path $path");
-
-			default:
-				throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
-		}
+		return $this->getResponse($request, $route, $route->getParams());
 	}
 
 	public function getRouteForRequest(Request $request)
@@ -350,31 +333,29 @@ class Router implements RouterInterface
 		$result = $this->getDispatcher()
 			->dispatch($method, $path);
 
-		switch ($result[0]) {
-			case \FastRoute\Dispatcher::FOUND:
-				return $result[1];
-
-			case \FastRoute\Dispatcher::NOT_FOUND:
-				throw new NotFoundHttpException("No route match for path $path");
-
-			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-				throw new MethodNotAllowedHttpException($result[1],
-					"Method $method not allowed for path $path");
-
-			default:
-				throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
+		if ($result[0] == \FastRoute\Dispatcher::NOT_FOUND) {
+			throw new NotFoundHttpException("No route match for path $path");
+		} else if ($result[0] == \FastRoute\Dispatcher::METHOD_NOT_ALLOWED) {
+			throw new MethodNotAllowedHttpException($result[1],
+				"Method $method not allowed for path $path");
+		} else if ($result[0] !== \FastRoute\Dispatcher::FOUND) {
+			throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
 		}
+
+		$result[1]->setParams($result[2]);
+
+		if ($this->eventDispatcher !== null) {
+			$event = new Events\RouteMatchedEvent($request, $result[1]);
+			$this->eventDispatcher->dispatch('route.match', $event);
+			$result[1] = $event->getRoute();
+		}
+
+		return $result[1];
 	}
 
 	protected function getResponse(Request $request, Route $route, array $params)
 	{
 		$params = $this->getContainerParams($params, $request);
-
-		if ($this->eventDispatcher !== null) {
-			$event = new Events\RouteMatchedEvent($request, $route);
-			$this->eventDispatcher->dispatch('route.match', $event);
-			$route = $event->getRoute();
-		}
 
 		$this->currentRoute = $route;
 

@@ -52,6 +52,8 @@ class Route
 	 */
 	protected $afterFilters = [];
 
+	protected $params;
+
 	/**
 	 * @param array    $methods    HTTP methods allowed for this route
 	 * @param string   $pattern
@@ -173,6 +175,16 @@ class Route
 	public function getController()
 	{
 		return $this->controller;
+	}
+
+	public function setParams(array $params)
+	{
+		$this->params = $params;
+	}
+
+	public function getParams()
+	{
+		return $this->params;
 	}
 
 	/**
