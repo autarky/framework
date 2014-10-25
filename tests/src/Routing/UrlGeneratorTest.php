@@ -26,13 +26,25 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 		return [$router, new UrlGenerator($router, $requests)];
 	}
 
-	/** @test */
-	public function urlGeneration()
+	/**
+	 * @test
+	 * @dataProvider getUrlGenerationData
+	 */
+	public function urlGeneration($path, array $params, $expected)
 	{
 		list($router, $url) = $this->makeRouterAndGenerator(Request::create('/'));
-		$router->addRoute('get', '/foo/{v}', function() {}, 'name');
-		$this->assertEquals('//localhost/foo/bar', $url->getRouteUrl('name', ['bar']));
-		$this->assertEquals('/foo/bar', $url->getRouteUrl('name', ['bar'], true));
+		$router->addRoute('get', $path, function() {}, 'name');
+		$this->assertEquals('//localhost'.$expected, $url->getRouteUrl('name', $params));
+		$this->assertEquals($expected, $url->getRouteUrl('name', $params, true));
+	}
+
+	public function getUrlGenerationData()
+	{
+		return [
+			['/foo/{v}', ['bar'], '/foo/bar'],
+			['/foo/{v:[a-z]+}', ['bar'], '/foo/bar'],
+			['/foo/{v:[0-9]+}', [123], '/foo/123'],
+		];
 	}
 
 	/** @test */
