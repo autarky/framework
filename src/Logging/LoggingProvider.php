@@ -32,12 +32,6 @@ class LoggingProvider extends ServiceProvider
 		$dic->define('Monolog\Logger', [$this, 'makeLogger']);
 		$dic->share('Monolog\Logger');
 		$dic->alias('Monolog\Logger', 'Psr\Log\LoggerInterface');
-
-		if ($errorHandler = $this->app->getErrorHandler()) {
-			$errorHandler->setLogger(function() {
-				return $this->app->resolve('Psr\Log\LoggerInterface');
-			});
-		}
 	}
 
 	public function makeLogger()
