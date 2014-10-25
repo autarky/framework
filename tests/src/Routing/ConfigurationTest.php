@@ -17,7 +17,7 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
 		$router = $this->mockRouter();
 		$data = $this->getRouteData();
 		$config = $this->makeConfig($router, $data, 'namespace');
-		$router->shouldReceive('addRoute')->once()->with(['get'], '/path', 'foo:bar', 'namespace:foobar');
+		$router->shouldReceive('addRoute')->once()->with(['get'], '/path', ['foo', 'bar'], 'namespace:foobar');
 		$config->mount();
 	}
 
@@ -28,7 +28,7 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
 		$data = $this->getRouteData();
 		$config = $this->makeConfig($router, $data);
 		$config->override('foobar', ['methods' => ['get', 'post']]);
-		$router->shouldReceive('addRoute')->once()->with(['get', 'post'], '/path', 'foo:bar', 'foobar');
+		$router->shouldReceive('addRoute')->once()->with(['get', 'post'], '/path', ['foo', 'bar'], 'foobar');
 		$config->mount();
 	}
 
@@ -42,7 +42,7 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
 		return [
 			'foobar' => [
 				'methods' => ['get'],
-				'handler' => 'foo:bar',
+				'controller' => ['foo', 'bar'],
 				'path' => '/path',
 			],
 		];

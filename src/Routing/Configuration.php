@@ -103,7 +103,8 @@ class Configuration
 			}
 
 			$path = $route['path'];
-			$handler = $route['handler'];
+			$controller = isset($route['controller']) ?
+				$route['controller'] : $route['handler'];
 
 			if (array_key_exists('methods', $route)) {
 				$methods = (array) $route['methods'];
@@ -113,7 +114,7 @@ class Configuration
 				$methods = ['GET'];
 			}
 
-			$this->router->addRoute($methods, $path, $handler, $name);
+			$this->router->addRoute($methods, $path, $controller, $name);
 		}
 	}
 }
