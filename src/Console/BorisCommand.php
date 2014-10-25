@@ -25,7 +25,7 @@ class BorisCommand extends Command
 	protected function configure()
 	{
 		$this->setName('boris')
-			->setDescription('Start an interactive boris shell.');
+			->setDescription('Start an interactive boris shell');
 	}
 
 	/**

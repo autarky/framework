@@ -20,9 +20,9 @@ class RouteDispatchCommand extends Command
 	public function configure()
 	{
 		$this->setName('route:dispatch')
-			->setDescription('Given a URL, see what route is matched.')
-			->addArgument('method', InputArgument::REQUIRED, 'HTTP method.')
-			->addArgument('path', InputArgument::REQUIRED, 'A URL path.')
+			->setDescription('Given a URL, see what route is matched')
+			->addArgument('method', InputArgument::REQUIRED, 'HTTP method')
+			->addArgument('path', InputArgument::REQUIRED, 'URL path')
 			;
 	}
 
