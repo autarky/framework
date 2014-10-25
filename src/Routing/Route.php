@@ -66,6 +66,16 @@ class Route
 		$this->controller = $controller;
 	}
 
+	public function getMethods()
+	{
+		return $this->methods;
+	}
+
+	public function getPattern()
+	{
+		return $this->pattern;
+	}
+
 	/**
 	 * Given a set of parameters, get the relative path to the route.
 	 *

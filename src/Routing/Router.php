@@ -108,6 +108,11 @@ class Router implements RouterInterface
 		);
 	}
 
+	public function getRoutes()
+	{
+		return $this->namedRoutes;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -324,6 +329,30 @@ class Router implements RouterInterface
 		switch ($result[0]) {
 			case \FastRoute\Dispatcher::FOUND:
 				return $this->getResponse($request, $result[1], $result[2]);
+
+			case \FastRoute\Dispatcher::NOT_FOUND:
+				throw new NotFoundHttpException("No route match for path $path");
+
+			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+				throw new MethodNotAllowedHttpException($result[1],
+					"Method $method not allowed for path $path");
+
+			default:
+				throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
+		}
+	}
+
+	public function getRouteForRequest(Request $request)
+	{
+		$method = $request->getMethod();
+		$path = $request->getPathInfo() ?: '/';
+
+		$result = $this->getDispatcher()
+			->dispatch($method, $path);
+
+		switch ($result[0]) {
+			case \FastRoute\Dispatcher::FOUND:
+				return $result[1];
 
 			case \FastRoute\Dispatcher::NOT_FOUND:
 				throw new NotFoundHttpException("No route match for path $path");
