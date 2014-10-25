@@ -10,6 +10,8 @@
 
 namespace Autarky\Routing;
 
+use FastRoute\RouteParser\Std as FastRoute;
+
 /**
  * Class that represents a single route in the application.
  */
@@ -83,7 +85,7 @@ class Route
 			return array_shift($params);
 		};
 
-		$path = preg_replace_callback('/\{\w+\}/', $callback, $this->pattern);
+		$path = preg_replace_callback(FastRoute::VARIABLE_REGEX, $callback, $this->pattern);
 
 		if (count($params) > 0) {
 			$path .= '?' . http_build_query($params);
