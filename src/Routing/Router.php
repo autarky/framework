@@ -108,6 +108,11 @@ class Router implements RouterInterface
 		);
 	}
 
+	public function isCaching()
+	{
+		return $this->dispatchData !== null;
+	}
+
 	public function getRoutes()
 	{
 		return $this->namedRoutes;
@@ -194,6 +199,10 @@ class Router implements RouterInterface
 	 */
 	public function mount(array $routes, $path = '/')
 	{
+		if ($this->isCaching()) {
+			return;
+		}
+
 		(new Configuration($this, $routes))
 			->mount($path);
 	}
@@ -203,6 +212,10 @@ class Router implements RouterInterface
 	 */
 	public function group(array $flags, Closure $callback)
 	{
+		if ($this->isCaching()) {
+			return;
+		}
+
 		$oldPrefix = $this->currentPrefix;
 		$oldFilters = $this->currentFilters;
 
@@ -238,9 +251,7 @@ class Router implements RouterInterface
 	 */
 	public function addRoute($methods, $url, $handler, $name = null)
 	{
-		// if dispatchData is set, we're using cached data and routes can no
-		// longer be added.
-		if ($this->dispatchData !== null) {
+		if ($this->isCaching()) {
 			return null;
 		}
 
