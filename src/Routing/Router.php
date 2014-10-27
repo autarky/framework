@@ -77,6 +77,11 @@ class Router implements RouterInterface
 	protected $filters = [];
 
 	/**
+	 * @var \SplObjectStorage
+	 */
+	protected $routes;
+
+	/**
 	 * @var array
 	 */
 	protected $namedRoutes = [];
@@ -91,6 +96,7 @@ class Router implements RouterInterface
 		EventDispatcherInterface $eventDispatcher,
 		$cachePath = null
 	) {
+		$this->routes = new \SplObjectStorage;
 		$this->invoker = $invoker;
 		$this->eventDispatcher = $eventDispatcher;
 
@@ -115,7 +121,7 @@ class Router implements RouterInterface
 
 	public function getRoutes()
 	{
-		return $this->namedRoutes;
+		return $this->routes;
 	}
 
 	/**
@@ -249,23 +255,24 @@ class Router implements RouterInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function addRoute($methods, $url, $handler, $name = null)
+	public function addRoute($methods, $path, $controller, $name = null)
 	{
 		if ($this->isCaching()) {
 			return null;
 		}
 
 		$methods = (array) $methods;
-		$url = $this->makePath($url);
+		$path = $this->makePath($path);
 
-		$route = $this->createRoute($methods, $url, $handler, $name);
+		$route = $this->createRoute($methods, $path, $controller, $name);
+		$this->routes->attach($route);
 
 		if ($name) {
 			$this->addNamedRoute($name, $route);
 		}
 
-		foreach ($methods as $method) {
-			$this->routeCollector->addRoute(strtoupper($method), $url, $route);
+		foreach ($route->getMethods() as $method) {
+			$this->routeCollector->addRoute($method, $path, $route);
 		}
 
 		return $route;
@@ -303,9 +310,9 @@ class Router implements RouterInterface
 		$this->namedRoutes[$name] = $route;
 	}
 
-	protected function createRoute($methods, $url, $handler, $name)
+	protected function createRoute($methods, $path, $controller, $name)
 	{
-		$route = new Route($methods, $url, $handler, $name);
+		$route = new Route($methods, $path, $controller, $name);
 
 		foreach ($this->currentFilters as $filter) {
 			$route->addFilter($filter[0], $filter[1]);

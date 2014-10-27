@@ -62,7 +62,7 @@ class Route
 	 */
 	public function __construct(array $methods, $pattern, $controller, $name = null)
 	{
-		$this->methods = $methods;
+		$this->methods = array_map('strtoupper', $methods);
 		$this->pattern = $pattern;
 		$this->name = $name;
 		$this->controller = $controller;

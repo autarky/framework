@@ -48,6 +48,24 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
 		];
 	}
 
+	/** @test */
+	public function canRegisterMultiControllers()
+	{
+		$router = $this->mockRouter();
+		$config = $this->makeConfig($router, [
+			'name' => [
+				'path' => '/path',
+				'methods' => [
+					'get' => ['Controller', 'get'],
+					'post' => ['Controller', 'post'],
+				],
+			],
+		]);
+		$router->shouldReceive('addRoute')->with(['get'], '/path', ['Controller', 'get'], 'name')->once();
+		$router->shouldReceive('addRoute')->with(['post'], '/path', ['Controller', 'post'], null)->once();
+		$config->mount();
+	}
+
 	protected function mockRouter()
 	{
 		return m::mock('Autarky\Routing\RouterInterface');
