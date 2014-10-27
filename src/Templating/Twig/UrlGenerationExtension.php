@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Templating\Twig\Extension;
+namespace Autarky\Templating\Twig;
 
 use Twig_Extension;
 use Twig_SimpleFunction;
