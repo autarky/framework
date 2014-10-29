@@ -31,11 +31,11 @@ class ArrayUtils
 		}
 
 		foreach (explode('.', $key) as $segment) {
-			if (!array_key_exists($segment, $data)) {
+			if (!is_array($data)) {
 				return $default;
 			}
 
-			if (!is_array($data)) {
+			if (!array_key_exists($segment, $data)) {
 				return $default;
 			}
 
