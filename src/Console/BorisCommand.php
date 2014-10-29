@@ -10,6 +10,7 @@
 
 namespace Autarky\Console;
 
+use Boris\Boris;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,12 +21,29 @@ use Symfony\Component\Console\Output\OutputInterface;
 class BorisCommand extends Command
 {
 	/**
+	 * The boris instance.
+	 *
+	 * @var Boris
+	 */
+	protected $boris;
+
+	/**
 	 * {@inheritdoc}
 	 */
 	protected function configure()
 	{
 		$this->setName('boris')
 			->setDescription('Start an interactive boris shell');
+	}
+
+	/**
+	 * Set the boris instance.
+	 *
+	 * @param Boris $boris
+	 */
+	public function setBoris(Boris $boris)
+	{
+		$this->boris = $boris;
 	}
 
 	/**
@@ -40,7 +58,7 @@ class BorisCommand extends Command
 		// prevent the error handler from outputting any information
 		$this->app->getErrorHandler()->prependHandler(function($e) { return ''; });
 
-		$boris = new \Boris\Boris('> ');
+		$boris = $this->boris ?: new \Boris\Boris('> ');
 
 		// make the $app variable available
 		$boris->setLocal(['app' => $this->app]);
