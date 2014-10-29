@@ -26,7 +26,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function environmentClosureIsResolvedOnBoot()
+	public function environmentClosureIsInvoked()
 	{
 		$app = $this->makeApplication([], function() { return 'testenv'; });
 		$app->boot();
@@ -42,7 +42,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function pushStringMiddleware()
+	public function canAddClassNameStringAsMiddleware()
 	{
 		$app = $this->makeApplication();
 		$this->returnResponse($app, 'foo');
@@ -52,7 +52,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function pushClosureMiddleware()
+	public function canAddClosureAsMiddleware()
 	{
 		$app = $this->makeApplication();
 		$this->returnResponse($app, 'foo');
@@ -62,7 +62,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function pushArrayMiddleware()
+	public function canAddCallableArrayAsMiddleware()
 	{
 		$app = $this->makeApplication();
 		$this->returnResponse($app, 'foo');
@@ -72,7 +72,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function pushMiddlewarePriority()
+	public function canSetMiddlewarePriority()
 	{
 		$app = $this->makeApplication();
 		$this->returnResponse($app, 'foo');
@@ -104,7 +104,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function serviceProvidersAreCalled()
+	public function serviceProvidersAreCalledOnBoot()
 	{
 		$app = $this->makeApplication([__NAMESPACE__.'\\StubServiceProvider']);
 		$app->boot();

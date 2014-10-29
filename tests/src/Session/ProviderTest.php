@@ -73,7 +73,7 @@ class ProviderTest extends TestCase
 	}
 
 	/** @test */
-	public function writeCheckHandler()
+	public function handlerIsWrappedInWriteCheckHandlerIfConfigured()
 	{
 		$app = $this->makeApplication([new SessionProvider]);
 		$app->getConfig()->set('session.handler', 'null');

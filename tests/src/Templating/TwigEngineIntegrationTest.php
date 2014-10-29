@@ -22,7 +22,7 @@ class TwigEngineIntegrationTest extends TestCase
 		return $app;
 	}
 
-	public function makeEngine(array $providers = array())
+	protected function makeEngine(array $providers = array())
 	{
 		$this->app = $this->makeApplication($providers);
 		$this->app->boot();
@@ -30,7 +30,7 @@ class TwigEngineIntegrationTest extends TestCase
 	}
 
 	/** @test */
-	public function extendLayout()
+	public function extendLayoutWorks()
 	{
 		$eng = $this->makeEngine();
 		$result = $eng->render('template.twig');
@@ -38,7 +38,7 @@ class TwigEngineIntegrationTest extends TestCase
 	}
 
 	/** @test */
-	public function urlGeneration()
+	public function urlGenerationViaUrlFunctionWorks()
 	{
 		$eng = $this->makeEngine(['Autarky\Routing\RoutingProvider']);
 		$this->app->getRequestStack()->push(Request::create('/'));
@@ -49,7 +49,7 @@ class TwigEngineIntegrationTest extends TestCase
 	}
 
 	/** @test */
-	public function partial()
+	public function partialFunctionWorks()
 	{
 		$eng = $this->makeEngine();
 		$mock = m::mock(['bar' => 'baz']);
@@ -59,7 +59,7 @@ class TwigEngineIntegrationTest extends TestCase
 	}
 
 	/** @test */
-	public function assetUrl()
+	public function assetUrlGenerationWorksViaAssetFunction()
 	{
 		$eng = $this->makeEngine(['Autarky\Routing\RoutingProvider']);
 		$this->app->getRequestStack()->push(Request::create('/index.php/foo/bar'));
@@ -68,7 +68,7 @@ class TwigEngineIntegrationTest extends TestCase
 	}
 
 	/** @test */
-	public function sessionMessages()
+	public function sessionMessagesAreAvailableAsGlobals()
 	{
 		$eng = $this->makeEngine(['Autarky\Session\SessionProvider']);
 		$session = $this->app->resolve('Symfony\Component\HttpFoundation\Session\Session');
@@ -79,7 +79,7 @@ class TwigEngineIntegrationTest extends TestCase
 	}
 
 	/** @test */
-	public function namespacedTemplate()
+	public function namespacedTemplatesCanBeRendered()
 	{
 		$eng = $this->makeEngine();
 		$eng->addNamespace('namespace', TESTS_RSC_DIR.'/templates/vendor/namespace');
@@ -88,7 +88,7 @@ class TwigEngineIntegrationTest extends TestCase
 	}
 
 	/** @test */
-	public function namespacedTemplateOverriding()
+	public function namespacedTemplatesCanBeOverridden()
 	{
 		$eng = $this->makeEngine();
 		$eng->addNamespace('namespace', TESTS_RSC_DIR.'/templates/vendor/namespace');
@@ -97,7 +97,7 @@ class TwigEngineIntegrationTest extends TestCase
 	}
 
 	/** @test */
-	public function eventsAreFired()
+	public function eventsAreFiredWhenTemplatesAreCreatedAndRendered()
 	{
 		$eng = $this->makeEngine();
 		$eng->setEventDispatcher($dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher);

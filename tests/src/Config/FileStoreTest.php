@@ -23,7 +23,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function canHas()
+	public function hasReturnsCorrectly()
 	{
 		$config = $this->makeConfig();
 		$this->assertEquals(true, $config->has('testfile.foo'));
@@ -31,14 +31,14 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function canGet()
+	public function getReturnsCorrectValue()
 	{
 		$config = $this->makeConfig();
 		$this->assertEquals('bar', $config->get('testfile.foo'));
 	}
 
 	/** @test */
-	public function canSet()
+	public function setChangesValueInMemory()
 	{
 		$config = $this->makeConfig();
 		$config->set('testfile.foo', 'baz');
@@ -46,7 +46,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function canGetAndSet()
+	public function setWorksAfterGetting()
 	{
 		$config = $this->makeConfig();
 		$this->assertEquals('bar', $config->get('testfile.foo'));
@@ -55,29 +55,29 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function getNonexistantKeys()
+	public function callingGetOnNonexistantKeysReturnsNull()
 	{
 		$config = $this->makeConfig();
 		$this->assertEquals(null, $config->get('testfile.bar'));
-		$this->assertEquals(null, $config->get('testfile.bar.baz'));
+		$this->assertEquals(null, $config->get('testfile.foo.bar'));
 	}
 
 	/** @test */
-	public function getDefault()
+	public function getReturnsDefaultWhenKeyNotFound()
 	{
 		$config = $this->makeConfig();
 		$this->assertEquals('bar', $config->get('testfile.bar', 'bar'));
 	}
 
 	/** @test */
-	public function environmentOverrides()
+	public function valuesAreOverridenDependingOnEnvironment()
 	{
 		$config = $this->makeConfig('dummyenv');
 		$this->assertEquals('baz', $config->get('testfile.foo'));
 	}
 
 	/** @test */
-	public function addNamespace()
+	public function addNamespaceAndGetValueFromIt()
 	{
 		$config = $this->makeConfig();
 		$config->addNamespace('namespace', $this->getConfigPath().'/vendor/namespace');
@@ -85,7 +85,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function setNamespaceLoadsData()
+	public function settingNamespacedDataLoadsTheRestOfTheNamespacedDataCorrectly()
 	{
 		$config = $this->makeConfig();
 		$config->addNamespace('namespace', $this->getConfigPath().'/vendor/namespace');
@@ -95,7 +95,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function overrideNamespace()
+	public function overrideNamespaceWithCustomPath()
 	{
 		$config = $this->makeConfig();
 		$config->addNamespace('namespace', $this->getConfigPath().'/vendor/namespace');
@@ -103,7 +103,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function namespaceInEnvironment()
+	public function environmentOverridesWorkForNamespacedConfigs()
 	{
 		$config = $this->makeConfig('dummyenv');
 		$config->addNamespace('namespace', $this->getConfigPath().'/vendor/namespace');
@@ -111,7 +111,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function notArrayThrowsException()
+	public function fileReturningNonArrayThrowsException()
 	{
 		$this->setExpectedException('RuntimeException');
 		$config = $this->makeConfig();
@@ -119,7 +119,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function customLoaderIsCalled()
+	public function customConfigFileLoaderIsCalled()
 	{
 		$config = $this->makeConfig();
 		$config->getLoaderFactory()->addLoader('mock', m::mock(['load' => ['foo' => 'bar']]));

@@ -10,7 +10,7 @@ class ArrayUtilsTest extends TestCase
 	 * @test
 	 * @dataProvider getGetData
 	 */
-	public function get(array $data, $key, $expected)
+	public function getCallReturnsCorrectValue(array $data, $key, $expected)
 	{
 		$this->assertEquals($expected, ArrayUtils::get($data, $key));
 	}
@@ -32,7 +32,7 @@ class ArrayUtilsTest extends TestCase
 	 * @test
 	 * @dataProvider getSetData
 	 */
-	public function set(array $input, $key, $value, array $expected)
+	public function setCallSetsCorrectKeyToValue(array $input, $key, $value, array $expected)
 	{
 		ArrayUtils::set($input, $key, $value);
 		$this->assertEquals($expected, $input);
@@ -84,7 +84,7 @@ class ArrayUtilsTest extends TestCase
 	 * @test
 	 * @dataProvider getHasData
 	 */
-	public function has(array $input, $key, $result)
+	public function hasCallReturnsCorrectly(array $input, $key, $result)
 	{
 		$this->assertEquals($result, ArrayUtils::has($input, $key));
 	}

@@ -5,8 +5,6 @@ use Mockery as m;
 use PHPUnit_Framework_TestCase;
 
 use Autarky\Events\EventDispatcher;
-use Autarky\Events\ListenerResolver;
-use Autarky\Container\Container;
 
 class EventDispatcherTest extends PHPUnit_Framework_TestCase
 {
@@ -27,10 +25,12 @@ class EventDispatcherTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function simpleDispatch()
+	public function listenersAreResolved()
 	{
-		$events = $this->makeDispatcher();
-		$events->addListener('foo', [__NAMESPACE__.'\StubListener', 'bar']);
+		$resolver = m::mock('Autarky\Events\ListenerResolver');
+		$events = new EventDispatcher($resolver);
+		$resolver->shouldReceive('resolve')->with('class')->once()->andReturn(new StubListener);
+		$events->addListener('foo', ['class', 'bar']);
 		$mockEvent = $this->mockEvent();
 		$mockEvent->shouldReceive('doStuff')->once();
 		$event = $events->dispatch('foo', $mockEvent);
@@ -40,23 +40,10 @@ class EventDispatcherTest extends PHPUnit_Framework_TestCase
 
 class StubListener
 {
-	public function __construct(StubDependency $dep)
-	{
-		$this->dep = $dep;
-	}
-
 	public function bar($event)
 	{
-		$this->dep->doStuff($event);
-		return $event;
-	}
-}
-
-class StubDependency
-{
-	public function doStuff($event)
-	{
 		$event->doStuff();
+		return $event;
 	}
 }
 

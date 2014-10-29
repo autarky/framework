@@ -21,7 +21,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function shareClosure()
+	public function defineSharedServiceWithClosure()
 	{
 		$c = $this->makeContainer();
 		$c->define('foo', function() { return new \StdClass; });
@@ -30,18 +30,19 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function alias()
+	public function defineSharedServiceAndAliasIt()
 	{
 		$c = $this->makeContainer();
-		$c->define('foo', function() { return new LowerClass; });
-		$c->share('foo');
-		$c->alias('foo', __NAMESPACE__.'\\LowerClass');
+		$c->define(__NAMESPACE__.'\\LowerClass', function() { return new LowerClass; });
+		$c->share(__NAMESPACE__.'\\LowerClass');
+		$c->alias(__NAMESPACE__.'\\LowerClass', 'foo');
 		$this->assertTrue($c->isBound(__NAMESPACE__.'\\LowerClass'));
+		$this->assertTrue($c->isBound('foo'));
 		$this->assertSame($c->resolve('foo'), $c->resolve(__NAMESPACE__.'\\UpperClass')->cl);
 	}
 
 	/** @test */
-	public function instance()
+	public function putInstanceOntoContainer()
 	{
 		$c = $this->makeContainer();
 		$c->instance('foo', $o = new \StdClass);
@@ -50,7 +51,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function shareWithoutFactory()
+	public function shareWithoutDefiningFirst()
 	{
 		$c = $this->makeContainer();
 		$c->share('StdClass');
@@ -67,7 +68,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function externalClassFactory()
+	public function defineWithResolvableFactoryArray()
 	{
 		$c = $this->makeContainer();
 		$c->define('foo', [__NAMESPACE__.'\\StubFactory', 'makeFoo']);
@@ -75,7 +76,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function aliasedInterfaceFactory()
+	public function defineWithResolvableFactoryArrayWithAliasedInterface()
 	{
 		$c = $this->makeContainer();
 		$c->define('foo', [__NAMESPACE__.'\\StubFactoryInterface', 'makeFoo']);
@@ -84,7 +85,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function resolveDependencies()
+	public function automaticallyResolvesDependencies()
 	{
 		$c = $this->makeContainer();
 		$o1 = $c->resolve(__NAMESPACE__ .'\\UpperClass');
@@ -96,7 +97,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function resolveSharedDependencies()
+	public function automaticallyResolvesDependenciesIncludingSharedInstances()
 	{
 		$c = $this->makeContainer();
 		$c->share(__NAMESPACE__.'\\LowerClass');
@@ -152,7 +153,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function paramsAreMerged()
+	public function multipleParamCallsAddUp()
 	{
 		$c = $this->makeContainer();
 		$c->params(__NAMESPACE__.'\ParamStub', ['$foo' => 'old_foo']);
@@ -163,7 +164,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function containerAware()
+	public function setContainerIsCalledOnContainerAwareInterfaceClasses()
 	{
 		$c = $this->makeContainer();
 		$o = $c->resolve(__NAMESPACE__.'\ContainerAware');
@@ -171,7 +172,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function boundReturnsTrueWhenBound()
+	public function isBoundReturnsTrueWhenBound()
 	{
 		$c = $this->makeContainer();
 
@@ -213,7 +214,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function canResolveWithDependencyDefaultValue()
+	public function resolveWithNonClassDependencyThatHasDefaultValue()
 	{
 		$c = $this->makeContainer();
 		$o = $c->resolve(__NAMESPACE__.'\\DefaultValueStub');
@@ -251,7 +252,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function invokeInvokes()
+	public function invokeCanInvokeClosure()
 	{
 		$c = $this->makeContainer();
 		$retval = $c->invoke(function() { return 42; });
@@ -259,7 +260,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function canInvokeObjectMethod()
+	public function invokeCanInvokeObjectMethod()
 	{
 		$c = $this->makeContainer();
 		$retval = $c->invoke([new StubFactory, 'makeFoo']);
