@@ -16,6 +16,14 @@ namespace Autarky\Support;
 class ArrayUtils
 {
 	/**
+	 * This class is a static class and should not be instantiated.
+	 */
+	private function __construct()
+	{
+		//
+	}
+
+	/**
 	 * Get an element from an array.
 	 *
 	 * @param  array  $data

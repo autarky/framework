@@ -33,7 +33,13 @@ class BorisCommand extends Command
 	protected function configure()
 	{
 		$this->setName('boris')
-			->setDescription('Start an interactive boris shell');
+			->setDescription('Start an interactive boris shell')
+			->setHelp(<<<'EOS'
+If the package d11wtq/boris is installed via composer, this command will start an interactive PHP shell where you can play around in an application-like environment.
+
+The main instance of Autarky\Kernel\Application is available as the global variable $app.
+EOS
+);
 	}
 
 	/**
@@ -63,6 +69,9 @@ class BorisCommand extends Command
 		// make the $app variable available
 		$boris->setLocal(['app' => $this->app]);
 
+		// this will loop forever until ctrl+C is pressed
 		$boris->start();
+
+		return 0;
 	}
 }

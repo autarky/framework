@@ -16,12 +16,22 @@ use Symfony\Component\Console\Helper\Table;
 
 class RouteListCommand extends Command
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function configure()
 	{
 		$this->setName('route:list')
-			->setDescription('Show a list of routes');
+			->setDescription('Show a list of routes')
+			->setHelp(<<<'EOS'
+Shows a list of all routes registered, their name, controller, path and filters.
+EOS
+);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$table = new Table($output);

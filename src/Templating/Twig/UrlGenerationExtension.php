@@ -22,13 +22,24 @@ use Autarky\Routing\UrlGenerator;
  */
 class UrlGenerationExtension extends Twig_Extension
 {
+	/**
+	 * @var UrlGenerator
+	 */
 	protected $urlGenerator;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param UrlGenerator $urlGenerator
+	 */
 	public function __construct(UrlGenerator $urlGenerator)
 	{
 		$this->urlGenerator = $urlGenerator;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getFunctions()
 	{
 		return array(
@@ -37,11 +48,28 @@ class UrlGenerationExtension extends Twig_Extension
 		);
 	}
 
+	/**
+	 * Implementation of the `url(route)` twig function.
+	 *
+	 * @param  string  $name       Route name
+	 * @param  array   $parameters Route parameters
+	 * @param  boolean $relative   Whether to generate an absolute or relative URL.
+	 *
+	 * @return string
+	 */
 	public function getUrl($name, $parameters = array(), $relative = false)
 	{
 		return $this->urlGenerator->getRouteUrl($name, $parameters, $relative);
 	}
 
+	/**
+	 * Implementation of the `asset(path)` twig function.
+	 *
+	 * @param  string  $path     Path to the asset, relative to the webroot or asset root.
+	 * @param  boolean $relative Whether to generate an absolute or relative URL.
+	 *
+	 * @return [type]            [description]
+	 */
 	public function getAsset($path, $relative = false)
 	{
 		return $this->urlGenerator->getAssetUrl($path, $relative);
@@ -87,6 +115,9 @@ class UrlGenerationExtension extends Twig_Extension
 		return array();
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getName()
 	{
 		return 'routing';

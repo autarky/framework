@@ -62,6 +62,7 @@ class TwigTemplatingProvider extends ServiceProvider
 
 		$env = new Twig\Environment($dic->resolve('Twig_LoaderInterface'), $options);
 
+		// merge core framework extensions with user extensions
 		$extensions = array_merge([
 			'Autarky\Templating\Twig\PartialExtension',
 			'Autarky\Templating\Twig\UrlGenerationExtension' =>
@@ -70,22 +71,28 @@ class TwigTemplatingProvider extends ServiceProvider
 				['Symfony\Component\HttpFoundation\Session\Session'],
 		], $this->app->getConfig()->get('twig.extensions', []));
 
+		// iterate through the array of extensions. if the array key is an
+		// integer, there are no dependencies defined for that extension and we
+		// can simply add it. if the array key is a string, the key is the class
+		// name of the extension and the value is an array of class dependencies
+		// that must be bound to the service container in order for the
+		// extension to be loaded.
 		foreach ($extensions as $extension => $dependencies) {
 			if (is_int($extension)) {
 				$env->addExtension($dic->resolve($dependencies));
 			} else {
-				$load = true;
-
 				foreach ((array) $dependencies as $dependency) {
 					if (!$dic->isBound($dependency)) {
-						$load = false;
-						break;
+						// break out of this inner foreach loop and continue to
+						// the next iteration of the outer foreach loop,
+						// effectively preventing the extension from loading
+						continue 2;
 					}
 				}
 
-				if ($load) {
-					$env->addExtension($dic->resolve($extension));
-				}
+				// if any of the dependencies are not met in the above loop,
+				// this line of code will not be executed
+				$env->addExtension($dic->resolve($extension));
 			}
 		}
 

@@ -20,21 +20,32 @@ use Autarky\Support\NamespacedResourceResolverInterface;
  */
 class FileLoader extends Twig_Loader_Filesystem implements NamespacedResourceResolverInterface
 {
+	/**
+	 * The main templates directory.
+	 *
+	 * @var string
+	 */
 	protected $mainPath;
 
-	public function __construct($paths = array())
+	/**
+	 * Constructor.
+	 *
+	 * @param string $path
+	 */
+	public function __construct($path)
 	{
-		if (is_array($paths) && count($paths) == 1) {
-			$paths = $paths[0];
+		// Twig_Loader_Filesystem compatibility. Can it be safely removed?
+		if (is_array($path) && count($path) == 1) {
+			$path = $path[0];
 		}
 
-		if (!is_string($paths)) {
-			throw new \InvalidArgumentException('$paths must be string, '.gettype($paths).' given');
+		if (!is_string($path)) {
+			throw new \InvalidArgumentException('$path must be string, '.gettype($path).' given');
 		}
 
-		$this->mainPath = $paths;
+		$this->mainPath = $path;
 
-		parent::__construct([$paths]);
+		parent::__construct([$path]);
 	}
 
 	protected function parseName($name, $default = self::MAIN_NAMESPACE)
@@ -48,6 +59,9 @@ class FileLoader extends Twig_Loader_Filesystem implements NamespacedResourceRes
 		return [$default, $name];
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function addNamespace($namespace, $location)
 	{
 		$this->addPath($location, $namespace);

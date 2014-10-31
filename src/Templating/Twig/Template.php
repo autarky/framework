@@ -14,6 +14,10 @@ use Autarky\Templating\TemplateEvent;
 use Autarky\Events\EventDispatcherAwareInterface;
 use Autarky\Events\EventDispatcherAwareTrait;
 
+/**
+ * Extension of the Twig_Template class to enable event dispatching as well as
+ * working with template context objects.
+ */
 abstract class Template extends \Twig_Template implements EventDispatcherAwareInterface
 {
 	use EventDispatcherAwareTrait;
@@ -23,14 +27,23 @@ abstract class Template extends \Twig_Template implements EventDispatcherAwareIn
 	 */
 	protected $template;
 
+	/**
+	 * Set the Autarky Template instance.
+	 *
+	 * @param \Autarky\Templating\Template $template
+	 */
 	public function setTemplate(\Autarky\Templating\Template $template)
 	{
 		$this->template = $template;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function display(array $context, array $blocks = array())
 	{
-		$this->template->getContext()->replace($context);
+		$this->template->getContext()
+			->replace($context);
 
 		if ($this->eventDispatcher !== null) {
 			$this->eventDispatcher->dispatch(

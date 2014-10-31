@@ -15,17 +15,33 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * "route:dispatch" command.
+ */
 class RouteDispatchCommand extends Command
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function configure()
 	{
 		$this->setName('route:dispatch')
 			->setDescription('Given a URL, see what route is matched')
 			->addArgument('method', InputArgument::REQUIRED, 'HTTP method')
 			->addArgument('path', InputArgument::REQUIRED, 'URL path')
-			;
+			->setHelp(<<<'EOS'
+This command fakes an HTTP request and returns information about the route that was matched against the request. For example:
+
+    php bin/console.php route:dispatch GET /foo/bar/baz
+
+This example will fake a HTTP GET request to the path /foo/bar/baz.
+EOS
+);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$router = $this->app->getContainer()
@@ -53,5 +69,7 @@ class RouteDispatchCommand extends Command
 		if ($filters = $route->getAfterFilters()) {
 			$output->writeln('<info>After filters:</info> '.implode(', ', $filters));
 		}
+
+		return 0;
 	}
 }

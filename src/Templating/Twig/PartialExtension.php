@@ -26,11 +26,19 @@ class PartialExtension extends Twig_Extension
 	 */
 	protected $container;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param ContainerInterface $container
+	 */
 	public function __construct(ContainerInterface $container)
 	{
 		$this->container = $container;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getFunctions()
 	{
 		return [
@@ -53,6 +61,9 @@ class PartialExtension extends Twig_Extension
 		return call_user_func_array([$obj, $method], $params);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getName()
 	{
 		return 'partial';

@@ -44,6 +44,16 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 		$this->client = $this->createClient();
 	}
 
+	/**
+	 * Enable exception handling in the application being tested.
+	 *
+	 * By default, uncaught exceptions in the application will simply be thrown
+	 * again, meaning you have to call `setExpectedException` or similar if an
+	 * exception is expected behaviour. If instead you want the application
+	 * error handler to do its job and return a response, call this method.
+	 *
+	 * @return void
+	 */
 	protected function enableExceptionHandling()
 	{
 		$this->app->getErrorHandler()->setRethrow(false);
