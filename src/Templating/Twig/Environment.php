@@ -17,10 +17,17 @@ use Autarky\Events\EventDispatcherAwareInterface;
 use Autarky\Events\EventDispatcherAwareTrait;
 use Autarky\Templating\TemplateEvent;
 
+/**
+ * Autarky extension of the Twig_Environment class in order to add event
+ * dispatching capabilities.
+ */
 class Environment extends Twig_Environment implements EventDispatcherAwareInterface
 {
 	use EventDispatcherAwareTrait;
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function __construct(Twig_LoaderInterface $loader = null, $options = array())
 	{
 		$options['base_template_class'] = 'Autarky\Templating\Twig\Template';
@@ -28,14 +35,15 @@ class Environment extends Twig_Environment implements EventDispatcherAwareInterf
 		parent::__construct($loader, $options);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function loadTemplate($path, $index = null)
 	{
-		$name = $this->normalizeName($path);
-
-		$template = new \Autarky\Templating\Template($name);
+		$template = new \Autarky\Templating\Template($path);
 
 		if ($this->eventDispatcher !== null) {
-			$this->eventDispatcher->dispatch('template.creating: '.$name,
+			$this->eventDispatcher->dispatch('template.creating: '.$path,
 				new TemplateEvent($template));
 		}
 
@@ -45,10 +53,5 @@ class Environment extends Twig_Environment implements EventDispatcherAwareInterf
 		$twigTemplate->setEventDispatcher($this->eventDispatcher);
 
 		return $twigTemplate;
-	}
-
-	protected function normalizeName($path)
-	{
-		return str_replace(['.html.twig', '.twig'], '', $path);
 	}
 }
