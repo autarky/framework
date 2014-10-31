@@ -10,8 +10,8 @@ class ServiceProviderTest extends TestCase
 	{
 		$app = $this->makeApplication('Autarky\Database\DatabaseProvider');
 		$app->boot();
-		$object = $app->resolve('Autarky\Database\MultiPdoContainer');
-		$this->assertInstanceOf('Autarky\Database\MultiPdoContainer', $object);
-		$this->assertSame($object, $app->getContainer()->resolve('Autarky\Database\MultiPdoContainer'));
+		$object = $app->resolve('Autarky\Database\ConnectionManager');
+		$this->assertInstanceOf('Autarky\Database\ConnectionManager', $object);
+		$this->assertSame($object, $app->getContainer()->resolve('Autarky\Database\ConnectionManager'));
 	}
 }

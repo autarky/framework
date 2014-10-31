@@ -15,9 +15,10 @@ use PDO;
 use Autarky\Config\ConfigInterface;
 
 /**
- * Container that manages multiple PDO instances.
+ * Manager for multiple database connections in the form of PDO instances and
+ * configuration data.
  */
-class MultiPdoContainer
+class ConnectionManager
 {
 	/**
 	 * @var \Autarky\Config\ConfigInterface
@@ -86,17 +87,9 @@ class MultiPdoContainer
 
 	protected function makePdo($connection)
 	{
-		$config = $this->config->get("database.connections.$connection");
+		$config = $this->getConnectionConfig($connection);
 
-		if (!$config) {
-			if (!is_string($connection)) {
-				$connection = gettype($connection);
-			}
-
-			throw new \InvalidArgumentException("Connection $connection not defined");
-		}
-
-		if (!isset($config['dsn'])) {
+		if (!isset($config['dsn']) || !$config['dsn']) {
 			throw new \InvalidArgumentException("Connection $connection missing data: dsn");
 		}
 
@@ -116,5 +109,33 @@ class MultiPdoContainer
 
 		return new PDO($config['dsn'], $username, $password,
 			$configOptions + $this->defaultPdoOptions);
+	}
+
+	/**
+	 * Get the configuration array for a specific connection.
+	 *
+	 * @param  strgin $connection The name of the connection.
+	 *
+	 * @return array
+	 *
+	 * @throws \InvalidArgumentException If connection is not defined
+	 */
+	public function getConnectionConfig($connection = null)
+	{
+		if ($connection === null) {
+			$connection = $this->defaultConnection;
+		}
+
+		$config = $this->config->get("database.connections.$connection");
+
+		if (!$config) {
+			if (!is_string($connection)) {
+				$connection = gettype($connection);
+			}
+
+			throw new \InvalidArgumentException("Connection $connection not defined");
+		}
+
+		return $config;
 	}
 }

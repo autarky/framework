@@ -101,7 +101,7 @@ class SessionProvider extends ServiceProvider
 				break;
 
 			case 'pdo':
-				$pdo = $this->dic->resolve('Autarky\Database\MultiPdoContainer')
+				$pdo = $this->dic->resolve('Autarky\Database\ConnectionManager')
 					->getPdo($this->config->get('session.db_connection'));
 				$options = $this->config->get('session.handler_options', []);
 				$handler = new PdoSessionHandler($pdo, $options);

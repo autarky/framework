@@ -26,13 +26,14 @@ class DatabaseProvider extends ServiceProvider
 	{
 		$dic = $this->app->getContainer();
 
-		$dic->define('Autarky\Database\MultiPdoContainer', function() {
-			return new MultiPdoContainer($this->app->getConfig());
+		$dic->define('Autarky\Database\ConnectionManager', function() {
+			return new ConnectionManager($this->app->getConfig());
 		});
-		$dic->share('Autarky\Database\MultiPdoContainer');
+		$dic->share('Autarky\Database\ConnectionManager');
 
 		$dic->define('PDO', function(ContainerInterface $container) {
-			return $container->resolve('Autarky\Database\MultiPdoContainer')->getPdo();
+			return $container->resolve('Autarky\Database\ConnectionManager')
+				->getPdo();
 		});
 	}
 }
