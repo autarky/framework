@@ -80,6 +80,14 @@ class ArrayUtilsTest extends TestCase
 		];
 	}
 
+	/** @test */
+	public function setThrowsExceptionOnNonArraySegment()
+	{
+		$data = ['foo' => 'bar'];
+		$this->setExpectedException('UnexpectedValueException', 'Non-array segment encountered');
+		ArrayUtils::set($data, 'foo.bar', 'baz');
+	}
+
 	/**
 	 * @test
 	 * @dataProvider getHasData
