@@ -31,9 +31,9 @@ class DatabaseProvider extends ServiceProvider
 		});
 		$dic->share('Autarky\Database\ConnectionManager');
 
-		$dic->define('PDO', function(ContainerInterface $container) {
+		$dic->define('PDO', function(ContainerInterface $container, $connection = null) {
 			return $container->resolve('Autarky\Database\ConnectionManager')
-				->getPdo();
+				->getPdo($connection);
 		});
 	}
 }

@@ -4,7 +4,7 @@ namespace Autarky\Tests\Container;
 use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
-use Autarky\Container\IlluminateContainer;
+use Autarky\Container\ContainerInterface;
 use Autarky\Container\Container;
 
 class ContainerTest extends PHPUnit_Framework_TestCase
@@ -364,9 +364,45 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 		$this->assertSame($c, $c->resolve('Autarky\Container\Container'));
 		$this->assertSame($c, $c->resolve('Autarky\Container\ContainerInterface'));
 	}
+
+	/** @test */
+	public function canDefineDynamicFactoryParam()
+	{
+		$c = $this->makeContainer();
+		$c->define('var.service', function(ContainerInterface $container, $variable) {
+			return strtoupper($variable);
+		});
+		$c->params(__NAMESPACE__.'\\ParamStub', [
+			'$foo' => ['var.service', ['$variable' => 'foo']],
+			'$bar' => ['var.service', ['$variable' => 'bar']],
+		]);
+		$obj = $c->resolve(__NAMESPACE__.'\\ParamStub');
+		$this->assertEquals('FOO', $obj->foo);
+		$this->assertEquals('BAR', $obj->bar);
+	}
+
+	/** @test */
+	public function canDefineDynamicFactoryParamWithClasses()
+	{
+		$c = $this->makeContainer();
+		$c->define(__NAMESPACE__.'\\ValueLowerClass', function(ContainerInterface $container, $value) {
+			return new ValueLowerClass($value);
+		});
+		$c->params(__NAMESPACE__.'\\UpperClass', [
+			__NAMESPACE__.'\LowerClass' => [__NAMESPACE__.'\ValueLowerClass', ['$value' => 'foobar']]
+		]);
+		$obj = $c->resolve(__NAMESPACE__.'\\UpperClass');
+		$this->assertInstanceOf(__NAMESPACE__.'\\ValueLowerClass', $obj->cl);
+		$this->assertEquals('foobar', $obj->cl->value);
+	}
 }
 
 class LowerClass {}
+class ValueLowerClass extends LowerClass {
+	public function __construct($value) {
+		$this->value = $value;
+	}
+}
 class UpperClass {
 	public function __construct(LowerClass $cl) {
 		$this->cl = $cl;

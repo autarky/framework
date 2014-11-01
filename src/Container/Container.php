@@ -254,11 +254,15 @@ class Container implements ContainerInterface
 			return $this->instances[$class];
 		}
 
+		if (array_key_exists($class, $this->params)) {
+			$params = array_replace($this->params[$class], $params);
+		}
+
 		$previousState = $this->protectInternals;
 		$this->protectInternals = false;
 
 		if (array_key_exists($class, $this->factories)) {
-			$object = call_user_func($this->factories[$class], $this);
+			$object = $this->callFactory($this->factories[$class]);
 		} else if ($this->autowire) {
 			$object = $this->build($class, $params);
 		} else {
@@ -362,6 +366,40 @@ class Container implements ContainerInterface
 	}
 
 	/**
+	 * Call a factory.
+	 *
+	 * @param  mixed  $factory
+	 * @param  array  $params
+	 *
+	 * @return object
+	 */
+	protected function callFactory($factory, array $params = array())
+	{
+		if (is_array($factory) && is_string($factory[0])) {
+			$factory[0] = $this->resolve($factory[0]);
+		}
+
+		if (!$params) {
+			return call_user_func($factory, $this);
+		}
+
+		if (is_string($factory) && array_key_exists($factory, $this->factories)) {
+			$factory = $this->factories[$factory];
+		}
+
+		if (is_array($factory)) {
+			$reflClass = new ReflectionClass($factory[0]);
+			$reflFunc = $reflClass->getMethod($factory[1]);
+		} else {
+			$reflFunc = new ReflectionFunction($factory);
+		}
+
+		$args = $this->getFunctionArguments($reflFunc, $params);
+
+		return call_user_func_array($factory, $args);
+	}
+
+	/**
 	 * Build a class, resolving dependencies automatically by checking type-
 	 * hints.
 	 *
@@ -386,10 +424,6 @@ class Container implements ContainerInterface
 
 		if (!$reflClass->hasMethod('__construct')) {
 			return $reflClass->newInstance();
-		}
-
-		if (array_key_exists($class, $this->params)) {
-			$params = array_replace($this->params[$class], $params);
 		}
 
 		$args = $this->getFunctionArguments($reflClass->getMethod('__construct'), $params);
@@ -418,14 +452,7 @@ class Container implements ContainerInterface
 			if ($class) {
 				$args[] = $this->resolveClassArg($class, $param, $params);
 			} else {
-				$name = $param->getName();
-				if ($params && array_key_exists("\$$name", $params)) {
-					$args[] = $params["\$$name"];
-				} else if ($param->isDefaultValueAvailable()) {
-					$args[] = $param->getDefaultValue();
-				} else {
-					throw new Exception\UnresolvableArgumentException($param, $func);
-				}
+				$args[] = $this->resolveNonClassArg($param, $params, $func);
 			}
 		}
 
@@ -443,23 +470,26 @@ class Container implements ContainerInterface
 	 */
 	protected function resolveClassArg(ReflectionClass $class, ReflectionParameter $param, array $params)
 	{
-		$name = $param->getName();
+		$name = '$'.$param->getName();
 		$class = $class->getName();
 
-		if ($params && array_key_exists("\$$name", $params)) {
-			$class = $params["\$$name"];
-		}
+		// loop to prevent code repetition. executes once trying to find the
+		// parameter name in the $params array, then once more trying to find
+		// the class name (typehint) of the parameter.
+		while ($name !== null) {
+			if ($params && array_key_exists($name, $params)) {
+				$class = $params[$name];
+			}
 
-		if (is_object($class)) {
-			return $class;
-		}
+			if (is_object($class)) {
+				return $class;
+			}
 
-		if ($params && array_key_exists($class, $params)) {
-			$class = $params[$class];
-		}
+			if (is_array($class)) {
+				return $this->callFactory($class[0], $class[1]);
+			}
 
-		if (is_object($class)) {
-			return $class;
+			$name = ($name != $class) ? $class : null;
 		}
 
 		try {
@@ -471,6 +501,36 @@ class Container implements ContainerInterface
 
 			throw $exception;
 		}
+	}
+
+	/**
+	 * Resolve a non-class function argument.
+	 *
+	 * @param  ReflectionParameter        $param
+	 * @param  array                      $params
+	 * @param  ReflectionFunctionAbstract $func
+	 *
+	 * @return mixed
+	 */
+	protected function resolveNonClassArg(ReflectionParameter $param, array $params, ReflectionFunctionAbstract $func)
+	{
+		$name = '$'.$param->getName();
+
+		if ($params && array_key_exists($name, $params)) {
+			$argument = $params[$name];
+
+			if (is_array($argument)) {
+				$argument = $this->callFactory($argument[0], $argument[1]);
+			}
+
+			return $argument;
+		}
+
+		if ($param->isDefaultValueAvailable()) {
+			return $param->getDefaultValue();
+		}
+
+		throw new Exception\UnresolvableArgumentException($param, $func);
 	}
 
 	/**
