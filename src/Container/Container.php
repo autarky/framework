@@ -134,59 +134,6 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function instance($class, $instance)
-	{
-		$this->shared[$class] = true;
-		$this->instances[$class] = $instance;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function share($classOrClasses)
-	{
-		foreach ((array) $classOrClasses as $class) {
-			$this->shared[$class] = true;
-		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function internal($classOrClasses)
-	{
-		foreach ((array) $classOrClasses as $class) {
-			$this->internals[$class] = true;
-		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function alias($original, $aliasOrAliases)
-	{
-		foreach ((array) $aliasOrAliases as $alias) {
-			$this->aliases[$alias] = $original;
-		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function params($classOrClasses, array $params)
-	{
-		foreach ((array) $classOrClasses as $class) {
-			if (!array_key_exists($class, $this->params)) {
-				$this->params[$class] = $params;
-			} else {
-				$this->params[$class] = array_replace($this->params[$class], $params);
-			}
-		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
 	public function invoke($callable, array $params = array())
 	{
 		if (is_string($callable) && !is_callable($callable)) {
@@ -288,81 +235,6 @@ class Container implements ContainerInterface
 		}
 
 		return $object;
-	}
-
-	/**
-	 * Check if a class and its alias (optionally) are protected, and throw an
-	 * exception if they are.
-	 *
-	 * @param  string $class
-	 * @param  string|null $alias
-	 *
-	 * @return void
-	 *
-	 * @throws Exception\ResolvingInternalException If class or alias is internal
-	 */
-	protected function checkProtected($class, $alias)
-	{
-		if (!$this->protectInternals) {
-			return;
-		}
-
-		if ($alias) {
-			if ($this->isProtected($class) || $this->isProtected($alias)) {
-				$msg = "Class $class (via alias $alias) or its alias is internal and cannot be resolved.";
-				throw new Exception\ResolvingInternalException($msg);
-			}
-		} else {
-			if ($this->isProtected($class)) {
-				$msg = "Class $class is internal and cannot be resolved.";
-				throw new Exception\ResolvingInternalException($msg);
-			}
-		}
-	}
-
-	/**
-	 * Determine if a class is protected or not.
-	 *
-	 * @param  string  $class
-	 *
-	 * @return boolean
-	 */
-	protected function isProtected($class)
-	{
-		return array_key_exists($class, $this->internals) && $this->internals[$class];
-	}
-
-	/**
-	 * Call resolving callbacks for an object.
-	 *
-	 * @param  string $key    Container key - usually the class name
-	 * @param  object $object
-	 *
-	 * @return void
-	 */
-	protected function callResolvingCallbacks($key, $object)
-	{
-		foreach ($this->resolvingAnyCallbacks as $callback) {
-			call_user_func($callback, $object, $this);
-		}
-
-		if (array_key_exists($key, $this->resolvingCallbacks)) {
-			foreach ($this->resolvingCallbacks[$key] as $callback) {
-				call_user_func($callback, $object, $this);
-			}
-		}
-	}
-
-	/**
-	 * Determine if a class is shared or not.
-	 *
-	 * @param  string  $class
-	 *
-	 * @return boolean
-	 */
-	protected function isShared($class)
-	{
-		return array_key_exists($class, $this->shared) && $this->shared[$class];
 	}
 
 	/**
@@ -536,20 +408,6 @@ class Container implements ContainerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isBound($class)
-	{
-		if (array_key_exists($class, $this->aliases)) {
-			$class = $this->aliases[$class];
-		}
-
-		return array_key_exists($class, $this->instances)
-			|| array_key_exists($class, $this->factories)
-			|| array_key_exists($class, $this->shared);
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
 	public function resolving($classOrClasses, callable $callback)
 	{
 		foreach ((array) $classOrClasses as $class) {
@@ -566,6 +424,27 @@ class Container implements ContainerInterface
 	}
 
 	/**
+	 * Call resolving callbacks for an object.
+	 *
+	 * @param  string $key    Container key - usually the class name
+	 * @param  object $object
+	 *
+	 * @return void
+	 */
+	protected function callResolvingCallbacks($key, $object)
+	{
+		foreach ($this->resolvingAnyCallbacks as $callback) {
+			call_user_func($callback, $object, $this);
+		}
+
+		if (array_key_exists($key, $this->resolvingCallbacks)) {
+			foreach ($this->resolvingCallbacks[$key] as $callback) {
+				call_user_func($callback, $object, $this);
+			}
+		}
+	}
+
+	/**
 	 * Enable or disable autowiring.
 	 *
 	 * @param boolean $autowire
@@ -573,5 +452,126 @@ class Container implements ContainerInterface
 	public function setAutowire($autowire)
 	{
 		$this->autowire = (bool) $autowire;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function isBound($class)
+	{
+		if (array_key_exists($class, $this->aliases)) {
+			$class = $this->aliases[$class];
+		}
+
+		return array_key_exists($class, $this->instances)
+			|| array_key_exists($class, $this->factories)
+			|| array_key_exists($class, $this->shared);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function instance($class, $instance)
+	{
+		$this->shared[$class] = true;
+		$this->instances[$class] = $instance;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function share($classOrClasses)
+	{
+		foreach ((array) $classOrClasses as $class) {
+			$this->shared[$class] = true;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function internal($classOrClasses)
+	{
+		foreach ((array) $classOrClasses as $class) {
+			$this->internals[$class] = true;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function alias($original, $aliasOrAliases)
+	{
+		foreach ((array) $aliasOrAliases as $alias) {
+			$this->aliases[$alias] = $original;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function params($classOrClasses, array $params)
+	{
+		foreach ((array) $classOrClasses as $class) {
+			if (!array_key_exists($class, $this->params)) {
+				$this->params[$class] = $params;
+			} else {
+				$this->params[$class] = array_replace($this->params[$class], $params);
+			}
+		}
+	}
+
+	/**
+	 * Determine if a class is shared or not.
+	 *
+	 * @param  string  $class
+	 *
+	 * @return boolean
+	 */
+	protected function isShared($class)
+	{
+		return array_key_exists($class, $this->shared) && $this->shared[$class];
+	}
+
+	/**
+	 * Check if a class and its alias (optionally) are protected, and throw an
+	 * exception if they are.
+	 *
+	 * @param  string $class
+	 * @param  string|null $alias
+	 *
+	 * @return void
+	 *
+	 * @throws Exception\ResolvingInternalException If class or alias is internal
+	 */
+	protected function checkProtected($class, $alias)
+	{
+		if (!$this->protectInternals) {
+			return;
+		}
+
+		if ($alias) {
+			if ($this->isProtected($class) || $this->isProtected($alias)) {
+				$msg = "Class $class (via alias $alias) or its alias is internal and cannot be resolved.";
+				throw new Exception\ResolvingInternalException($msg);
+			}
+		} else {
+			if ($this->isProtected($class)) {
+				$msg = "Class $class is internal and cannot be resolved.";
+				throw new Exception\ResolvingInternalException($msg);
+			}
+		}
+	}
+
+	/**
+	 * Determine if a class is protected or not.
+	 *
+	 * @param  string  $class
+	 *
+	 * @return boolean
+	 */
+	protected function isProtected($class)
+	{
+		return array_key_exists($class, $this->internals) && $this->internals[$class];
 	}
 }
