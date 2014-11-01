@@ -382,6 +382,19 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function canDefineNonFactoryArrayAsParameter()
+	{
+		$c = $this->makeContainer();
+		$c->params(__NAMESPACE__.'\\ParamStub', [
+			'$foo' => ['foo', 'bar', 'baz'],
+			'$bar' => ['baz', 'bar', 'foo'],
+		]);
+		$obj = $c->resolve(__NAMESPACE__.'\\ParamStub');
+		$this->assertEquals(['foo', 'bar', 'baz'], $obj->foo);
+		$this->assertEquals(['baz', 'bar', 'foo'], $obj->bar);
+	}
+
+	/** @test */
 	public function canDefineDynamicFactoryParamWithClasses()
 	{
 		$c = $this->makeContainer();

@@ -391,7 +391,7 @@ class Container implements ContainerInterface
 		if ($params && array_key_exists($name, $params)) {
 			$argument = $params[$name];
 
-			if (is_array($argument)) {
+			if (is_array($argument) && array_key_exists($argument[0], $this->factories)) {
 				$argument = $this->callFactory($argument[0], $argument[1]);
 			}
 
