@@ -34,6 +34,11 @@ class LoggingProvider extends ServiceProvider
 		$dic->alias('Monolog\Logger', 'Psr\Log\LoggerInterface');
 	}
 
+	/**
+	 * Make a logger instance.
+	 *
+	 * @return Logger
+	 */
 	public function makeLogger()
 	{
 		$logger = new Logger($this->app->getEnvironment());
@@ -56,6 +61,11 @@ class LoggingProvider extends ServiceProvider
 		return $logger;
 	}
 
+	/**
+	 * Get the log directory if there is one.
+	 *
+	 * @return string|null Returns null if not configured or directory does not exist
+	 */
 	protected function getLogDirectory()
 	{
 		$config = $this->app->getConfig();

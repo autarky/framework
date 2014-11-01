@@ -311,6 +311,11 @@ class Application implements HttpKernelInterface
 		$this->booted = true;
 	}
 
+	/**
+	 * Register all of the application's service providers.
+	 *
+	 * @return void
+	 */
 	protected function registerProviders()
 	{
 		foreach ($this->providers as $provider) {
@@ -321,6 +326,13 @@ class Application implements HttpKernelInterface
 		}
 	}
 
+	/**
+	 * Register a single service provider.
+	 *
+	 * @param  ServiceProvider $provider
+	 *
+	 * @return void
+	 */
 	protected function registerProvider(ServiceProvider $provider)
 	{
 		$provider->setApplication($this);
@@ -331,6 +343,11 @@ class Application implements HttpKernelInterface
 		}
 	}
 
+	/**
+	 * Call the application's config callbacks.
+	 *
+	 * @return void
+	 */
 	protected function callConfigCallbacks()
 	{
 		foreach ($this->configCallbacks as $callback) {
@@ -338,25 +355,36 @@ class Application implements HttpKernelInterface
 		}
 	}
 
+	/**
+	 * Resolve the stack builder.
+	 *
+	 * @return \Stack\Builder
+	 */
 	protected function resolveStack()
 	{
-		if ($this->stack !== null) return $this->stack;
+		if ($this->stack !== null) {
+			return $this->stack;
+		}
 
 		$this->stack = new StackBuilder;
 
 		foreach ($this->middlewares as $middleware) {
-			if (!is_array($middleware)) {
-				$middleware = [$middleware];
-			}
-			call_user_func_array([$this->stack, 'push'], $middleware);
+			call_user_func_array([$this->stack, 'push'], (array) $middleware);
 		}
 
 		return $this->stack;
 	}
 
+	/**
+	 * Resolve the HTTP kernel.
+	 *
+	 * @return HttpKernelInterface
+	 */
 	protected function resolveKernel()
 	{
-		if ($this->kernel !== null) return $this->kernel;
+		if ($this->kernel !== null) {
+			return $this->kernel;
+		}
 
 		$class = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
 		$eventDispatcher = $this->container->isBound($class) ?

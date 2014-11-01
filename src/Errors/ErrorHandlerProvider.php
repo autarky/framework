@@ -30,6 +30,9 @@ class ErrorHandlerProvider extends ServiceProvider
 		$this->register = (bool) $register;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		$dic = $this->app->getContainer();

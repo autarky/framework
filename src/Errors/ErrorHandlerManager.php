@@ -74,7 +74,8 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 */
 	public function appendHandler($handler)
 	{
-		$this->addHandler('push', $handler);
+		$this->checkHandler($handler);
+		$this->handlers->push($handler);
 	}
 
 	/**
@@ -82,10 +83,11 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 */
 	public function prependHandler($handler)
 	{
-		$this->addHandler('unshift', $handler);
+		$this->checkHandler($handler);
+		$this->handlers->unshift($handler);
 	}
 
-	protected function addHandler($method, $handler)
+	protected function checkHandler($handler)
 	{
 		if (
 			!$handler instanceof ErrorHandlerInterface
@@ -95,8 +97,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 			$type = is_object($handler) ? get_class($handler) : gettype($handler);
 			throw new \InvalidArgumentException("Error handler must be callable, string or instance of Autarky\Errors\ErrorHandlerInterface, $type given");
 		}
-
-		$this->handlers->$method($handler);
 	}
 
 	/**
@@ -223,6 +223,14 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		return $handlerHint->isInstance($exception);
 	}
 
+	/**
+	 * Call an exception handler.
+	 *
+	 * @param  mixed     $handler
+	 * @param  Exception $exception
+	 *
+	 * @return mixed
+	 */
 	protected function callHandler($handler, Exception $exception)
 	{
 		if ($handler instanceof ErrorHandlerInterface) {

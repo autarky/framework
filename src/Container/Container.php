@@ -286,6 +286,17 @@ class Container implements ContainerInterface
 		return $object;
 	}
 
+	/**
+	 * Check if a class and its alias (optionally) are protected, and throw an
+	 * exception if they are.
+	 *
+	 * @param  string $class
+	 * @param  string|null $alias
+	 *
+	 * @return void
+	 *
+	 * @throws Exception\ResolvingInternalException If class or alias is internal
+	 */
 	protected function checkProtected($class, $alias)
 	{
 		if (!$this->protectInternals) {
@@ -305,11 +316,26 @@ class Container implements ContainerInterface
 		}
 	}
 
+	/**
+	 * Determine if a class is protected or not.
+	 *
+	 * @param  string  $class
+	 *
+	 * @return boolean
+	 */
 	protected function isProtected($class)
 	{
 		return array_key_exists($class, $this->internals) && $this->internals[$class];
 	}
 
+	/**
+	 * Call resolving callbacks for an object.
+	 *
+	 * @param  string $key    Container key - usually the class name
+	 * @param  object $object
+	 *
+	 * @return void
+	 */
 	protected function callResolvingCallbacks($key, $object)
 	{
 		foreach ($this->resolvingAnyCallbacks as $callback) {
@@ -323,11 +349,29 @@ class Container implements ContainerInterface
 		}
 	}
 
+	/**
+	 * Determine if a class is shared or not.
+	 *
+	 * @param  string  $class
+	 *
+	 * @return boolean
+	 */
 	protected function isShared($class)
 	{
 		return array_key_exists($class, $this->shared) && $this->shared[$class];
 	}
 
+	/**
+	 * Build a class, resolving dependencies automatically by checking type-
+	 * hints.
+	 *
+	 * @param  string $class
+	 * @param  array  $params
+	 *
+	 * @return object
+	 *
+	 * @throws Exception\NotInstantiableException If class does not exist or otherwise cannot be instantiated (it is abstract, has a private constructor)
+	 */
 	protected function build($class, array $params = array())
 	{
 		if (!class_exists($class)) {
@@ -353,6 +397,17 @@ class Container implements ContainerInterface
 		return $reflClass->newInstanceArgs($args);
 	}
 
+	/**
+	 * Get an array of arguments to a function, resolving type-hinted arguments
+	 * automatically on the way.
+	 *
+	 * @param  ReflectionFunctionAbstract $func
+	 * @param  array                      $params
+	 *
+	 * @return array
+	 *
+	 * @throws Exception\UnresolvableArgumentException If any of the arguments are not type-hinted, does not have a default value and is not specified in $params
+	 */
 	protected function getFunctionArguments(ReflectionFunctionAbstract $func, array $params = array())
 	{
 		$args = [];
@@ -377,6 +432,15 @@ class Container implements ContainerInterface
 		return $args;
 	}
 
+	/**
+	 * Resolve a class type-hinted argument for a funtion.
+	 *
+	 * @param  ReflectionClass     $class
+	 * @param  ReflectionParameter $param
+	 * @param  array               $params
+	 *
+	 * @return object|null
+	 */
 	protected function resolveClassArg(ReflectionClass $class, ReflectionParameter $param, array $params)
 	{
 		$name = $param->getName();
