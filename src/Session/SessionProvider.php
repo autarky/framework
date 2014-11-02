@@ -13,17 +13,11 @@ namespace Autarky\Session;
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\MongoDbSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
 
 use Autarky\Kernel\ServiceProvider;
 
@@ -50,6 +44,10 @@ class SessionProvider extends ServiceProvider
 		$this->config = $this->app->getConfig();
 		$this->dic = $this->app->getContainer();
 
+		$this->dic->define('Autarky\Session\HandlerFactory', function() {
+			return new HandlerFactory($this->dic, $this->config);
+		});
+		$this->dic->share('Autarky\Session\HandlerFactory');
 		$this->dic->define('SessionHandlerInterface', [$this, 'makeSessionHandler']);
 		$this->dic->share('SessionHandlerInterface');
 
@@ -91,45 +89,8 @@ class SessionProvider extends ServiceProvider
 	 */
 	public function makeSessionHandler()
 	{
-		switch ($this->config->get('session.handler')) {
-			case 'native':
-				$handler = new \SessionHandler;
-				break;
-
-			case 'file':
-				$handler = new NativeFileSessionHandler($this->getSessionPath());
-				break;
-
-			case 'pdo':
-				$pdo = $this->dic->resolve('Autarky\Database\ConnectionManager')
-					->getPdo($this->config->get('session.db_connection'));
-				$options = $this->config->get('session.handler_options', []);
-				$handler = new PdoSessionHandler($pdo, $options);
-				break;
-
-			case 'mongo':
-				$handler = new MongoDbSessionHandler($this->dic->resolve('MongoClient'),
-					$this->config->get('session.handler_options', []));
-				break;
-
-			case 'memcache':
-				$handler = new MemcacheSessionHandler($this->dic->resolve('Memcache'),
-					$this->config->get('session.handler_options', []));
-				break;
-
-			case 'memcached':
-				$handler = new MemcachedSessionHandler($this->dic->resolve('Memcached'),
-					$this->config->get('session.handler_options', []));
-				break;
-
-			case 'null':
-				$handler = new NullSessionHandler;
-				break;
-
-			default:
-				throw new \RuntimeException('Unknown session handler type: '.
-					$this->config->get('session.handler'));
-		}
+		$handler = $this->dic->resolve('Autarky\Session\HandlerFactory')
+			->makeHandler($this->config->get('session.handler'));
 
 		if ($this->config->get('session.write_check') === true) {
 			$handler = new WriteCheckSessionHandler($handler);
