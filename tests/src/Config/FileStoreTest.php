@@ -1,7 +1,5 @@
 <?php
-namespace Autarky\Tests\Config;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
 use Autarky\Config\FileStore;

@@ -1,7 +1,5 @@
 <?php
-namespace Autarky\Tests\Logging;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
 use Psr\Log\LogLevel;
@@ -42,7 +40,7 @@ class ChannelManagerTest extends PHPUnit_Framework_TestCase
 		$mock->shouldReceive('debug')->never();
 		$log->setChannel('specific', $mock = $this->getMockLogger());
 		$mock->shouldReceive('debug')->with('message')->once();
-		$log->to('specific')->debug('message');
+		$log->getChannel('specific')->debug('message');
 	}
 
 	/** @test */

@@ -1,7 +1,5 @@
 <?php
-namespace Autarky\Tests\Console;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
 use Symfony\Component\Console\Input\ArrayInput;

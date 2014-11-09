@@ -1,10 +1,9 @@
 <?php
-namespace Autarky\Tests\Templating;
 
 use Autarky\Tests\TestCase;
 use Mockery as m;
 
-class ServiceProviderTest extends TestCase
+class TemplatingProviderTest extends TestCase
 {
 	protected function makeApplication($providers = array(), $env = 'testing')
 	{

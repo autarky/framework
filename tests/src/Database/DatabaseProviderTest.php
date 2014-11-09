@@ -3,7 +3,7 @@ namespace Autarky\Tests\Database;
 
 use Autarky\Tests\TestCase;
 
-class ServiceProviderTest extends TestCase
+class DatabaseProviderTest extends TestCase
 {
 	/** @test */
 	public function canResolve()

@@ -1,10 +1,9 @@
 <?php
-namespace Autarky\Tests\Config;
 
 use Autarky\Tests\TestCase;
 use Autarky\Kernel\Application;
 
-class ServiceProviderTest extends TestCase
+class ConfigProviderTest extends TestCase
 {
 	protected function makeApplication($providers = array(), $env = 'testing')
 	{

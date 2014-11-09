@@ -1,7 +1,5 @@
 <?php
-namespace Autarky\Tests\Kernel;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
 use Autarky\Kernel\HttpKernel;

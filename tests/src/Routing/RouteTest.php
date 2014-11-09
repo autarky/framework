@@ -1,7 +1,5 @@
 <?php
-namespace Autarky\Tests\Routing;
 
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 use Autarky\Routing\Route;

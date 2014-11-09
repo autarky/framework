@@ -1,7 +1,5 @@
 <?php
-namespace Autarky\Tests\Routing;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

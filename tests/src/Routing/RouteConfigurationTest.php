@@ -1,10 +1,8 @@
 <?php
-namespace Autarky\Tests\Routing;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
-class ConfigurationTest extends PHPUnit_Framework_TestCase
+class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 {
 	public function tearDown()
 	{

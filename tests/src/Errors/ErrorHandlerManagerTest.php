@@ -1,9 +1,6 @@
 <?php
-namespace Autarky\Tests\Errors;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
-use Exception;
 
 use Autarky\Errors\ErrorHandlerManager;
 use Autarky\Errors\HandlerResolver;

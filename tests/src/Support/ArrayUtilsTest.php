@@ -1,5 +1,4 @@
 <?php
-namespace Autarky\Tests\Support;
 
 use Autarky\Tests\TestCase;
 use Autarky\Support\ArrayUtils;

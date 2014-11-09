@@ -1,14 +1,12 @@
 <?php
-namespace Autarky\Tests\Session;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class MiddlewareTest extends PHPUnit_Framework_TestCase
+class SessionMiddlewareTest extends PHPUnit_Framework_TestCase
 {
 	public function tearDown()
 	{

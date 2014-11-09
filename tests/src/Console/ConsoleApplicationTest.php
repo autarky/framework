@@ -1,10 +1,8 @@
 <?php
-namespace Autarky\Tests\Console;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
-class ApplicationTest extends PHPUnit_Framework_TestCase
+class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
 {
 	/** @test */
 	public function autarkyApplicationInstanceIsSetOnCommands()

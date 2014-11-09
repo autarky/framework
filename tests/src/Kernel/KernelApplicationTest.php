@@ -1,5 +1,4 @@
 <?php
-namespace Autarky\Tests\Kernel;
 
 use Mockery as m;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,7 +10,7 @@ use Autarky\Kernel\Application;
 use Autarky\Config\ArrayStore;
 use Autarky\Container\Container;
 
-class ApplicationTest extends TestCase
+class KernelApplicationTest extends TestCase
 {
 	public function tearDown()
 	{

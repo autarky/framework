@@ -1,11 +1,10 @@
 <?php
-namespace Autarky\Tests\Session;
 
 use Autarky\Tests\TestCase;
 use Autarky\Session\SessionProvider;
 use Mockery as m;
 
-class ProviderTest extends TestCase
+class SessionProviderTest extends TestCase
 {
 	/**
 	 * @test

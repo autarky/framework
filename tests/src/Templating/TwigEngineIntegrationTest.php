@@ -1,5 +1,4 @@
 <?php
-namespace Autarky\Tests\Templating;
 
 use Mockery as m;
 use Autarky\Tests\TestCase;

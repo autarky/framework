@@ -1,10 +1,9 @@
 <?php
-namespace Autarky\Tests\Routing;
 
 use Autarky\Tests\TestCase;
 use Mockery as m;
 
-class ServiceProviderTest extends TestCase
+class RoutingProviderTest extends TestCase
 {
 	protected function checkResolve($class)
 	{

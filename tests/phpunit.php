@@ -2,6 +2,7 @@
 define('TESTS_RSC_DIR', __DIR__.'/resources');
 
 $loader = require dirname(__DIR__) . '/vendor/autoload.php';
+require __DIR__.'/src/TestCase.php';
 
 Mockery::getConfiguration()->allowMockingNonExistentMethods(false);
 
