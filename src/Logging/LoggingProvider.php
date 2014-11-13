@@ -33,7 +33,8 @@ class LoggingProvider extends ServiceProvider
 		$this->dic->define('Autarky\Logging\ChannelManager',
 			[$this, 'makeChannelManager']);
 		$this->dic->share('Autarky\Logging\ChannelManager');
-		$this->dic->define('Psr\Log\LoggerInterface', [$this, 'getChannel']);
+		$this->dic->define('Psr\Log\LoggerInterface',
+			['Autarky\Logging\ChannelManager', 'getChannel']);
 	}
 
 	public function makeChannelManager(ContainerInterface $container)
