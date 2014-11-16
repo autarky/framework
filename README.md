@@ -36,7 +36,8 @@ Visit the url "localhost:8000" in your browser to make sure it's working.
 ```
 git clone https://github.com/autarky/framework /path/to/autarky
 cd /path/to/autarky
-./vendor/bin/phpunit
+composer install
+phpunit
 ```
 
 The master branch is the current minor version. Previous minor versions have their own branches. Only critical bugfixes should be applied to these branches.
