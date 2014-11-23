@@ -46,7 +46,7 @@ class ConnectionManager
 	 */
 	protected $defaultPdoOptions = [
 		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_CLASS,
+		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
 		PDO::ATTR_CASE               => PDO::CASE_NATURAL,
 		PDO::ATTR_ORACLE_NULLS       => PDO::NULL_NATURAL,
 		PDO::ATTR_STRINGIFY_FETCHES  => false,
