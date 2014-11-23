@@ -137,7 +137,7 @@ class Container implements ContainerInterface
 	public function invoke($callable, array $params = array())
 	{
 		if (is_string($callable) && !is_callable($callable)) {
-			$factory = [$factory, 'invoke'];
+			$callable = [$callable, 'invoke'];
 		}
 
 		if (is_string($callable) && strpos($callable, '::') !== false) {
