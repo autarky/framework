@@ -107,8 +107,14 @@ class ConnectionManager
 
 		$configOptions = array_key_exists('options', $config) ? $config['options'] : [];
 
-		return new PDO($config['dsn'], $username, $password,
-			$configOptions + $this->defaultPdoOptions);
+		try {
+			return new PDO($config['dsn'], $username, $password,
+				$configOptions + $this->defaultPdoOptions);
+		} catch (\PDOException $e) {
+			$newException = new CannotConnectException($e->getMessage(), $e->getCode(), $e);
+			$newException->errorInfo = $e->errorInfo;
+			throw $newException;
+		}
 	}
 
 	/**
