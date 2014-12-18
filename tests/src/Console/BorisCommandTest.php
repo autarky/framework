@@ -3,7 +3,7 @@
 use Mockery as m;
 
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class BorisCommandTest extends PHPUnit_Framework_TestCase
 {
@@ -34,7 +34,7 @@ class BorisCommandTest extends PHPUnit_Framework_TestCase
 		$app = m::mock('Autarky\Kernel\Application');
 		$cmd = $this->makeCommand($app);
 		$this->setExpectedException('RuntimeException', 'Install d11wtq/boris via composer to use this command.');
-		$cmd->run(new ArrayInput([]), new BufferedOutput);
+		$cmd->run(new ArrayInput([]), new NullOutput);
 	}
 
 	/** @test */
@@ -54,6 +54,6 @@ class BorisCommandTest extends PHPUnit_Framework_TestCase
 		$boris->shouldReceive('setLocal')->with(['app' => $app])->once();
 		$boris->shouldReceive('start')->once();
 		$cmd->setBoris($boris);
-		$cmd->run(new ArrayInput([]), new BufferedOutput);
+		$cmd->run(new ArrayInput([]), new NullOutput);
 	}
 }
