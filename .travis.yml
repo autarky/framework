@@ -16,12 +16,18 @@ php:
   - 5.6
   - hhvm
 
+env:
+  - COMPOSER_ARGS=""
+  - COMPOSER_ARGS="--prefer-lowest"
+
 before_install:
   - bash ./setup-travis.bash
   - composer self-update
 
 install:
-  - composer install --dev --no-interaction
+  - composer update ${COMPOSER_ARGS} --dev --no-interaction
 
 script:
   - phpunit --verbose
+
+sudo: false
