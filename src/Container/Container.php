@@ -10,6 +10,7 @@
 
 namespace Autarky\Container;
 
+use Autarky\Container\Factory\Definition;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
@@ -109,6 +110,17 @@ class Container implements ContainerInterface
 	 */
 	public function define($class, $factory, array $params = array())
 	{
+		if ($params) {
+			$this->params($class, $params);
+		}
+
+		if (!$factory instanceof Factory\Definition) {
+			$factory = Factory\Definition::getDefaultForCallable($factory);
+		}
+
+		return $this->factories[$class] = $factory;
+
+		// OLD CODE
 		if (is_string($factory) && !is_callable($factory)) {
 			$factory = [$factory, 'make'];
 		}
@@ -208,10 +220,12 @@ class Container implements ContainerInterface
 		$previousState = $this->protectInternals;
 		$this->protectInternals = false;
 
+		if (!isset($this->factories[$class]) && $this->autowire) {
+			$this->factories[$class] = Definition::getDefaultForClass($class);
+		}
+
 		if (array_key_exists($class, $this->factories)) {
-			$object = $this->callFactory($this->factories[$class]);
-		} else if ($this->autowire) {
-			$object = $this->build($class, $params);
+			$object = $this->callFactory($this->factories[$class], $params);
 		} else {
 			if ($alias) {
 				$class = "$class (via $alias)";
@@ -245,8 +259,11 @@ class Container implements ContainerInterface
 	 *
 	 * @return object
 	 */
-	protected function callFactory($factory, array $params = array())
+	protected function callFactory(Factory\FactoryInterface $factory, array $params = array())
 	{
+		return $factory->invoke($this, $params);
+
+		// OLD CODE
 		if (is_array($factory) && is_string($factory[0])) {
 			$factory[0] = $this->resolve($factory[0]);
 		}
@@ -269,6 +286,20 @@ class Container implements ContainerInterface
 		$args = $this->getFunctionArguments($reflFunc, $params);
 
 		return call_user_func_array($factory, $args);
+	}
+
+	public function makeFactory($callable)
+	{
+		return new Definition($callable);
+	}
+
+	public function getFactory($class, array $params = array())
+	{
+		if (!isset($this->factories[$class]) && $this->autowire) {
+			$this->factories[$class] = Definition::getDefaultForClass($class);
+		}
+
+		return $this->factories[$class]->getFactory($params);
 	}
 
 	/**
@@ -402,7 +433,7 @@ class Container implements ContainerInterface
 			return $param->getDefaultValue();
 		}
 
-		throw new Exception\UnresolvableArgumentException($param, $func);
+		throw Exception\UnresolvableArgumentException::fromReflectionParam($param, $func);
 	}
 
 	/**

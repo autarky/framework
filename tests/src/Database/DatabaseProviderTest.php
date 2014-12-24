@@ -31,21 +31,25 @@ class DatabaseProviderTest extends TestCase
 	public function canResolveCustomConnectionPdoAsDependency()
 	{
 		$app = $this->makeApplication('Autarky\Database\DatabaseProvider');
+		$container = $app->getContainer();
 		$app->getConfig()->set('database.connection', 'default');
 		$app->getConfig()->set('database.connections', [
 			'custom' => ['dsn' => 'sqlite::memory:'],
 		]);
 		$app->boot();
-		$app->resolve(__NAMESPACE__.'\PdoDependentStub', [
-			'PDO' => ['PDO', ['$connection' => 'custom']],
+
+		$container->resolve(__NAMESPACE__.'\PdoDependentStub', [
+			'PDO' => $container->getFactory('PDO', ['$connection' => 'custom']),
 		]);
-		$app->resolve(__NAMESPACE__.'\PdoDependentStub', [
-			'$pdo' => ['PDO', ['$connection' => 'custom']],
+
+		$container->resolve(__NAMESPACE__.'\PdoDependentStub', [
+			'$pdo' => $container->getFactory('PDO', ['$connection' => 'custom']),
 		]);
-		$app->getContainer()->params(__NAMESPACE__.'\PdoDependentStub', [
-			'$pdo' => ['PDO', ['$connection' => 'custom']],
+
+		$container->params(__NAMESPACE__.'\PdoDependentStub', [
+			'$pdo' => $container->getFactory('PDO', ['$connection' => 'custom']),
 		]);
-		$app->resolve(__NAMESPACE__.'\PdoDependentStub');
+		$container->resolve(__NAMESPACE__.'\PdoDependentStub');
 	}
 }
 

@@ -10,9 +10,9 @@
 
 namespace Autarky\Container\Exception;
 
-use ReflectionParameter;
-use ReflectionMethod;
 use ReflectionFunctionAbstract;
+use ReflectionMethod;
+use ReflectionParameter;
 
 /**
  * Exception that is thrown when an argument to a method that the container
@@ -23,26 +23,26 @@ class UnresolvableArgumentException extends ContainerException
 	/**
 	 * {@inheritdoc}
 	 */
-	public function __construct(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)
+	public static function fromReflectionParam(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)
 	{
-		parent::__construct($this->makeMessage($param, $func));
+		return new static(static::makeMessage($param, $func));
 	}
 
-	protected function makeMessage(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)
+	protected static function makeMessage(ReflectionParameter $param, ReflectionFunctionAbstract $func = null)
 	{
 		$pos = $param->getPosition() + 1;
 
 		$name = $param->getName();
 
-		$func = $this->getFunctionName($func ?: $param->getDeclaringFunction());
+		$func = static::getFunctionName($func ?: $param->getDeclaringFunction());
 
 		return "Unresolvable argument: Argument #{$pos} (\${$name}) of {$func}";
 	}
 
-	protected function getFunctionName(ReflectionFunctionAbstract $func)
+	protected static function getFunctionName(ReflectionFunctionAbstract $func)
 	{
 		if ($func->isClosure()) {
-			return 'closure in '.$this->getClosureLocation($func);
+			return 'closure in '.static::getClosureLocation($func);
 		}
 
 		if ($func instanceof ReflectionMethod) {
@@ -52,7 +52,7 @@ class UnresolvableArgumentException extends ContainerException
 		return $func->getName().' in '.$func->getFileName();
 	}
 
-	protected function getClosureLocation(ReflectionFunctionAbstract $func)
+	protected static function getClosureLocation(ReflectionFunctionAbstract $func)
 	{
 		if ($class = $func->getClosureScopeClass()) {
 			$location = $class->getName();

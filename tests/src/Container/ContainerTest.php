@@ -370,8 +370,8 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 			return strtoupper($variable);
 		});
 		$c->params('ParamStub', [
-			'$foo' => ['var.service', ['$variable' => 'foo']],
-			'$bar' => ['var.service', ['$variable' => 'bar']],
+			'$foo' => $c->getFactory('var.service', ['$variable' => 'foo']),
+			'$bar' => $c->getFactory('var.service', ['$variable' => 'bar']),
 		]);
 		$obj = $c->resolve('ParamStub');
 		$this->assertEquals('FOO', $obj->foo);
@@ -399,7 +399,7 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 			return new ValueLowerClass($value);
 		});
 		$c->params('UpperClass', [
-			'LowerClass' => ['ValueLowerClass', ['$value' => 'foobar']]
+			'LowerClass' => $c->getFactory('ValueLowerClass', ['$value' => 'foobar']),
 		]);
 		$obj = $c->resolve('UpperClass');
 		$this->assertInstanceOf('ValueLowerClass', $obj->cl);
