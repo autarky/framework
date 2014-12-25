@@ -11,6 +11,8 @@
 namespace Autarky\Container;
 
 use Autarky\Container\Factory\Definition;
+use Autarky\Container\Factory\FactoryInterface;
+
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
@@ -114,33 +116,11 @@ class Container implements ContainerInterface
 			$this->params($class, $params);
 		}
 
-		if (!$factory instanceof Factory\Definition) {
-			$factory = Factory\Definition::getDefaultForCallable($factory);
+		if (!$factory instanceof FactoryInterface) {
+			$factory = Definition::getDefaultForCallable($factory);
 		}
 
 		return $this->factories[$class] = $factory;
-
-		// OLD CODE
-		if (is_string($factory) && !is_callable($factory)) {
-			$factory = [$factory, 'make'];
-		}
-
-		if (is_array($factory) && is_string($factory[0])) {
-			$factory = function(ContainerInterface $container) use($factory) {
-				return $container->invoke($factory);
-			};
-		}
-
-		if (!is_callable($factory)) {
-			$type = is_object($factory) ? get_class($factory) : gettype($factory);
-			throw new \InvalidArgumentException("Factory for class $class must be callable, $type given");
-		}
-
-		if ($params) {
-			$this->params($class, $params);
-		}
-
-		$this->factories[$class] = $factory;
 	}
 
 	/**
@@ -262,76 +242,42 @@ class Container implements ContainerInterface
 	protected function callFactory(Factory\FactoryInterface $factory, array $params = array())
 	{
 		return $factory->invoke($this, $params);
-
-		// OLD CODE
-		if (is_array($factory) && is_string($factory[0])) {
-			$factory[0] = $this->resolve($factory[0]);
-		}
-
-		if (!$params) {
-			return call_user_func($factory, $this);
-		}
-
-		if (is_string($factory) && array_key_exists($factory, $this->factories)) {
-			$factory = $this->factories[$factory];
-		}
-
-		if (is_array($factory)) {
-			$reflClass = new ReflectionClass($factory[0]);
-			$reflFunc = $reflClass->getMethod($factory[1]);
-		} else {
-			$reflFunc = new ReflectionFunction($factory);
-		}
-
-		$args = $this->getFunctionArguments($reflFunc, $params);
-
-		return call_user_func_array($factory, $args);
 	}
 
+	/**
+	 * Make a new factory definition for a class.
+	 *
+	 * @param  callable $callable
+	 *
+	 * @return Definition
+	 */
 	public function makeFactory($callable)
 	{
 		return new Definition($callable);
 	}
 
+	/**
+	 * Get the existing factory for a class. If a factory is not already defined
+	 * a default one will be created via reflection.
+	 *
+	 * @param  string $class  Name of the class
+	 * @param  array  $params Optional
+	 *
+	 * @return FactoryInterface
+	 */
 	public function getFactory($class, array $params = array())
 	{
 		if (!isset($this->factories[$class]) && $this->autowire) {
 			$this->factories[$class] = Definition::getDefaultForClass($class);
 		}
 
-		return $this->factories[$class]->getFactory($params);
-	}
+		$factory = $this->factories[$class];
 
-	/**
-	 * Build a class, resolving dependencies automatically by checking type-
-	 * hints.
-	 *
-	 * @param  string $class
-	 * @param  array  $params
-	 *
-	 * @return object
-	 *
-	 * @throws Exception\NotInstantiableException If class does not exist or otherwise cannot be instantiated (it is abstract, has a private constructor)
-	 */
-	protected function build($class, array $params = array())
-	{
-		if (!class_exists($class)) {
-			throw new Exception\NotInstantiableException("Class $class does not exist");
+		if ($params) {
+			$factory = $factory->getFactory($params);
 		}
 
-		$reflClass = new ReflectionClass($class);
-
-		if (!$reflClass->isInstantiable()) {
-			throw new Exception\NotInstantiableException("Class $class is not instantiable");
-		}
-
-		if (!$reflClass->hasMethod('__construct')) {
-			return $reflClass->newInstance();
-		}
-
-		$args = $this->getFunctionArguments($reflClass->getMethod('__construct'), $params);
-
-		return $reflClass->newInstanceArgs($args);
+		return $factory;
 	}
 
 	/**
@@ -384,12 +330,12 @@ class Container implements ContainerInterface
 				$class = $params[$name];
 			}
 
-			if (is_object($class)) {
-				return $class;
+			if ($class instanceof Factory\FactoryInterface) {
+				return $class->invoke();
 			}
 
-			if (is_array($class)) {
-				return $this->callFactory($class[0], $class[1]);
+			if (is_object($class)) {
+				return $class;
 			}
 
 			$name = ($name != $class) ? $class : null;

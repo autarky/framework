@@ -1,20 +1,66 @@
 <?php
+/**
+ * This file is part of the Autarky package.
+ *
+ * (c) Andreas Lutro <anlutro@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Autarky\Container\Factory;
 
 use Autarky\Container\ContainerInterface;
 use Autarky\Container\Exception\UnresolvableArgumentException;
 
+/**
+ * A factory.
+ */
 class Factory implements FactoryInterface
 {
+	/**
+	 * The factory's definition.
+	 *
+	 * @var Definition
+	 */
 	protected $definition;
+
+	/**
+	 * The factory's default parameters.
+	 *
+	 * @var array
+	 */
 	protected $params;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param Definition $definition
+	 * @param array      $params
+	 */
 	public function __construct(Definition $definition, array $params = array())
 	{
 		$this->definition = $definition;
 		$this->params = $params;
 	}
 
+	/**
+	 * Get a new instance of the factory.
+	 *
+	 * @param  array  $params
+	 *
+	 * @return static
+	 */
+	public function getFactory(array $params = array())
+	{
+		$factory = clone $this;
+		$factory->params = $params;
+		return $factory;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function invoke(ContainerInterface $container, array $params = array())
 	{
 		$params = array_replace($this->params, $params);

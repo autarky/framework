@@ -1,4 +1,13 @@
 <?php
+/**
+ * This file is part of the Autarky package.
+ *
+ * (c) Andreas Lutro <anlutro@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Autarky\Container\Factory;
 
 use Autarky\Container\ContainerInterface;
@@ -7,20 +16,65 @@ use ReflectionClass;
 use ReflectionFunction;
 use ReflectionMethod;
 
+/**
+ * Factory definition.
+ */
 class Definition implements FactoryInterface
 {
+	/**
+	 * The callable function/method.
+	 *
+	 * @var callable
+	 */
 	protected $callable;
+
+	/**
+	 * Map of argument position => argument
+	 *
+	 * @var array
+	 */
 	protected $argumentPositions = [];
+
+	/**
+	 * Map of argument name => argument
+	 *
+	 * @var array
+	 */
 	protected $argumentNames = [];
+
+	/**
+	 * Map of argument class => argument
+	 *
+	 * @var array
+	 */
 	protected $argumentClasses = [];
+
+	/**
+	 * The current argument postition.
+	 *
+	 * @var integer
+	 */
 	protected $argumentPosition = 0;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param callable $callable
+	 */
 	public function __construct($callable)
 	{
 		$this->callable = $callable;
 	}
 
-	public static function getDefaultForClass($class)
+	/**
+	 * Get a default factory for a class.
+	 *
+	 * @param  string $class
+	 * @param  array  $params Optional
+	 *
+	 * @return FactoryInterface
+	 */
+	public static function getDefaultForClass($class, array $params = array())
 	{
 		$reflectionClass = new ReflectionClass($class);
 		if (!$reflectionClass->isInstantiable()) {
@@ -40,10 +94,18 @@ class Definition implements FactoryInterface
 			}
 		}
 
-		return $factory;
+		return $factory->getFactory($params);
 	}
 
-	public static function getDefaultForCallable($callable)
+	/**
+	 * Get a default factory for a callable.
+	 *
+	 * @param  callable $callable
+	 * @param  array    $params   Optional
+	 *
+	 * @return FactoryInterface
+	 */
+	public static function getDefaultForCallable($callable, array $params = array())
 	{
 		$factory = new static($callable);
 		if (is_array($callable)) {
@@ -60,29 +122,59 @@ class Definition implements FactoryInterface
 			}
 		}
 
-		return $factory;
+		return $factory->getFactory($params);
 	}
 
+	/**
+	 * Get the factory callable.
+	 *
+	 * @return callable
+	 */
 	public function getCallable()
 	{
 		return $this->callable;
 	}
 
+	/**
+	 * Get the factory definition's arguments, mapped by position.
+	 *
+	 * @return array
+	 */
 	public function getArguments()
 	{
 		return $this->argumentPositions;
 	}
 
+	/**
+	 * Add a scalar argument to the factory definition.
+	 *
+	 * @param string  $name
+	 * @param string  $type     int, string, object, etc.
+	 * @param boolean $required
+	 * @param mixed   $default  Default value, if not required
+	 */
 	public function addScalarArgument($name, $type, $required = true, $default = null)
 	{
 		return $this->addArgument(new ScalarArgument($this->argumentPosition++, $name, $type, $required, $default));
 	}
 
+	/**
+	 * Add a class argument to the factory definition.
+	 *
+	 * @param string  $name
+	 * @param string  $class
+	 * @param boolean $required
+	 */
 	public function addClassArgument($name, $class, $required = true)
 	{
 		return $this->addArgument(new ClassArgument($this->argumentPosition++, $name, $class, $required));
 	}
 
+	/**
+	 * Add an argument to the factory definition.
+	 *
+	 * @param ArgumentInterface $argument
+	 */
 	public function addArgument(ArgumentInterface $argument)
 	{
 		$this->argumentPositions[$argument->getPosition()] = $argument;
@@ -93,11 +185,21 @@ class Definition implements FactoryInterface
 		return $argument;
 	}
 
+	/**
+	 * Get the definition's factory.
+	 *
+	 * @param  array  $params
+	 *
+	 * @return Factory
+	 */
 	public function getFactory(array $params = array())
 	{
 		return new Factory($this, $params);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function invoke(ContainerInterface $container, array $params = array())
 	{
 		return $this->getFactory($params)
