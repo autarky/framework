@@ -323,6 +323,8 @@ class Application implements HttpKernelInterface
 				$provider = new $provider();
 			}
 			$this->registerProvider($provider);
+
+			$this->checkProviderDependencies($provider);
 		}
 	}
 
@@ -343,11 +345,47 @@ class Application implements HttpKernelInterface
 		}
 	}
 
-	/**
-	 * Call the application's config callbacks.
-	 *
-	 * @return void
-	 */
+	protected function checkProviderDependencies(ServiceProvider $provider)
+	{
+		$errors = [];
+
+		foreach ($provider->getClassDependencies() as $class) {
+			if (!class_exists($class)) {
+				$errors[] = "Class must exist: $class";
+			}
+		}
+
+		foreach ($provider->getContainerDependencies() as $class) {
+			if (!$this->container->isBound($class)) {
+				$errors[] = "Class must be bound to the container: $class";
+			}
+		}
+
+		static $providerClasses;
+		if (!isset($providerClasses)) {
+			$providerClasses = array_keys($this->providers);
+		}
+
+		foreach ($provider->getProviderDependencies() as $class) {
+			if (!in_array($class, $providerClasses, true)) {
+				$errors[] = "Provider must be loaded: $class";
+			}
+		}
+
+		if ($errors) {
+			$providerClass = get_class($provider);
+
+			if (count($errors) > 1) {
+				$message = "Errors while registering provider: $providerClass\n"
+					. implode("\n", $errors);
+			} else {
+				$message = "Error while registering provider: {$providerClass} - {$errors[0]}";
+			}
+
+			throw new \RuntimeException($message);
+		}
+	}
+
 	protected function callConfigCallbacks()
 	{
 		foreach ($this->configCallbacks as $callback) {
