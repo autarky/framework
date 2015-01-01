@@ -94,7 +94,7 @@ class Application implements HttpKernelInterface
 	/**
 	 * @var \SplStack
 	 */
-	protected $configCallbacks;
+	protected $configurators;
 
 	/**
 	 * @var \Symfony\Component\HttpFoundation\RequestStack
@@ -110,7 +110,7 @@ class Application implements HttpKernelInterface
 	public function __construct($environment, array $providers)
 	{
 		$this->middlewares = new SplPriorityQueue;
-		$this->configCallbacks = new SplStack;
+		$this->configurators = new SplStack;
 		$this->requests = new RequestStack;
 		$this->setEnvironment($environment);
 		
@@ -121,20 +121,45 @@ class Application implements HttpKernelInterface
 	}
 
 	/**
-	 * Push a configuration on top of the stack. The config callbacks will be
+	 * Push a configurator on top of the stack. The configurators will be
 	 * executed when the application is booted. If the application is already
-	 * booted, the callback will be executed at once.
+	 * booted, the configurator will be executed at once.
 	 *
-	 * @param  callable $callback
+	 * @param  callable|ConfiguratorInterface $configurator
 	 *
 	 * @return void
 	 */
-	public function config(callable $callback)
+	public function config($configurator)
 	{
 		if ($this->booted) {
-			call_user_func($callback, $this);
+			$this->invokeConfigurator($configurator);
 		} else {
-			$this->configCallbacks->push($callback);
+			$this->configurators->push($configurator);
+		}
+	}
+
+	/**
+	 * Invoke a single configurator.
+	 *
+	 * @param  callable|string|ConfiguratorInterface $configurator
+	 *
+	 * @return void
+	 */
+	protected function invokeConfigurator($configurator)
+	{
+		if (is_callable($configurator)) {
+			call_user_func($configurator, $this);
+			return;
+		}
+
+		if (is_string($configurator)) {
+			$configurator = $this->container->resolve($configurator);
+		}
+
+		if ($configurator instanceof ConfiguratorInterface) {
+			$configurator->configure();
+		} else {
+			throw new \UnexpectedValueException('Invalid configurator');
 		}
 	}
 
@@ -305,7 +330,11 @@ class Application implements HttpKernelInterface
 		$this->booting = true;
 
 		$this->registerProviders();
-		$this->callConfigCallbacks();
+
+		foreach ($this->configurators as $configurator) {
+			$this->invokeConfigurator($configurator);
+		}
+
 		$this->resolveStack();
 
 		$this->booted = true;
@@ -340,18 +369,6 @@ class Application implements HttpKernelInterface
 
 		if ($this->console) {
 			$provider->registerConsole($this->console);
-		}
-	}
-
-	/**
-	 * Call the application's config callbacks.
-	 *
-	 * @return void
-	 */
-	protected function callConfigCallbacks()
-	{
-		foreach ($this->configCallbacks as $callback) {
-			call_user_func($callback, $this);
 		}
 	}
 

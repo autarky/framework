@@ -103,6 +103,19 @@ class KernelApplicationTest extends TestCase
 	}
 
 	/** @test */
+	public function configuratorClassesResolvedOnBoot()
+	{
+		$mock = m::mock('Autarky\Kernel\ConfiguratorInterface');
+		$app = $this->makeApplication();
+		$app->getContainer()->define('MockConfigurator', function() use($mock) {
+			return $mock;
+		});
+		$app->config('MockConfigurator');
+		$mock->shouldReceive('configure')->once();
+		$app->boot();
+	}
+
+	/** @test */
 	public function serviceProvidersAreCalledOnBoot()
 	{
 		$app = $this->makeApplication([__NAMESPACE__.'\\StubServiceProvider']);
