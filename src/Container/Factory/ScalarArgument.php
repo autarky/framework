@@ -15,6 +15,16 @@ namespace Autarky\Container\Factory;
  */
 class ScalarArgument extends AbstractArgument implements ArgumentInterface
 {
+	const TYPE_ARRAY    = 'array';
+	const TYPE_BOOL     = 'bool';
+	const TYPE_DOUBLE   = 'float';
+	const TYPE_FLOAT    = 'float';
+	const TYPE_INT      = 'int';
+	const TYPE_MIXED    = 'mixed';
+	const TYPE_OBJECT   = 'object';
+	const TYPE_RESOURCE = 'resource';
+	const TYPE_STRING   = 'string';
+
 	/**
 	 * The argument's type.
 	 *

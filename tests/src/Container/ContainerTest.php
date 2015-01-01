@@ -366,9 +366,11 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function canDefineDynamicFactoryParam()
 	{
 		$c = $this->makeContainer();
-		$c->define('var.service', function(ContainerInterface $container, $variable) {
+		$f = $c->makeFactory(function($variable) {
 			return strtoupper($variable);
 		});
+		$f->addScalarArgument('$variable', 'string');
+		$c->define('var.service', $f);
 		$c->params('ParamStub', [
 			'$foo' => $c->getFactory('var.service', ['$variable' => 'foo']),
 			'$bar' => $c->getFactory('var.service', ['$variable' => 'bar']),
@@ -395,9 +397,11 @@ class ContainerTest extends PHPUnit_Framework_TestCase
 	public function canDefineDynamicFactoryParamWithClasses()
 	{
 		$c = $this->makeContainer();
-		$c->define('ValueLowerClass', function(ContainerInterface $container, $value) {
+		$f = $c->makeFactory(function($value) {
 			return new ValueLowerClass($value);
 		});
+		$f->addScalarArgument('$value', 'mixed');
+		$c->define('ValueLowerClass', $f);
 		$c->params('UpperClass', [
 			'LowerClass' => $c->getFactory('ValueLowerClass', ['$value' => 'foobar']),
 		]);

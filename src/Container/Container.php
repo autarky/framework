@@ -248,11 +248,16 @@ class Container implements ContainerInterface
 	 * Make a new factory definition for a class.
 	 *
 	 * @param  callable $callable
+	 * @param  boolean  $reflect  Optional, default false - Whether to use reflection to find the arguments to the callable. If false, you will need to add arguments to the definition object yourself
 	 *
 	 * @return Definition
 	 */
-	public function makeFactory($callable)
+	public function makeFactory($callable, $reflect = false)
 	{
+		if ($reflect) {
+			return Definition::getFromReflection($callable, null);
+		}
+
 		return new Definition($callable);
 	}
 
