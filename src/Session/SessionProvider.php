@@ -173,15 +173,4 @@ class SessionProvider extends ServiceProvider
 
 		return $session;
 	}
-
-	protected function getSessionPath()
-	{
-		if ($this->config->has('path.session')) {
-			return $this->config->get('path.session');
-		} else if ($this->config->has('path.storage')) {
-			return $this->config->get('path.storage').'/session';
-		} else {
-			return null;
-		}
-	}
 }
