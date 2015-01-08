@@ -532,16 +532,12 @@ class Container implements ContainerInterface
 			return;
 		}
 
-		if ($alias) {
-			if ($this->isProtected($class) || $this->isProtected($alias)) {
-				$msg = "Class $class (via alias $alias) or its alias is internal and cannot be resolved.";
-				throw new Exception\ResolvingInternalException($msg);
+		if ($this->isProtected($class) || ($alias && $this->isProtected($alias))) {
+			if ($alias) {
+				$class = "$class (via alias $alias)";
 			}
-		} else {
-			if ($this->isProtected($class)) {
-				$msg = "Class $class is internal and cannot be resolved.";
-				throw new Exception\ResolvingInternalException($msg);
-			}
+			$msg = "Class $class is internal and cannot be resolved.";
+			throw new Exception\ResolvingInternalException($msg);
 		}
 	}
 
