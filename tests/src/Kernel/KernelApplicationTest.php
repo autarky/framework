@@ -119,6 +119,7 @@ class KernelApplicationTest extends TestCase
 	public function serviceProvidersAreCalledOnBoot()
 	{
 		$app = $this->makeApplication([__NAMESPACE__.'\\StubServiceProvider']);
+		$this->assertFalse(StubServiceProvider::$called);
 		$app->boot();
 		$this->assertTrue(StubServiceProvider::$called);
 	}

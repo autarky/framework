@@ -125,7 +125,7 @@ class Application implements HttpKernelInterface
 	 * executed when the application is booted. If the application is already
 	 * booted, the configurator will be executed at once.
 	 *
-	 * @param  callable|ConfiguratorInterface $configurator
+	 * @param  callable|string|ConfiguratorInterface $configurator
 	 *
 	 * @return void
 	 */
