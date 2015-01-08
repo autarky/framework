@@ -174,7 +174,7 @@ class Application implements HttpKernelInterface
 			throw new \RuntimeException('Cannot set environment after application has booted');
 		}
 
-		if (is_callable($environment)) {
+		if ($environment instanceof Closure) {
 			$environment = call_user_func($environment);
 		}
 
