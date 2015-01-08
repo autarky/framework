@@ -37,6 +37,13 @@ interface ArgumentInterface
 	public function isRequired();
 
 	/**
+	 * Get whether the argument is optional or not.
+	 *
+	 * @return boolean
+	 */
+	public function isOptional();
+
+	/**
 	 * Whether the argument is a class.
 	 *
 	 * @return boolean

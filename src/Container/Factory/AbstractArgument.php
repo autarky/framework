@@ -82,4 +82,12 @@ abstract class AbstractArgument
 	{
 		return $this->required;
 	}
+
+	/**
+	 * {@inheridoc}
+	 */
+	public function isOptional()
+	{
+		return !$this->required;
+	}
 }

@@ -16,6 +16,11 @@ namespace Autarky\Container\Factory;
 class ClassArgument extends AbstractArgument implements ArgumentInterface
 {
 	/**
+	 * @var string
+	 */
+	protected $class;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param int     $position
