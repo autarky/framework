@@ -89,14 +89,16 @@ class ChannelManager extends AbstractLogger implements LoggerInterface
 	/**
 	 * Get a specific channel.
 	 *
-	 * @param  string $channel
+	 * @param  string $channel  Optional - if none, use default channel
 	 *
 	 * @return \Psr\Log\LoggerInterface
 	 *
 	 * @throws InvalidArgumentException If the channel is not defined.
 	 */
-	public function getChannel($channel)
+	public function getChannel($channel = null)
 	{
+		$channel = $channel ?: $this->defaultChannel;
+
 		if (isset($this->deferredChannels[$channel])) {
 			$this->setChannel($channel, $this->deferredChannels[$channel]());
 			unset($this->deferredChannels[$channel]);
