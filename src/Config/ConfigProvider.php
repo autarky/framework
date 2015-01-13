@@ -43,7 +43,7 @@ class ConfigProvider extends ServiceProvider
 	 */
 	public function register()
 	{
-		$this->app->setConfig($this->getConfigStore());
+		$this->app->setConfig($store = $this->getConfigStore());
 
 		if ($store->has('app.configurators')) {
 			foreach ($store->get('app.configurators') as $configurator) {
