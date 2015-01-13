@@ -12,7 +12,7 @@ namespace Autarky\Kernel;
 
 use Closure;
 use SplPriorityQueue;
-use SplStack;
+use SplDoublyLinkedList;
 use Stack\Builder as StackBuilder;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -92,7 +92,7 @@ class Application implements HttpKernelInterface
 	protected $booted = false;
 
 	/**
-	 * @var \SplStack
+	 * @var \SplDoublyLinkedList
 	 */
 	protected $configurators;
 
@@ -110,7 +110,7 @@ class Application implements HttpKernelInterface
 	public function __construct($environment, array $providers)
 	{
 		$this->middlewares = new SplPriorityQueue;
-		$this->configurators = new SplStack;
+		$this->configurators = new SplDoublyLinkedList;
 		$this->requests = new RequestStack;
 		$this->setEnvironment($environment);
 		
