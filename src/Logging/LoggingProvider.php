@@ -10,16 +10,13 @@
 
 namespace Autarky\Logging;
 
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Formatter\LineFormatter;
-
 use Autarky\Kernel\ServiceProvider;
 use Autarky\Container\ContainerInterface;
 
 /**
- * Simple service provider that binds a Monolog instance onto the container and
- * registers an error handler that logs all errors.
+ * Logging provider.
+ *
+ * Provides a channel manager which can store multiple loggers.
  */
 class LoggingProvider extends ServiceProvider
 {
@@ -39,6 +36,6 @@ class LoggingProvider extends ServiceProvider
 
 	public function makeChannelManager(ContainerInterface $container)
 	{
-		return new ChannelManager;
+		return new ChannelManager();
 	}
 }

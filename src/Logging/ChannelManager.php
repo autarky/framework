@@ -51,6 +51,26 @@ class ChannelManager extends AbstractLogger implements LoggerInterface
 	}
 
 	/**
+	 * Change the default channel.
+	 *
+	 * @param string $channel
+	 */
+	public function setDefaultChannel($channel)
+	{
+		$this->defaultChannel = $channel;
+	}
+
+	/**
+	 * Get the name of the default channel.
+	 *
+	 * @return string
+	 */
+	public function getDefaultChannelName()
+	{
+		return $this->defaultChannel;
+	}
+
+	/**
 	 * Set a channel instance.
 	 *
 	 * @param string          $channel
