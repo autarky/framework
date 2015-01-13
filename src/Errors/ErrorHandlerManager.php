@@ -13,6 +13,7 @@ namespace Autarky\Errors;
 use Exception;
 use ErrorException;
 use ReflectionFunction;
+use ReflectionMethod;
 use SplDoublyLinkedList;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FatalErrorException;
@@ -135,6 +136,9 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 				if (is_string($handler)) {
 					$handler = $this->resolver->resolve($handler);
 					$this->handlers->offsetSet($index, $handler);
+				} else if (is_array($handler) && is_string($handler[0])) {
+					$handler[0] = $this->resolver->resolve($handler[0]);
+					$this->handlers->offsetSet($index, $handler);
 				}
 
 				if (!$this->matchesTypehint($handler, $exception)) {
@@ -202,8 +206,13 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 			return $handler->handles($exception);
 		}
 
-		$params = (new ReflectionFunction($handler))
-			->getParameters();
+		if (is_array($handler)) {
+			$reflection = (new ReflectionMethod($handler[0], $handler[1]));
+		} else {
+			$reflection = (new ReflectionFunction($handler));
+		}
+
+		$params = $reflection->getParameters();
 
 		// if the handler takes no parameters it is considered global and should
 		// handle every exception
