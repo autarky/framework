@@ -1,10 +1,9 @@
 <?php
-namespace Autarky\Tests\Events;
 
 use Autarky\Tests\TestCase;
 use Mockery as m;
 
-class ServiceProviderTest extends TestCase
+class EventDispatcherProviderTest extends TestCase
 {
 	public function tearDown()
 	{

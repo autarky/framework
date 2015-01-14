@@ -1,10 +1,8 @@
 <?php
-namespace Autarky\Tests\Routing;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 
-class ConfigurationTest extends PHPUnit_Framework_TestCase
+class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 {
 	public function tearDown()
 	{
@@ -17,7 +15,7 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
 		$router = $this->mockRouter();
 		$data = $this->getRouteData();
 		$config = $this->makeConfig($router, $data, 'namespace');
-		$router->shouldReceive('addRoute')->once()->with(['get'], '/path', 'foo:bar', 'namespace:foobar');
+		$router->shouldReceive('addRoute')->once()->with(['get'], '/path', ['foo', 'bar'], 'namespace:foobar');
 		$config->mount();
 	}
 
@@ -28,7 +26,7 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
 		$data = $this->getRouteData();
 		$config = $this->makeConfig($router, $data);
 		$config->override('foobar', ['methods' => ['get', 'post']]);
-		$router->shouldReceive('addRoute')->once()->with(['get', 'post'], '/path', 'foo:bar', 'foobar');
+		$router->shouldReceive('addRoute')->once()->with(['get', 'post'], '/path', ['foo', 'bar'], 'foobar');
 		$config->mount();
 	}
 
@@ -42,10 +40,28 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase
 		return [
 			'foobar' => [
 				'methods' => ['get'],
-				'handler' => 'foo:bar',
+				'controller' => ['foo', 'bar'],
 				'path' => '/path',
 			],
 		];
+	}
+
+	/** @test */
+	public function canRegisterMultiControllers()
+	{
+		$router = $this->mockRouter();
+		$config = $this->makeConfig($router, [
+			'name' => [
+				'path' => '/path',
+				'methods' => [
+					'get' => ['Controller', 'get'],
+					'post' => ['Controller', 'post'],
+				],
+			],
+		]);
+		$router->shouldReceive('addRoute')->with(['get'], '/path', ['Controller', 'get'], 'name')->once();
+		$router->shouldReceive('addRoute')->with(['post'], '/path', ['Controller', 'post'], null)->once();
+		$config->mount();
 	}
 
 	protected function mockRouter()

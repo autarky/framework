@@ -1,5 +1,4 @@
 <?php
-namespace Autarky\Tests\Kernel;
 
 use Mockery as m;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,7 +10,7 @@ use Autarky\Kernel\Application;
 use Autarky\Config\ArrayStore;
 use Autarky\Container\Container;
 
-class ApplicationTest extends TestCase
+class KernelApplicationTest extends TestCase
 {
 	public function tearDown()
 	{
@@ -26,7 +25,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function environmentClosureIsResolvedOnBoot()
+	public function environmentClosureIsInvoked()
 	{
 		$app = $this->makeApplication([], function() { return 'testenv'; });
 		$app->boot();
@@ -42,7 +41,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function pushStringMiddleware()
+	public function canAddClassNameStringAsMiddleware()
 	{
 		$app = $this->makeApplication();
 		$this->returnResponse($app, 'foo');
@@ -52,7 +51,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function pushClosureMiddleware()
+	public function canAddClosureAsMiddleware()
 	{
 		$app = $this->makeApplication();
 		$this->returnResponse($app, 'foo');
@@ -62,7 +61,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function pushArrayMiddleware()
+	public function canAddCallableArrayAsMiddleware()
 	{
 		$app = $this->makeApplication();
 		$this->returnResponse($app, 'foo');
@@ -72,7 +71,7 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function pushMiddlewarePriority()
+	public function canSetMiddlewarePriority()
 	{
 		$app = $this->makeApplication();
 		$this->returnResponse($app, 'foo');
@@ -104,9 +103,23 @@ class ApplicationTest extends TestCase
 	}
 
 	/** @test */
-	public function serviceProvidersAreCalled()
+	public function configuratorClassesResolvedOnBoot()
+	{
+		$mock = m::mock('Autarky\Kernel\ConfiguratorInterface');
+		$app = $this->makeApplication();
+		$app->getContainer()->define('MockConfigurator', function() use($mock) {
+			return $mock;
+		});
+		$app->config('MockConfigurator');
+		$mock->shouldReceive('configure')->once();
+		$app->boot();
+	}
+
+	/** @test */
+	public function serviceProvidersAreCalledOnBoot()
 	{
 		$app = $this->makeApplication([__NAMESPACE__.'\\StubServiceProvider']);
+		$this->assertFalse(StubServiceProvider::$called);
 		$app->boot();
 		$this->assertTrue(StubServiceProvider::$called);
 	}

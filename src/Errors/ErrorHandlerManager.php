@@ -13,6 +13,7 @@ namespace Autarky\Errors;
 use Exception;
 use ErrorException;
 use ReflectionFunction;
+use ReflectionMethod;
 use SplDoublyLinkedList;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FatalErrorException;
@@ -28,16 +29,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 * @var \Autarky\Errors\HandlerResolver
 	 */
 	protected $resolver;
-
-	/**
-	 * @var \Autarky\Errors\ContextCollectorInterface
-	 */
-	protected $contextCollector;
-
-	/**
-	 * @var \Closure|\Psr\Log\LoggerInterface
-	 */
-	protected $logger;
 
 	/**
 	 * @var \SplDoublyLinkedList
@@ -58,14 +49,10 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 
 	/**
 	 * @param HandlerResolver           $resolver
-	 * @param ContextCollectorInterface $contextCollector
 	 */
-	public function __construct(
-		HandlerResolver $resolver,
-		ContextCollectorInterface $contextCollector
-	) {
+	public function __construct(HandlerResolver $resolver)
+	{
 		$this->resolver = $resolver;
-		$this->contextCollector = $contextCollector;
 		$this->handlers = new SplDoublyLinkedList;
 	}
 
@@ -86,26 +73,10 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function setLogger($logger)
-	{
-		$this->logger = $logger;
-	}
-
-	protected function getLogger()
-	{
-		if ($this->logger instanceof \Closure) {
-			$this->logger = call_user_func($this->logger);
-		}
-
-		return $this->logger;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
 	public function appendHandler($handler)
 	{
-		$this->addHandler('push', $handler);
+		$this->checkHandler($handler);
+		$this->handlers->push($handler);
 	}
 
 	/**
@@ -113,10 +84,11 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 */
 	public function prependHandler($handler)
 	{
-		$this->addHandler('unshift', $handler);
+		$this->checkHandler($handler);
+		$this->handlers->unshift($handler);
 	}
 
-	protected function addHandler($method, $handler)
+	protected function checkHandler($handler)
 	{
 		if (
 			!$handler instanceof ErrorHandlerInterface
@@ -126,8 +98,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 			$type = is_object($handler) ? get_class($handler) : gettype($handler);
 			throw new \InvalidArgumentException("Error handler must be callable, string or instance of Autarky\Errors\ErrorHandlerInterface, $type given");
 		}
-
-		$this->handlers->$method($handler);
 	}
 
 	/**
@@ -161,22 +131,27 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	{
 		if ($this->rethrow) throw $exception;
 
-		$this->logException($exception);
-
 		foreach ($this->handlers as $index => $handler) {
-			if (is_string($handler)) {
-				$handler = $this->resolver->resolve($handler);
-				$this->handlers->offsetSet($index, $handler);
-			}
+			try {
+				if (is_string($handler)) {
+					$handler = $this->resolver->resolve($handler);
+					$this->handlers->offsetSet($index, $handler);
+				} else if (is_array($handler) && is_string($handler[0])) {
+					$handler[0] = $this->resolver->resolve($handler[0]);
+					$this->handlers->offsetSet($index, $handler);
+				}
 
-			if (!$this->matchesTypehint($handler, $exception)) {
-				continue;
-			}
+				if (!$this->matchesTypehint($handler, $exception)) {
+					continue;
+				}
 
-			$result = $this->callHandler($handler, $exception);
+				$result = $this->callHandler($handler, $exception);
 
-			if ($result !== null) {
-				return $this->makeResponse($result, $exception);
+				if ($result !== null) {
+					return $this->makeResponse($result, $exception);
+				}
+			} catch (Exception $newException) {
+				return $this->handle($newException);
 			}
 		}
 
@@ -189,20 +164,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	public function handles(Exception $exception)
 	{
 		return true;
-	}
-
-	/**
-	 * Log an exception if a logger has been set.
-	 *
-	 * @param  \Exception $exception
-	 *
-	 * @return void
-	 */
-	protected function logException(Exception $exception)
-	{
-		if ($this->logger === null) return;
-
-		$this->getLogger()->error($exception, $this->contextCollector->getContext());
 	}
 
 	/**
@@ -245,8 +206,13 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 			return $handler->handles($exception);
 		}
 
-		$params = (new ReflectionFunction($handler))
-			->getParameters();
+		if (is_array($handler)) {
+			$reflection = (new ReflectionMethod($handler[0], $handler[1]));
+		} else {
+			$reflection = (new ReflectionFunction($handler));
+		}
+
+		$params = $reflection->getParameters();
 
 		// if the handler takes no parameters it is considered global and should
 		// handle every exception
@@ -266,6 +232,14 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		return $handlerHint->isInstance($exception);
 	}
 
+	/**
+	 * Call an exception handler.
+	 *
+	 * @param  mixed     $handler
+	 * @param  Exception $exception
+	 *
+	 * @return mixed
+	 */
 	protected function callHandler($handler, Exception $exception)
 	{
 		if ($handler instanceof ErrorHandlerInterface) {

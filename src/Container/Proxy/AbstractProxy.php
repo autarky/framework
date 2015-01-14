@@ -24,6 +24,14 @@ abstract class AbstractProxy
 	 */
 	protected static $container;
 
+	/**
+	 * This class is a static class and should not be instantiated.
+	 */
+	private function __construct()
+	{
+		//
+	}
+
 	public static function setProxyContainer(ContainerInterface $container = null)
 	{
 		static::$instances = [];

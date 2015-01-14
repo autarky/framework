@@ -1,9 +1,8 @@
 <?php
-namespace Autarky\Tests\Errors;
 
 use Autarky\Tests\TestCase;
 
-class ServiceProviderTest extends TestCase
+class ErrorHandlerProviderTest extends TestCase
 {
 	/** @test */
 	public function canResolve()

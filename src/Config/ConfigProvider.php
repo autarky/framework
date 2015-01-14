@@ -43,6 +43,17 @@ class ConfigProvider extends ServiceProvider
 	 */
 	public function register()
 	{
+		$this->app->setConfig($store = $this->getConfigStore());
+
+		if ($store->has('app.configurators')) {
+			foreach ($store->get('app.configurators') as $configurator) {
+				$this->app->config($configurator);
+			}
+		}
+	}
+
+	protected function getConfigStore()
+	{
 		$dic = $this->app->getContainer();
 
 		$loaderFactory = new LoaderFactory($dic);
@@ -60,7 +71,7 @@ class ConfigProvider extends ServiceProvider
 		$dic->share('Autarky\Config\Loaders\CachingYamlFileLoader');
 		$loaderFactory->addLoader(['yml', 'yaml'], 'Autarky\Config\Loaders\CachingYamlFileLoader');
 
-		$this->app->setConfig($store);
+		return $store;
 	}
 
 	protected function getYamlCachePath()

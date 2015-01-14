@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Templating\Twig\Extension;
+namespace Autarky\Templating\Twig;
 
 use Twig_Extension;
 use Twig_SimpleFunction;
@@ -26,11 +26,19 @@ class PartialExtension extends Twig_Extension
 	 */
 	protected $container;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param ContainerInterface $container
+	 */
 	public function __construct(ContainerInterface $container)
 	{
 		$this->container = $container;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getFunctions()
 	{
 		return [
@@ -41,19 +49,21 @@ class PartialExtension extends Twig_Extension
 	/**
 	 * The implementation of the twig partial() function.
 	 *
-	 * @param  string $name   'Namespace\Class' or 'Class:method'. If method is
-	 *                        left out, defaults to 'render'
-	 * @param  array  $params
+	 * @param  array $name   ['ClassName', 'method']
+	 * @param  array $params
 	 *
 	 * @return string
 	 */
-	public function getPartial($name, array $params = array())
+	public function getPartial(array $name, array $params = array())
 	{
-		list($class, $method) = \Autarky\splitclm($name, 'handle');
+		list($class, $method) = $name;
 		$obj = $this->container->resolve($class);
 		return call_user_func_array([$obj, $method], $params);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getName()
 	{
 		return 'partial';

@@ -10,6 +10,10 @@
 
 namespace Autarky\Support;
 
+/**
+ * @ignore
+ * @codeCoverageIgnore
+ */
 class Diagnostic
 {
 	protected $errors = 0;

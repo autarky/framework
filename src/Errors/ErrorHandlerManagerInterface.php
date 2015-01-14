@@ -24,15 +24,6 @@ interface ErrorHandlerManagerInterface extends ErrorHandlerInterface
 	public function setRethrow($toggle);
 
 	/**
-	 * Set the error handler's logger.
-	 *
-	 * Can be a closure for the logger to be resolved lazily.
-	 *
-	 * @param \Psr\Log\LoggerInterface|\Closure $logger
-	 */
-	public function setLogger($logger);
-
-	/**
 	 * Append a handler to the list of handlers.
 	 *
 	 * @param  callable|ErrorHandlerInterface $handler

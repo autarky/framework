@@ -12,7 +12,7 @@ namespace Autarky\Kernel;
 
 use Closure;
 use SplPriorityQueue;
-use SplStack;
+use SplDoublyLinkedList;
 use Stack\Builder as StackBuilder;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +32,7 @@ class Application implements HttpKernelInterface
 	/**
 	 * The framework version.
 	 */
-	const VERSION = '0.6.1';
+	const VERSION = '0.7.x';
 
 	/**
 	 * The application's service providers.
@@ -72,11 +72,6 @@ class Application implements HttpKernelInterface
 	protected $errorHandler;
 
 	/**
-	 * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|false
-	 */
-	protected $eventDispatcher;
-
-	/**
 	 * @var \Symfony\Component\Console\Application
 	 */
 	protected $console;
@@ -97,9 +92,9 @@ class Application implements HttpKernelInterface
 	protected $booted = false;
 
 	/**
-	 * @var \SplStack
+	 * @var \SplDoublyLinkedList
 	 */
-	protected $configCallbacks;
+	protected $configurators;
 
 	/**
 	 * @var \Symfony\Component\HttpFoundation\RequestStack
@@ -115,7 +110,7 @@ class Application implements HttpKernelInterface
 	public function __construct($environment, array $providers)
 	{
 		$this->middlewares = new SplPriorityQueue;
-		$this->configCallbacks = new SplStack;
+		$this->configurators = new SplDoublyLinkedList;
 		$this->requests = new RequestStack;
 		$this->setEnvironment($environment);
 		
@@ -126,20 +121,45 @@ class Application implements HttpKernelInterface
 	}
 
 	/**
-	 * Push a configuration on top of the stack. The config callbacks will be
+	 * Push a configurator on top of the stack. The configurators will be
 	 * executed when the application is booted. If the application is already
-	 * booted, the callback will be executed at once.
+	 * booted, the configurator will be executed at once.
 	 *
-	 * @param  callable $callback
+	 * @param  callable|string|ConfiguratorInterface $configurator
 	 *
 	 * @return void
 	 */
-	public function config(callable $callback)
+	public function config($configurator)
 	{
 		if ($this->booted) {
-			call_user_func($callback, $this);
+			$this->invokeConfigurator($configurator);
 		} else {
-			$this->configCallbacks->push($callback);
+			$this->configurators->push($configurator);
+		}
+	}
+
+	/**
+	 * Invoke a single configurator.
+	 *
+	 * @param  callable|string|ConfiguratorInterface $configurator
+	 *
+	 * @return void
+	 */
+	protected function invokeConfigurator($configurator)
+	{
+		if (is_callable($configurator)) {
+			call_user_func($configurator, $this);
+			return;
+		}
+
+		if (is_string($configurator)) {
+			$configurator = $this->container->resolve($configurator);
+		}
+
+		if ($configurator instanceof ConfiguratorInterface) {
+			$configurator->configure();
+		} else {
+			throw new \UnexpectedValueException('Invalid configurator');
 		}
 	}
 
@@ -154,7 +174,7 @@ class Application implements HttpKernelInterface
 			throw new \RuntimeException('Cannot set environment after application has booted');
 		}
 
-		if (is_callable($environment)) {
+		if ($environment instanceof Closure) {
 			$environment = call_user_func($environment);
 		}
 
@@ -262,25 +282,6 @@ class Application implements HttpKernelInterface
 	}
 
 	/**
-	 * Get the application's event dispatcher.
-	 *
-	 * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface|null
-	 */
-	public function getEventDispatcher()
-	{
-		if ($this->eventDispatcher === null) {
-			$class = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
-			if ($this->container->isBound($class)) {
-				$this->eventDispatcher = $this->container->resolve($class);
-			} else {
-				$this->eventDispatcher = false;
-			}
-		}
-
-		return $this->eventDispatcher ?: null;
-	}
-
-	/**
 	 * Get the application's request stack.
 	 *
 	 * @return \Symfony\Component\HttpFoundation\RequestStack
@@ -329,12 +330,21 @@ class Application implements HttpKernelInterface
 		$this->booting = true;
 
 		$this->registerProviders();
-		$this->callConfigCallbacks();
+
+		foreach ($this->configurators as $configurator) {
+			$this->invokeConfigurator($configurator);
+		}
+
 		$this->resolveStack();
 
 		$this->booted = true;
 	}
 
+	/**
+	 * Register all of the application's service providers.
+	 *
+	 * @return void
+	 */
 	protected function registerProviders()
 	{
 		foreach ($this->providers as $provider) {
@@ -345,6 +355,13 @@ class Application implements HttpKernelInterface
 		}
 	}
 
+	/**
+	 * Register a single service provider.
+	 *
+	 * @param  ServiceProvider $provider
+	 *
+	 * @return void
+	 */
 	protected function registerProvider(ServiceProvider $provider)
 	{
 		$provider->setApplication($this);
@@ -355,35 +372,43 @@ class Application implements HttpKernelInterface
 		}
 	}
 
-	protected function callConfigCallbacks()
-	{
-		foreach ($this->configCallbacks as $callback) {
-			call_user_func($callback, $this);
-		}
-	}
-
+	/**
+	 * Resolve the stack builder.
+	 *
+	 * @return \Stack\Builder
+	 */
 	protected function resolveStack()
 	{
-		if ($this->stack !== null) return $this->stack;
+		if ($this->stack !== null) {
+			return $this->stack;
+		}
 
 		$this->stack = new StackBuilder;
 
 		foreach ($this->middlewares as $middleware) {
-			if (!is_array($middleware)) {
-				$middleware = [$middleware];
-			}
-			call_user_func_array([$this->stack, 'push'], $middleware);
+			call_user_func_array([$this->stack, 'push'], (array) $middleware);
 		}
 
 		return $this->stack;
 	}
 
+	/**
+	 * Resolve the HTTP kernel.
+	 *
+	 * @return HttpKernelInterface
+	 */
 	protected function resolveKernel()
 	{
-		if ($this->kernel !== null) return $this->kernel;
+		if ($this->kernel !== null) {
+			return $this->kernel;
+		}
+
+		$class = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
+		$eventDispatcher = $this->container->isBound($class) ?
+			$this->container->resolve($class) : null;
 
 		$kernel = new HttpKernel(
-			$this->getRouter(), $this->errorHandler, $this->requests, $this->getEventDispatcher()
+			$this->getRouter(), $this->errorHandler, $this->requests, $eventDispatcher
 		);
 
 		return $this->kernel = $this->resolveStack()

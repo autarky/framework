@@ -30,14 +30,16 @@ class ErrorHandlerProvider extends ServiceProvider
 		$this->register = (bool) $register;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function register()
 	{
 		$dic = $this->app->getContainer();
 		$debug = $this->app->getConfig()->get('app.debug');
 
 		$manager = new ErrorHandlerManager(
-			new HandlerResolver($dic),
-			new ApplicationContextCollector($this->app)
+			new HandlerResolver($dic)
 		);
 
 		$manager->setDefaultHandler(new DefaultErrorHandler($debug));

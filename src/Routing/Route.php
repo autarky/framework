@@ -52,6 +52,8 @@ class Route
 	 */
 	protected $afterFilters = [];
 
+	protected $params;
+
 	/**
 	 * @param array    $methods    HTTP methods allowed for this route
 	 * @param string   $pattern
@@ -60,15 +62,20 @@ class Route
 	 */
 	public function __construct(array $methods, $pattern, $controller, $name = null)
 	{
-		$this->methods = $methods;
+		$this->methods = array_map('strtoupper', $methods);
 		$this->pattern = $pattern;
 		$this->name = $name;
-
-		if (is_string($controller) && !is_callable($controller)) {
-			$controller = \Autarky\splitclm($controller, 'action');
-		}
-
 		$this->controller = $controller;
+	}
+
+	public function getMethods()
+	{
+		return $this->methods;
+	}
+
+	public function getPattern()
+	{
+		return $this->pattern;
 	}
 
 	/**
@@ -168,6 +175,16 @@ class Route
 	public function getController()
 	{
 		return $this->controller;
+	}
+
+	public function setParams(array $params)
+	{
+		$this->params = $params;
+	}
+
+	public function getParams()
+	{
+		return $this->params;
 	}
 
 	/**

@@ -8,17 +8,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Errors;
+namespace Autarky\Kernel;
 
 /**
- * Class that collects an array of context data from an application instance.
+ * A configurator is a class that configures one or more other classes after the
+ * application has booted.
  */
-interface ContextCollectorInterface
+interface ConfiguratorInterface
 {
 	/**
-	 * Get an array of context data for the application.
+	 * Run the configuration.
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public function getContext();
+	public function configure();
 }

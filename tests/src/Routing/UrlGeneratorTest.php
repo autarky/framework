@@ -1,7 +1,5 @@
 <?php
-namespace Autarky\Tests\Routing;
 
-use PHPUnit_Framework_TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -14,7 +12,7 @@ use Autarky\Routing\UrlGenerator;
 
 class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 {
-	public function makeRouterAndGenerator($request = null)
+	protected function makeRouterAndGenerator($request = null)
 	{
 		$container = new Container;
 		$router = new Router(
@@ -30,7 +28,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	 * @test
 	 * @dataProvider getUrlGenerationData
 	 */
-	public function urlGeneration($path, array $params, $expected)
+	public function getRouteUrlReturnsCorrectUrl($path, array $params, $expected)
 	{
 		list($router, $url) = $this->makeRouterAndGenerator(Request::create('/'));
 		$router->addRoute('get', $path, function() {}, 'name');
@@ -48,7 +46,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function canAddRoutesWithoutLeadingSlash()
+	public function routesAddedWithoutLeadingSlashAreNormalized()
 	{
 		list($router, $url) = $this->makeRouterAndGenerator($request = Request::create('/foo/foo'));
 		$router->addRoute('get', 'foo/{v}', function() { return 'test'; }, 'name');
@@ -74,7 +72,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function canGenerateRelativeAssetUrlInSubdirectory()
+	public function canGenerateRelativeAssetUrlsInSubdirectory()
 	{
 		$server = [
 			'PHP_SELF' => '/path/to/subdir/index.php',

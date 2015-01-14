@@ -77,6 +77,11 @@ class Router implements RouterInterface
 	protected $filters = [];
 
 	/**
+	 * @var \SplObjectStorage
+	 */
+	protected $routes;
+
+	/**
 	 * @var array
 	 */
 	protected $namedRoutes = [];
@@ -91,6 +96,7 @@ class Router implements RouterInterface
 		EventDispatcherInterface $eventDispatcher,
 		$cachePath = null
 	) {
+		$this->routes = new \SplObjectStorage;
 		$this->invoker = $invoker;
 		$this->eventDispatcher = $eventDispatcher;
 
@@ -106,6 +112,16 @@ class Router implements RouterInterface
 		$this->routeCollector = new RouteCollector(
 			new RouteParser, new DataGenerator
 		);
+	}
+
+	public function isCaching()
+	{
+		return $this->dispatchData !== null;
+	}
+
+	public function getRoutes()
+	{
+		return $this->routes;
 	}
 
 	/**
@@ -189,6 +205,10 @@ class Router implements RouterInterface
 	 */
 	public function mount(array $routes, $path = '/')
 	{
+		if ($this->isCaching()) {
+			return;
+		}
+
 		(new Configuration($this, $routes))
 			->mount($path);
 	}
@@ -198,6 +218,10 @@ class Router implements RouterInterface
 	 */
 	public function group(array $flags, Closure $callback)
 	{
+		if ($this->isCaching()) {
+			return;
+		}
+
 		$oldPrefix = $this->currentPrefix;
 		$oldFilters = $this->currentFilters;
 
@@ -231,25 +255,24 @@ class Router implements RouterInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function addRoute($methods, $url, $handler, $name = null)
+	public function addRoute($methods, $path, $controller, $name = null)
 	{
-		// if dispatchData is set, we're using cached data and routes can no
-		// longer be added.
-		if ($this->dispatchData !== null) {
+		if ($this->isCaching()) {
 			return null;
 		}
 
 		$methods = (array) $methods;
-		$url = $this->makePath($url);
+		$path = $this->makePath($path);
 
-		$route = $this->createRoute($methods, $url, $handler, $name);
+		$route = $this->createRoute($methods, $path, $controller, $name);
+		$this->routes->attach($route);
 
 		if ($name) {
 			$this->addNamedRoute($name, $route);
 		}
 
-		foreach ($methods as $method) {
-			$this->routeCollector->addRoute(strtoupper($method), $url, $route);
+		foreach ($route->getMethods() as $method) {
+			$this->routeCollector->addRoute($method, $path, $route);
 		}
 
 		return $route;
@@ -287,9 +310,9 @@ class Router implements RouterInterface
 		$this->namedRoutes[$name] = $route;
 	}
 
-	protected function createRoute($methods, $url, $handler, $name)
+	protected function createRoute($methods, $path, $controller, $name)
 	{
-		$route = new Route($methods, $url, $handler, $name);
+		$route = new Route($methods, $path, $controller, $name);
 
 		foreach ($this->currentFilters as $filter) {
 			$route->addFilter($filter[0], $filter[1]);
@@ -315,37 +338,42 @@ class Router implements RouterInterface
 	 */
 	public function dispatch(Request $request)
 	{
+		$route = $this->getRouteForRequest($request);
+
+		return $this->getResponse($request, $route, $route->getParams());
+	}
+
+	public function getRouteForRequest(Request $request)
+	{
 		$method = $request->getMethod();
 		$path = $request->getPathInfo() ?: '/';
 
 		$result = $this->getDispatcher()
 			->dispatch($method, $path);
 
-		switch ($result[0]) {
-			case \FastRoute\Dispatcher::FOUND:
-				return $this->getResponse($request, $result[1], $result[2]);
-
-			case \FastRoute\Dispatcher::NOT_FOUND:
-				throw new NotFoundHttpException("No route match for path $path");
-
-			case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-				throw new MethodNotAllowedHttpException($result[1],
-					"Method $method not allowed for path $path");
-
-			default:
-				throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
+		if ($result[0] == \FastRoute\Dispatcher::NOT_FOUND) {
+			throw new NotFoundHttpException("No route match for path $path");
+		} else if ($result[0] == \FastRoute\Dispatcher::METHOD_NOT_ALLOWED) {
+			throw new MethodNotAllowedHttpException($result[1],
+				"Method $method not allowed for path $path");
+		} else if ($result[0] !== \FastRoute\Dispatcher::FOUND) {
+			throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
 		}
+
+		$result[1]->setParams($result[2]);
+
+		if ($this->eventDispatcher !== null) {
+			$event = new Events\RouteMatchedEvent($request, $result[1]);
+			$this->eventDispatcher->dispatch('route.match', $event);
+			$result[1] = $event->getRoute();
+		}
+
+		return $result[1];
 	}
 
 	protected function getResponse(Request $request, Route $route, array $params)
 	{
 		$params = $this->getContainerParams($params, $request);
-
-		if ($this->eventDispatcher !== null) {
-			$event = new Events\RouteMatchedEvent($request, $route);
-			$this->eventDispatcher->dispatch('route.match', $event);
-			$route = $event->getRoute();
-		}
 
 		$this->currentRoute = $route;
 

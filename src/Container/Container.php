@@ -10,6 +10,9 @@
 
 namespace Autarky\Container;
 
+use Autarky\Container\Factory\Definition;
+use Autarky\Container\Factory\FactoryInterface;
+
 use ReflectionClass;
 use ReflectionException;
 use ReflectionFunction;
@@ -109,79 +112,15 @@ class Container implements ContainerInterface
 	 */
 	public function define($class, $factory, array $params = array())
 	{
-		if (is_string($factory) && !is_callable($factory)) {
-			$factory = \Autarky\splitclm($factory, 'make');
-		}
-
-		if (is_array($factory) && is_string($factory[0])) {
-			$factory = function(ContainerInterface $container) use($factory) {
-				return $container->invoke($factory);
-			};
-		}
-
-		if (!is_callable($factory)) {
-			$type = is_object($factory) ? get_class($factory) : gettype($factory);
-			throw new \InvalidArgumentException("Factory for class $class must be callable, $type given");
-		}
-
 		if ($params) {
 			$this->params($class, $params);
 		}
 
-		$this->factories[$class] = $factory;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function instance($class, $instance)
-	{
-		$this->shared[$class] = true;
-		$this->instances[$class] = $instance;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function share($classOrClasses)
-	{
-		foreach ((array) $classOrClasses as $class) {
-			$this->shared[$class] = true;
+		if (!$factory instanceof FactoryInterface) {
+			$factory = Definition::getDefaultForCallable($factory);
 		}
-	}
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function internal($classOrClasses)
-	{
-		foreach ((array) $classOrClasses as $class) {
-			$this->internals[$class] = true;
-		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function alias($original, $aliasOrAliases)
-	{
-		foreach ((array) $aliasOrAliases as $alias) {
-			$this->aliases[$alias] = $original;
-		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function params($classOrClasses, array $params)
-	{
-		foreach ((array) $classOrClasses as $class) {
-			if (!array_key_exists($class, $this->params)) {
-				$this->params[$class] = $params;
-			} else {
-				$this->params[$class] = array_replace($this->params[$class], $params);
-			}
-		}
+		return $this->factories[$class] = $factory;
 	}
 
 	/**
@@ -190,7 +129,7 @@ class Container implements ContainerInterface
 	public function invoke($callable, array $params = array())
 	{
 		if (is_string($callable) && !is_callable($callable)) {
-			$callable = \Autarky\splitclm($callable, 'invoke');
+			$callable = [$callable, 'invoke'];
 		}
 
 		if (is_string($callable) && strpos($callable, '::') !== false) {
@@ -254,13 +193,19 @@ class Container implements ContainerInterface
 			return $this->instances[$class];
 		}
 
+		if (array_key_exists($class, $this->params)) {
+			$params = array_replace($this->params[$class], $params);
+		}
+
 		$previousState = $this->protectInternals;
 		$this->protectInternals = false;
 
+		if (!isset($this->factories[$class]) && $this->autowire) {
+			$this->factories[$class] = Definition::getDefaultForClass($class);
+		}
+
 		if (array_key_exists($class, $this->factories)) {
-			$object = call_user_func($this->factories[$class], $this);
-		} else if ($this->autowire) {
-			$object = $this->build($class, $params);
+			$object = $this->callFactory($this->factories[$class], $params);
 		} else {
 			if ($alias) {
 				$class = "$class (via $alias)";
@@ -286,73 +231,71 @@ class Container implements ContainerInterface
 		return $object;
 	}
 
-	protected function checkProtected($class, $alias)
+	/**
+	 * Call a factory.
+	 *
+	 * @param  mixed  $factory
+	 * @param  array  $params
+	 *
+	 * @return object
+	 */
+	protected function callFactory(Factory\FactoryInterface $factory, array $params = array())
 	{
-		if (!$this->protectInternals) {
-			return;
-		}
-
-		if ($alias) {
-			if ($this->isProtected($class) || $this->isProtected($alias)) {
-				$msg = "Class $class (via alias $alias) or its alias is internal and cannot be resolved.";
-				throw new Exception\ResolvingInternalException($msg);
-			}
-		} else {
-			if ($this->isProtected($class)) {
-				$msg = "Class $class is internal and cannot be resolved.";
-				throw new Exception\ResolvingInternalException($msg);
-			}
-		}
+		return $factory->invoke($this, $params);
 	}
 
-	protected function isProtected($class)
+	/**
+	 * Make a new factory definition for a class.
+	 *
+	 * @param  callable $callable
+	 * @param  boolean  $reflect  Optional, default false - Whether to use reflection to find the arguments to the callable. If false, you will need to add arguments to the definition object yourself
+	 *
+	 * @return Definition
+	 */
+	public function makeFactory($callable, $reflect = false)
 	{
-		return array_key_exists($class, $this->internals) && $this->internals[$class];
+		if ($reflect) {
+			return Definition::getFromReflection($callable, null);
+		}
+
+		return new Definition($callable);
 	}
 
-	protected function callResolvingCallbacks($key, $object)
+	/**
+	 * Get the existing factory for a class. If a factory is not already defined
+	 * a default one will be created via reflection.
+	 *
+	 * @param  string $class  Name of the class
+	 * @param  array  $params Optional
+	 *
+	 * @return FactoryInterface
+	 */
+	public function getFactory($class, array $params = array())
 	{
-		foreach ($this->resolvingAnyCallbacks as $callback) {
-			call_user_func($callback, $object, $this);
+		if (!isset($this->factories[$class]) && $this->autowire) {
+			$this->factories[$class] = Definition::getDefaultForClass($class);
 		}
 
-		if (array_key_exists($key, $this->resolvingCallbacks)) {
-			foreach ($this->resolvingCallbacks[$key] as $callback) {
-				call_user_func($callback, $object, $this);
-			}
+		$factory = $this->factories[$class];
+
+		if ($params) {
+			$factory = $factory->getFactory($params);
 		}
+
+		return $factory;
 	}
 
-	protected function isShared($class)
-	{
-		return array_key_exists($class, $this->shared) && $this->shared[$class];
-	}
-
-	protected function build($class, array $params = array())
-	{
-		if (!class_exists($class)) {
-			throw new Exception\NotInstantiableException("Class $class does not exist");
-		}
-
-		$reflClass = new ReflectionClass($class);
-
-		if (!$reflClass->isInstantiable()) {
-			throw new Exception\NotInstantiableException("Class $class is not instantiable");
-		}
-
-		if (!$reflClass->hasMethod('__construct')) {
-			return $reflClass->newInstance();
-		}
-
-		if (array_key_exists($class, $this->params)) {
-			$params = array_replace($this->params[$class], $params);
-		}
-
-		$args = $this->getFunctionArguments($reflClass->getMethod('__construct'), $params);
-
-		return $reflClass->newInstanceArgs($args);
-	}
-
+	/**
+	 * Get an array of arguments to a function, resolving type-hinted arguments
+	 * automatically on the way.
+	 *
+	 * @param  ReflectionFunctionAbstract $func
+	 * @param  array                      $params
+	 *
+	 * @return array
+	 *
+	 * @throws Exception\UnresolvableArgumentException If any of the arguments are not type-hinted, does not have a default value and is not specified in $params
+	 */
 	protected function getFunctionArguments(ReflectionFunctionAbstract $func, array $params = array())
 	{
 		$args = [];
@@ -363,39 +306,44 @@ class Container implements ContainerInterface
 			if ($class) {
 				$args[] = $this->resolveClassArg($class, $param, $params);
 			} else {
-				$name = $param->getName();
-				if ($params && array_key_exists("\$$name", $params)) {
-					$args[] = $params["\$$name"];
-				} else if ($param->isDefaultValueAvailable()) {
-					$args[] = $param->getDefaultValue();
-				} else {
-					throw new Exception\UnresolvableArgumentException($param, $func);
-				}
+				$args[] = $this->resolveNonClassArg($param, $params, $func);
 			}
 		}
 
 		return $args;
 	}
 
+	/**
+	 * Resolve a class type-hinted argument for a funtion.
+	 *
+	 * @param  ReflectionClass     $class
+	 * @param  ReflectionParameter $param
+	 * @param  array               $params
+	 *
+	 * @return object|null
+	 */
 	protected function resolveClassArg(ReflectionClass $class, ReflectionParameter $param, array $params)
 	{
-		$name = $param->getName();
+		$name = '$'.$param->getName();
 		$class = $class->getName();
 
-		if ($params && array_key_exists("\$$name", $params)) {
-			$class = $params["\$$name"];
-		}
+		// loop to prevent code repetition. executes once trying to find the
+		// parameter name in the $params array, then once more trying to find
+		// the class name (typehint) of the parameter.
+		while ($name !== null) {
+			if ($params && array_key_exists($name, $params)) {
+				$class = $params[$name];
+			}
 
-		if (is_object($class)) {
-			return $class;
-		}
+			if ($class instanceof Factory\FactoryInterface) {
+				return $class->invoke();
+			}
 
-		if ($params && array_key_exists($class, $params)) {
-			$class = $params[$class];
-		}
+			if (is_object($class)) {
+				return $class;
+			}
 
-		if (is_object($class)) {
-			return $class;
+			$name = ($name != $class) ? $class : null;
 		}
 
 		try {
@@ -410,17 +358,33 @@ class Container implements ContainerInterface
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * Resolve a non-class function argument.
+	 *
+	 * @param  ReflectionParameter        $param
+	 * @param  array                      $params
+	 * @param  ReflectionFunctionAbstract $func
+	 *
+	 * @return mixed
 	 */
-	public function isBound($class)
+	protected function resolveNonClassArg(ReflectionParameter $param, array $params, ReflectionFunctionAbstract $func)
 	{
-		if (array_key_exists($class, $this->aliases)) {
-			$class = $this->aliases[$class];
+		$name = '$'.$param->getName();
+
+		if ($params && array_key_exists($name, $params)) {
+			$argument = $params[$name];
+
+			if (is_array($argument) && array_key_exists($argument[0], $this->factories)) {
+				$argument = $this->callFactory($argument[0], $argument[1]);
+			}
+
+			return $argument;
 		}
 
-		return array_key_exists($class, $this->instances)
-			|| array_key_exists($class, $this->factories)
-			|| array_key_exists($class, $this->shared);
+		if ($param->isDefaultValueAvailable()) {
+			return $param->getDefaultValue();
+		}
+
+		throw Exception\UnresolvableArgumentException::fromReflectionParam($param, $func);
 	}
 
 	/**
@@ -442,6 +406,27 @@ class Container implements ContainerInterface
 	}
 
 	/**
+	 * Call resolving callbacks for an object.
+	 *
+	 * @param  string $key    Container key - usually the class name
+	 * @param  object $object
+	 *
+	 * @return void
+	 */
+	protected function callResolvingCallbacks($key, $object)
+	{
+		foreach ($this->resolvingAnyCallbacks as $callback) {
+			call_user_func($callback, $object, $this);
+		}
+
+		if (array_key_exists($key, $this->resolvingCallbacks)) {
+			foreach ($this->resolvingCallbacks[$key] as $callback) {
+				call_user_func($callback, $object, $this);
+			}
+		}
+	}
+
+	/**
 	 * Enable or disable autowiring.
 	 *
 	 * @param boolean $autowire
@@ -449,5 +434,122 @@ class Container implements ContainerInterface
 	public function setAutowire($autowire)
 	{
 		$this->autowire = (bool) $autowire;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function isBound($class)
+	{
+		if (array_key_exists($class, $this->aliases)) {
+			$class = $this->aliases[$class];
+		}
+
+		return array_key_exists($class, $this->instances)
+			|| array_key_exists($class, $this->factories)
+			|| array_key_exists($class, $this->shared);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function instance($class, $instance)
+	{
+		$this->shared[$class] = true;
+		$this->instances[$class] = $instance;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function share($classOrClasses)
+	{
+		foreach ((array) $classOrClasses as $class) {
+			$this->shared[$class] = true;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function internal($classOrClasses)
+	{
+		foreach ((array) $classOrClasses as $class) {
+			$this->internals[$class] = true;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function alias($original, $aliasOrAliases)
+	{
+		foreach ((array) $aliasOrAliases as $alias) {
+			$this->aliases[$alias] = $original;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function params($classOrClasses, array $params)
+	{
+		foreach ((array) $classOrClasses as $class) {
+			if (!array_key_exists($class, $this->params)) {
+				$this->params[$class] = $params;
+			} else {
+				$this->params[$class] = array_replace($this->params[$class], $params);
+			}
+		}
+	}
+
+	/**
+	 * Determine if a class is shared or not.
+	 *
+	 * @param  string  $class
+	 *
+	 * @return boolean
+	 */
+	protected function isShared($class)
+	{
+		return array_key_exists($class, $this->shared) && $this->shared[$class];
+	}
+
+	/**
+	 * Check if a class and its alias (optionally) are protected, and throw an
+	 * exception if they are.
+	 *
+	 * @param  string $class
+	 * @param  string|null $alias
+	 *
+	 * @return void
+	 *
+	 * @throws Exception\ResolvingInternalException If class or alias is internal
+	 */
+	protected function checkProtected($class, $alias)
+	{
+		if (!$this->protectInternals) {
+			return;
+		}
+
+		if ($this->isProtected($class) || ($alias && $this->isProtected($alias))) {
+			if ($alias) {
+				$class = "$class (via alias $alias)";
+			}
+			$msg = "Class $class is internal and cannot be resolved.";
+			throw new Exception\ResolvingInternalException($msg);
+		}
+	}
+
+	/**
+	 * Determine if a class is protected or not.
+	 *
+	 * @param  string  $class
+	 *
+	 * @return boolean
+	 */
+	protected function isProtected($class)
+	{
+		return array_key_exists($class, $this->internals) && $this->internals[$class];
 	}
 }

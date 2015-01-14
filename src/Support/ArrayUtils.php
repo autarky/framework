@@ -16,6 +16,14 @@ namespace Autarky\Support;
 class ArrayUtils
 {
 	/**
+	 * This class is a static class and should not be instantiated.
+	 */
+	private function __construct()
+	{
+		//
+	}
+
+	/**
 	 * Get an element from an array.
 	 *
 	 * @param  array  $data
@@ -88,7 +96,7 @@ class ArrayUtils
 			if (!array_key_exists($segment, $data)) {
 				$data[$segment] = [];
 			} else if (!is_array($data[$segment])) {
-				throw new \InvalidArgumentException('Non-array segment encountered');
+				throw new \UnexpectedValueException('Non-array segment encountered');
 			}
 
 			$data =& $data[$segment];

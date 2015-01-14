@@ -40,6 +40,9 @@ class EventDispatcherProvider extends ServiceProvider
 		});
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function registerConsole(Application $console)
 	{
 		$eventDispatcher = $this->app->getContainer()

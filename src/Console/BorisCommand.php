@@ -10,6 +10,7 @@
 
 namespace Autarky\Console;
 
+use Boris\Boris;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,12 +21,35 @@ use Symfony\Component\Console\Output\OutputInterface;
 class BorisCommand extends Command
 {
 	/**
+	 * The boris instance.
+	 *
+	 * @var Boris
+	 */
+	protected $boris;
+
+	/**
 	 * {@inheritdoc}
 	 */
 	protected function configure()
 	{
 		$this->setName('boris')
-			->setDescription('Start an interactive boris shell.');
+			->setDescription('Start an interactive boris shell')
+			->setHelp(<<<'EOS'
+If the package d11wtq/boris is installed via composer, this command will start an interactive PHP shell where you can play around in an application-like environment.
+
+The main instance of Autarky\Kernel\Application is available as the global variable $app.
+EOS
+);
+	}
+
+	/**
+	 * Set the boris instance.
+	 *
+	 * @param Boris $boris
+	 */
+	public function setBoris(Boris $boris)
+	{
+		$this->boris = $boris;
 	}
 
 	/**
@@ -40,11 +64,14 @@ class BorisCommand extends Command
 		// prevent the error handler from outputting any information
 		$this->app->getErrorHandler()->prependHandler(function($e) { return ''; });
 
-		$boris = new \Boris\Boris('> ');
+		$boris = $this->boris ?: new \Boris\Boris('> ');
 
 		// make the $app variable available
 		$boris->setLocal(['app' => $this->app]);
 
+		// this will loop forever until ctrl+C is pressed
 		$boris->start();
+
+		return 0;
 	}
 }

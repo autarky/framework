@@ -10,6 +10,7 @@
 
 namespace Autarky\Templating;
 
+use Autarky\Container\ContainerInterface;
 use Autarky\Kernel\ServiceProvider;
 
 /**
@@ -26,9 +27,21 @@ class TwigTemplatingProvider extends ServiceProvider
 
 		$dic->share('Autarky\Templating\TemplatingEngine');
 
+		$dic->define('Twig_LoaderInterface', [$this, 'makeTwigLoader']);
+
 		$dic->define('Autarky\Templating\Twig\Environment', [$this, 'makeTwigEnvironment']);
 		$dic->share('Autarky\Templating\Twig\Environment');
 		$dic->alias('Autarky\Templating\Twig\Environment', 'Twig_Environment');
+	}
+
+	/**
+	 * Make the twig template loader.
+	 *
+	 * @return \Autarky\Templating\Twig\FileLoader
+	 */
+	public function makeTwigLoader()
+	{
+		return new Twig\FileLoader($this->app->getConfig()->get('path.templates'));
 	}
 
 	/**
@@ -36,10 +49,9 @@ class TwigTemplatingProvider extends ServiceProvider
 	 *
 	 * @return \Autarky\Templating\Twig\Environment
 	 */
-	public function makeTwigEnvironment()
+	public function makeTwigEnvironment(ContainerInterface $dic)
 	{
 		$config = $this->app->getConfig();
-		$loader = new Twig\FileLoader($config->get('path.templates'));
 		$options = ['debug' => $config->get('app.debug')];
 
 		if ($config->has('path.templates_cache')) {
@@ -48,18 +60,40 @@ class TwigTemplatingProvider extends ServiceProvider
 			$options['cache'] = $config->get('path.storage').'/twig';
 		}
 
-		$env = new Twig\Environment($loader, $options);
+		$env = new Twig\Environment($dic->resolve('Twig_LoaderInterface'), $options);
 
-		$extLoader = new Twig\ExtensionLoader($env, $this->app);
+		// merge core framework extensions with user extensions
+		$extensions = array_merge([
+			'Autarky\Templating\Twig\PartialExtension',
+			'Autarky\Templating\Twig\UrlGenerationExtension' =>
+				['Autarky\Routing\UrlGenerator'],
+			'Autarky\Templating\Twig\SessionExtension' =>
+				['Symfony\Component\HttpFoundation\Session\Session'],
+		], $this->app->getConfig()->get('twig.extensions', []));
 
-		$extLoader->loadCoreExtensions([
-			'Autarky\Container\ContainerInterface' => 'PartialExtension',
-			'Autarky\Routing\UrlGenerator' => 'UrlGenerationExtension',
-			'Symfony\Component\HttpFoundation\Session\Session' => 'SessionExtension',
-		]);
+		// iterate through the array of extensions. if the array key is an
+		// integer, there are no dependencies defined for that extension and we
+		// can simply add it. if the array key is a string, the key is the class
+		// name of the extension and the value is an array of class dependencies
+		// that must be bound to the service container in order for the
+		// extension to be loaded.
+		foreach ($extensions as $extension => $dependencies) {
+			if (is_int($extension)) {
+				$env->addExtension($dic->resolve($dependencies));
+			} else {
+				foreach ((array) $dependencies as $dependency) {
+					if (!$dic->isBound($dependency)) {
+						// break out of this inner foreach loop and continue to
+						// the next iteration of the outer foreach loop,
+						// effectively preventing the extension from loading
+						continue 2;
+					}
+				}
 
-		if ($extensions = $this->app->getConfig()->get('twig.extensions')) {
-			$extLoader->loadUserExtensions($extensions);
+				// if any of the dependencies are not met in the above loop,
+				// this line of code will not be executed
+				$env->addExtension($dic->resolve($extension));
+			}
 		}
 
 		return $env;

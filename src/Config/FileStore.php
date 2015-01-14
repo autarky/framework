@@ -154,12 +154,4 @@ class FileStore implements ConfigInterface
 
 		return $loader->load($path);
 	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setEnvironment($environment)
-	{
-		// do nothing - deprecated method
-	}
 }

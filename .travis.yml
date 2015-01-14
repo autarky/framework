@@ -17,16 +17,18 @@ php:
   - hhvm
 
 env:
-  - COMPOSER_ARGS=""
-  - COMPOSER_ARGS="--prefer-lowest"
+  matrix:
+    - COMPOSER_ARGS=""
+    - COMPOSER_ARGS="--prefer-lowest"
 
 before_install:
+  - ./scripts/setup-travis.bash
   - composer self-update
 
 install:
   - composer update ${COMPOSER_ARGS} --dev --no-interaction
 
 script:
-  - ./vendor/bin/phpunit
+  - phpunit --verbose
 
 sudo: false

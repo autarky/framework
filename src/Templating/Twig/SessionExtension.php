@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Templating\Twig\Extension;
+namespace Autarky\Templating\Twig;
 
 use Twig_Extension;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -20,13 +20,24 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class SessionExtension extends Twig_Extension
 {
+	/**
+	 * @var Session
+	 */
 	protected $session;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param Session $session
+	 */
 	public function __construct(Session $session)
 	{
 		$this->session = $session;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getGlobals()
 	{
 		return [
@@ -34,6 +45,9 @@ class SessionExtension extends Twig_Extension
 		];
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getName()
 	{
 		return 'session';

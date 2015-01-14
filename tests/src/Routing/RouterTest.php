@@ -1,7 +1,5 @@
 <?php
-namespace Autarky\Tests\Routing;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +29,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function basicRouting()
+	public function addRouteAndDispatchRequest()
 	{
 		$router = $this->makeRouter();
 		$router->addRoute('get', '/foo/{v}', function($v) { return 'v:'.$v; });
@@ -57,7 +55,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function routeGroupFilter()
+	public function addFiltersViaRouteGrouping()
 	{
 		$router = $this->makeRouter();
 		$router->onBefore('foo', function($event) {
@@ -72,7 +70,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function routeFilterCanChangeController()
+	public function beforeFilterCanChangeController()
 	{
 		$router = $this->makeRouter();
 		$route = $router->addRoute('get', '/foo', function() { return 'old controller'; });
@@ -86,7 +84,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function routeGroupPrefix()
+	public function pathPrefixCanBeSetViaRouteGroups()
 	{
 		$router = $this->makeRouter();
 		$router->group(['prefix' => 'foo'], function(Router $router) use(&$route) {
@@ -99,7 +97,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	 * @test
 	 * @dataProvider getPathData
 	 */
-	public function pathsAreNormalized($path, $expected)
+	public function routePathsAreNormalized($path, $expected)
 	{
 		$router = $this->makeRouter();
 		$route = $router->addRoute(['get'], $path, function() {});
@@ -155,7 +153,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	 * @test
 	 * @dataProvider getPrefixPathData
 	 */
-	public function prefixesCannotMessUpUris($prefix, $path, $expected)
+	public function prefixesCannotMessUpPaths($prefix, $path, $expected)
 	{
 		$router = $this->makeRouter();
 		$router->group(['prefix' => $prefix], function(Router $router) use($path, &$route) {

@@ -15,9 +15,10 @@ use PDO;
 use Autarky\Config\ConfigInterface;
 
 /**
- * Container that manages multiple PDO instances.
+ * Manager for multiple database connections in the form of PDO instances and
+ * configuration data.
  */
-class MultiPdoContainer
+class ConnectionManager
 {
 	/**
 	 * @var \Autarky\Config\ConfigInterface
@@ -45,7 +46,7 @@ class MultiPdoContainer
 	 */
 	protected $defaultPdoOptions = [
 		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_CLASS,
+		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
 		PDO::ATTR_CASE               => PDO::CASE_NATURAL,
 		PDO::ATTR_ORACLE_NULLS       => PDO::NULL_NATURAL,
 		PDO::ATTR_STRINGIFY_FETCHES  => false,
@@ -86,13 +87,9 @@ class MultiPdoContainer
 
 	protected function makePdo($connection)
 	{
-		$config = $this->config->get("database.connections.$connection");
+		$config = $this->getConnectionConfig($connection);
 
-		if (!$config) {
-			throw new \InvalidArgumentException("Connection $connection not defined");
-		}
-
-		if (!isset($config['dsn'])) {
+		if (!isset($config['dsn']) || !$config['dsn']) {
 			throw new \InvalidArgumentException("Connection $connection missing data: dsn");
 		}
 
@@ -110,7 +107,41 @@ class MultiPdoContainer
 
 		$configOptions = array_key_exists('options', $config) ? $config['options'] : [];
 
-		return new PDO($config['dsn'], $username, $password,
-			$configOptions + $this->defaultPdoOptions);
+		try {
+			return new PDO($config['dsn'], $username, $password,
+				$configOptions + $this->defaultPdoOptions);
+		} catch (\PDOException $e) {
+			$newException = new CannotConnectException($e->getMessage(), $e->getCode(), $e);
+			$newException->errorInfo = $e->errorInfo;
+			throw $newException;
+		}
+	}
+
+	/**
+	 * Get the configuration array for a specific connection.
+	 *
+	 * @param  strgin $connection The name of the connection.
+	 *
+	 * @return array
+	 *
+	 * @throws \InvalidArgumentException If connection is not defined
+	 */
+	public function getConnectionConfig($connection = null)
+	{
+		if ($connection === null) {
+			$connection = $this->defaultConnection;
+		}
+
+		$config = $this->config->get("database.connections.$connection");
+
+		if (!$config) {
+			if (!is_string($connection)) {
+				$connection = gettype($connection);
+			}
+
+			throw new \InvalidArgumentException("Connection $connection not defined");
+		}
+
+		return $config;
 	}
 }

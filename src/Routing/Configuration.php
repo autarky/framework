@@ -103,7 +103,6 @@ class Configuration
 			}
 
 			$path = $route['path'];
-			$handler = $route['handler'];
 
 			if (array_key_exists('methods', $route)) {
 				$methods = (array) $route['methods'];
@@ -113,7 +112,16 @@ class Configuration
 				$methods = ['GET'];
 			}
 
-			$this->router->addRoute($methods, $path, $handler, $name);
+			if (array_filter(array_keys($methods), 'is_string')) {
+				foreach ($methods as $method => $controller) {
+					$this->router->addRoute([$method], $path, $controller, $name);
+					$name = null;
+				}
+			} else {
+				$controller = isset($route['controller']) ?
+					$route['controller'] : $route['handler'];
+				$this->router->addRoute($methods, $path, $controller, $name);
+			}
 		}
 	}
 }

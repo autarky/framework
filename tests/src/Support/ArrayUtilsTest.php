@@ -1,5 +1,4 @@
 <?php
-namespace Autarky\Tests\Support;
 
 use Autarky\Tests\TestCase;
 use Autarky\Support\ArrayUtils;
@@ -10,7 +9,7 @@ class ArrayUtilsTest extends TestCase
 	 * @test
 	 * @dataProvider getGetData
 	 */
-	public function get(array $data, $key, $expected)
+	public function getCallReturnsCorrectValue(array $data, $key, $expected)
 	{
 		$this->assertEquals($expected, ArrayUtils::get($data, $key));
 	}
@@ -32,7 +31,7 @@ class ArrayUtilsTest extends TestCase
 	 * @test
 	 * @dataProvider getSetData
 	 */
-	public function set(array $input, $key, $value, array $expected)
+	public function setCallSetsCorrectKeyToValue(array $input, $key, $value, array $expected)
 	{
 		ArrayUtils::set($input, $key, $value);
 		$this->assertEquals($expected, $input);
@@ -80,11 +79,19 @@ class ArrayUtilsTest extends TestCase
 		];
 	}
 
+	/** @test */
+	public function setThrowsExceptionOnNonArraySegment()
+	{
+		$data = ['foo' => 'bar'];
+		$this->setExpectedException('UnexpectedValueException', 'Non-array segment encountered');
+		ArrayUtils::set($data, 'foo.bar', 'baz');
+	}
+
 	/**
 	 * @test
 	 * @dataProvider getHasData
 	 */
-	public function has(array $input, $key, $result)
+	public function hasCallReturnsCorrectly(array $input, $key, $result)
 	{
 		$this->assertEquals($result, ArrayUtils::has($input, $key));
 	}

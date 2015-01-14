@@ -1,9 +1,6 @@
 <?php
-namespace Autarky\Tests\Errors;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
-use Exception;
 
 use Autarky\Errors\ErrorHandlerManager;
 use Autarky\Errors\HandlerResolver;
@@ -19,11 +16,8 @@ class ErrorHandlerManagerTest extends PHPUnit_Framework_TestCase
 
 	protected function makeHandler()
 	{
-		$mockContextCollector = m::mock('Autarky\Errors\ApplicationContextCollector');
-		$mockContextCollector->shouldReceive('getContext')->andReturn([])->byDefault();
 		return new ErrorHandlerManager(
-			new HandlerResolver(new Container),
-			$mockContextCollector
+			new HandlerResolver(new Container)
 		);
 	}
 
@@ -87,16 +81,25 @@ class ErrorHandlerManagerTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function handlersAreResolved()
 	{
-		$mockContextCollector = m::mock('Autarky\Errors\ApplicationContextCollector');
-		$mockContextCollector->shouldReceive('getContext')->andReturn([])->byDefault();
 		$manager = new ErrorHandlerManager(
-			new HandlerResolver($container = new Container),
-			$mockContextCollector
+			new HandlerResolver($container = new Container)
 		);
 		$manager->prependHandler(__NAMESPACE__.'\\StubHandler');
 		$container->params(__NAMESPACE__.'\\StubHandler', ['$ret' => 'resolved handler']);
 		$response = $manager->handle(new Exception);
 		$this->assertEquals('resolved handler', $response->getContent());
+	}
+
+	/** @test */
+	public function handlersCanThrowExceptions()
+	{
+		$handler = $this->makeHandler();
+		$handler->appendHandler(function(\InvalidArgumentException $e) { return 'foo'; });
+		$handler->appendHandler(function(\RuntimeException $e) { throw new \InvalidArgumentException; });
+		$result = $handler->handle(new \RuntimeException);
+		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $result);
+		$this->assertEquals('foo', $result->getContent());
+		$this->assertEquals(500, $result->getStatusCode());
 	}
 }
 
