@@ -113,8 +113,8 @@ class RouterTest extends PHPUnit_Framework_TestCase
 			['/', '/'],
 			['foo', '/foo'],
 			['foo/', '/foo'],
-			['/foo', '/foo'],
 			['/foo/', '/foo'],
+			['/foo', '/foo'],
 		];
 	}
 
@@ -138,14 +138,15 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	public function getRootPathData()
 	{
 		return [
-			[''],
-			['/'],
 			['http://localhost'],
 			['http://localhost/'],
 			['http://sub.localhost'],
 			['http://sub.localhost/'],
-			['/foo', '/foo/index.php'],
-			['/foo/', '/foo/index.php'],
+			['http://localhost/foo/', '/foo/index.php'],
+			['http://sub.localhost/foo/', '/foo/index.php'],
+			// https://github.com/symfony/symfony/pull/13039
+			// ['http://localhost/foo', '/foo/index.php'],
+			// ['http://sub.localhost/foo', '/foo/index.php'],
 		];
 	}
 
