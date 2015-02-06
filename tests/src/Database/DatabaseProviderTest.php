@@ -1,5 +1,4 @@
 <?php
-namespace Autarky\Tests\Database;
 
 use Autarky\Tests\TestCase;
 

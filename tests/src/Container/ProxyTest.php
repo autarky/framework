@@ -1,5 +1,4 @@
 <?php
-namespace Autarky\Tests\Container;
 
 use Mockery as m;
 

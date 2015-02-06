@@ -1,10 +1,6 @@
 <?php
-namespace Autarky\Tests\Database;
 
-use PHPUnit_Framework_TestCase;
 use Mockery as m;
-
-use PDO;
 
 class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 {
