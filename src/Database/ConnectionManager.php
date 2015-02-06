@@ -120,7 +120,7 @@ class ConnectionManager
 	/**
 	 * Get the configuration array for a specific connection.
 	 *
-	 * @param  strgin $connection The name of the connection.
+	 * @param  string $connection The name of the connection.
 	 *
 	 * @return array
 	 *
