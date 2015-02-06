@@ -67,4 +67,23 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException('InvalidArgumentException');
 		$pdo = $container->getPdo('other');
 	}
+
+	/** @test */
+	public function pdoOptionsAreReplaced()
+	{
+		$options = [
+			PDO::ATTR_CASE               => PDO::CASE_LOWER,
+			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+		];
+		$connections = ['default' => [
+			'dsn' => 'sqlite::memory:',
+			'options' => $options
+		]];
+		$config = $this->makeConfig('default', $connections);
+		$container = $this->makeManager($config);
+		$pdo = $container->getPdo('default');
+		foreach ($options as $key => $value) {
+			$this->assertEquals($value, $pdo->getAttribute($key));
+		}
+	}
 }
