@@ -24,7 +24,6 @@ env:
 
 before_install:
   - ./scripts/setup-travis.bash
-  - composer self-update
 
 install:
   - composer update ${COMPOSER_ARGS} --dev --no-interaction
