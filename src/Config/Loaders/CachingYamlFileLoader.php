@@ -11,6 +11,7 @@
 namespace Autarky\Config\Loaders;
 
 use Autarky\Config\LoaderInterface;
+use Autarky\Files\LockingWriteOperation;
 
 /**
  * Caching wrapper for the YAML/YML config file loader.
