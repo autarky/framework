@@ -25,12 +25,32 @@ class PhpFileLoader implements LoaderInterface
 	 */
 	public function load($path)
 	{
-		$data = require $path;
+		$data = static::requireFile($path);
 
 		if (!is_array($data)) {
 			throw new \RuntimeException("Config file \"$path\" must return an array");
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Require a file and return the result.
+	 *
+	 * Static method to make it impossible to reference $this in the file.
+	 *
+	 * @param  string     $_path
+	 * @param  array|null $_variables
+	 *
+	 * @return mixed
+	 */
+	protected static function requireFile($_path, array $_variables = null)
+	{
+		if ($_variables) {
+			extract($_variables, EXTR_REFS);
+		}
+		unset($_variables);
+
+		return require $_path;
 	}
 }
