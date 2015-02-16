@@ -10,14 +10,14 @@
 
 namespace Autarky\Container;
 
-use Autarky\Kernel\ServiceProvider;
+use Autarky\Provider;
 
 /**
  * Provides the application with a container.
  *
  * This service provider is vital to the framework.
  */
-class ContainerProvider extends ServiceProvider
+class ContainerProvider extends Provider
 {
 	/**
 	 * {@inheritdoc}
@@ -25,7 +25,7 @@ class ContainerProvider extends ServiceProvider
 	public function register()
 	{
 		$this->app->setContainer($dic = new Container);
-		$dic->instance('Autarky\Kernel\Application', $this->app);
+		$dic->instance('Autarky\Application', $this->app);
 		$dic->instance('Autarky\Container\Container', $dic);
 		$dic->alias('Autarky\Container\Container', 'Autarky\Container\ContainerInterface');
 	}

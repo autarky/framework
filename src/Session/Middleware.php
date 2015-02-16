@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-use Autarky\Kernel\Application;
+use Autarky\Application;
 
 /**
  * Session middleware.

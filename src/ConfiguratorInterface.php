@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Kernel;
+namespace Autarky;
 
 /**
  * A configurator is a class that configures one or more other classes after the

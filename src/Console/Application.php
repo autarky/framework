@@ -23,16 +23,16 @@ class Application extends SymfonyApplication
 	/**
 	 * The Autarky Application object instance.
 	 *
-	 * @var \Autarky\Kernel\Application
+	 * @var \Autarky\Application
 	 */
 	protected $app;
 
 	/**
 	 * Set the Autarky application instance.
 	 *
-	 * @param \Autarky\Kernel\Application $app
+	 * @param \Autarky\Application $app
 	 */
-	public function setAutarkyApplication(\Autarky\Kernel\Application $app)
+	public function setAutarkyApplication(\Autarky\Application $app)
 	{
 		$this->app = $app;
 	}

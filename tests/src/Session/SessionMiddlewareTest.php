@@ -29,7 +29,7 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase
 
 	public function makeApplication($session)
 	{
-		$app = new \Autarky\Kernel\Application('testing', []);
+		$app = new \Autarky\Application('testing', []);
 		$app->setContainer($container = new \Autarky\Container\Container);
 		$container->instance('Symfony\Component\HttpFoundation\Session\SessionInterface', $session);
 		$app->setConfig(new \Autarky\Config\ArrayStore);

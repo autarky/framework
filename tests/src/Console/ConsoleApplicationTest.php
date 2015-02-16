@@ -8,7 +8,7 @@ class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
 	public function autarkyApplicationInstanceIsSetOnCommands()
 	{
 		$capp = new \Autarky\Console\Application;
-		$capp->setAutarkyApplication($app = new \Autarky\Kernel\Application('testing', []));
+		$capp->setAutarkyApplication($app = new \Autarky\Application('testing', []));
 		$cmd = m::mock('Autarky\Console\Command[setAutarkyApplication]', ['testcmd']);
 		$cmd->shouldReceive('setAutarkyApplication')->with($app)->once();
 		$capp->add($cmd);

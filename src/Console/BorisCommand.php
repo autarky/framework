@@ -37,7 +37,7 @@ class BorisCommand extends Command
 			->setHelp(<<<'EOS'
 If the package d11wtq/boris is installed via composer, this command will start an interactive PHP shell where you can play around in an application-like environment.
 
-The main instance of Autarky\Kernel\Application is available as the global variable $app.
+The main instance of Autarky\Application is available as the global variable $app.
 EOS
 );
 	}

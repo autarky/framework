@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Kernel;
+namespace Autarky;
 
 use Symfony\Component\Console\Application as ConsoleApplication;
 
@@ -19,12 +19,12 @@ use Symfony\Component\Console\Application as ConsoleApplication;
  * anything from binding a service class onto the service container to add a
  * bunch of routes with distinct functionality.
  */
-abstract class ServiceProvider
+abstract class Provider
 {
 	/**
 	 * The application instance.
 	 *
-	 * @var \Autarky\Kernel\Application
+	 * @var \Autarky\Application
 	 */
 	protected $app;
 

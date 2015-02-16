@@ -1,12 +1,11 @@
 <?php
 namespace Autarky\Tests;
 
-use PHPUnit_Framework_TestCase;
+use Autarky\Application;
 use Autarky\Config\ArrayStore;
 use Autarky\Container\Container;
 use Autarky\Errors\StubErrorHandler;
-use Autarky\Kernel\Application;
-use Autarky\Kernel\Errors\SymfonyErrorHandler;
+use PHPUnit_Framework_TestCase;
 
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {

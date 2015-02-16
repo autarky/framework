@@ -12,7 +12,7 @@ namespace Autarky\Config;
 
 use Symfony\Component\Yaml\Parser;
 
-use Autarky\Kernel\ServiceProvider;
+use Autarky\Provider;
 use Autarky\Config\Loaders\YamlFileLoader;
 use Autarky\Config\Loaders\CachingYamlFileLoader;
 
@@ -21,7 +21,7 @@ use Autarky\Config\Loaders\CachingYamlFileLoader;
  *
  * This service provider is vital to the framework.
  */
-class ConfigProvider extends ServiceProvider
+class ConfigProvider extends Provider
 {
 	/**
 	 * The path in which config files are located.

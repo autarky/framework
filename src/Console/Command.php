@@ -18,14 +18,14 @@ use Symfony\Component\Console\Command\Command as SymfonyCommand;
 class Command extends SymfonyCommand
 {
 	/**
-	 * @var \Autarky\Kernel\Application
+	 * @var \Autarky\Application
 	 */
 	protected $app;
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function setAutarkyApplication(\Autarky\Kernel\Application $app)
+	public function setAutarkyApplication(\Autarky\Application $app)
 	{
 		$this->app = $app;
 	}

@@ -13,13 +13,13 @@ namespace Autarky\Events;
 use Symfony\Component\Console\Application;
 
 use Autarky\Container\ContainerInterface;
-use Autarky\Kernel\ServiceProvider;
+use Autarky\Provider;
 
 /**
  * Simple service provider that binds a share instance of symfony's event
  * dispatcher onto the container.
  */
-class EventDispatcherProvider extends ServiceProvider
+class EventDispatcherProvider extends Provider
 {
 	/**
 	 * {@inheritdoc}

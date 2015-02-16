@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Kernel;
+namespace Autarky;
 
 use Closure;
 use SplPriorityQueue;
@@ -23,6 +23,7 @@ use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
 use Autarky\Container\ContainerInterface;
 use Autarky\Errors\ErrorHandlerManagerInterface;
+use Autarky\Kernel\HttpKernel;
 
 /**
  * The main application of the framework.
@@ -105,7 +106,7 @@ class Application implements HttpKernelInterface
 	 * Construct a new application instance.
 	 *
 	 * @param \Closure|string   $environment
-	 * @param ServiceProvider[] $providers
+	 * @param Provider[] $providers
 	 */
 	public function __construct($environment, array $providers)
 	{
@@ -237,7 +238,7 @@ class Application implements HttpKernelInterface
 	public function setContainer(ContainerInterface $container)
 	{
 		$this->container = $container;
-		$container->instance('Autarky\Kernel\Application', $this);
+		$container->instance('Autarky\Application', $this);
 		$container->instance('Symfony\Component\HttpFoundation\RequestStack', $this->requests);
 	}
 
@@ -358,11 +359,11 @@ class Application implements HttpKernelInterface
 	/**
 	 * Register a single service provider.
 	 *
-	 * @param  ServiceProvider $provider
+	 * @param  Provider $provider
 	 *
 	 * @return void
 	 */
-	protected function registerProvider(ServiceProvider $provider)
+	protected function registerProvider(Provider $provider)
 	{
 		$provider->setApplication($this);
 		$provider->register();

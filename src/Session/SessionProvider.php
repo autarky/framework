@@ -19,12 +19,12 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler;
 
-use Autarky\Kernel\ServiceProvider;
+use Autarky\Provider;
 
 /**
  * Service provider for symfony's session classes.
  */
-class SessionProvider extends ServiceProvider
+class SessionProvider extends Provider
 {
 	/**
 	 * @var \Autarky\Config\ConfigInterface

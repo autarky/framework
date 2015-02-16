@@ -21,7 +21,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 	/**
 	 * The application instance.
 	 *
-	 * @var \Autarky\Kernel\Application
+	 * @var \Autarky\Application
 	 */
 	protected $app;
 
@@ -74,7 +74,7 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 	 * Usually this will simply be a require of your app/start.php file. Make
 	 * sure that this file does return $app; at the end.
 	 *
-	 * @return \Autarky\Kernel\Application
+	 * @return \Autarky\Application
 	 */
 	abstract protected function createApplication();
 

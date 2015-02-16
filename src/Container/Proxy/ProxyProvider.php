@@ -10,9 +10,9 @@
 
 namespace Autarky\Container\Proxy;
 
-use Autarky\Kernel\ServiceProvider;
+use Autarky\Provider;
 
-class ProxyProvider extends ServiceProvider
+class ProxyProvider extends Provider
 {
 	public function register()
 	{

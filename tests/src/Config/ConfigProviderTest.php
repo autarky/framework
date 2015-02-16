@@ -1,7 +1,7 @@
 <?php
 
 use Autarky\Tests\TestCase;
-use Autarky\Kernel\Application;
+use Autarky\Application;
 
 class ConfigProviderTest extends TestCase
 {

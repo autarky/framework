@@ -11,8 +11,8 @@
 namespace Autarky\Logging;
 
 use Autarky\Config\ConfigInterface;
-use Autarky\Kernel\Application;
-use Autarky\Kernel\ConfiguratorInterface;
+use Autarky\Application;
+use Autarky\ConfiguratorInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;

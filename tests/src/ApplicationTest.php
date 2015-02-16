@@ -6,11 +6,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 use Autarky\Tests\TestCase;
-use Autarky\Kernel\Application;
+use Autarky\Application;
 use Autarky\Config\ArrayStore;
 use Autarky\Container\Container;
 
-class KernelApplicationTest extends TestCase
+class ApplicationTest extends TestCase
 {
 	public function tearDown()
 	{
@@ -105,7 +105,7 @@ class KernelApplicationTest extends TestCase
 	/** @test */
 	public function configuratorClassesResolvedOnBoot()
 	{
-		$mock = m::mock('Autarky\Kernel\ConfiguratorInterface');
+		$mock = m::mock('Autarky\ConfiguratorInterface');
 		$app = $this->makeApplication();
 		$app->getContainer()->define('MockConfigurator', function() use($mock) {
 			return $mock;
@@ -175,7 +175,7 @@ class MiddlewareC extends AbstractMiddleware
 	}
 }
 
-class StubServiceProvider extends \Autarky\Kernel\ServiceProvider
+class StubServiceProvider extends \Autarky\Provider
 {
 	public static $called = false;
 	public function register()

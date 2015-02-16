@@ -11,12 +11,12 @@
 namespace Autarky\Templating;
 
 use Autarky\Container\ContainerInterface;
-use Autarky\Kernel\ServiceProvider;
+use Autarky\Provider;
 
 /**
  * Provides the Twig templating engine.
  */
-class TwigTemplatingProvider extends ServiceProvider
+class TwigTemplatingProvider extends Provider
 {
 	/**
 	 * {@inheritdoc}

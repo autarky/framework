@@ -10,12 +10,12 @@
 
 namespace Autarky\Errors;
 
-use Autarky\Kernel\ServiceProvider;
+use Autarky\Provider;
 
 /**
  * Provides error handling.
  */
-class ErrorHandlerProvider extends ServiceProvider
+class ErrorHandlerProvider extends Provider
 {
 	/**
 	 * @var boolean Whether or not the error handler should register itself as handler of native PHP errors as well as application exceptions.

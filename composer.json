@@ -28,6 +28,11 @@
 			"Autarky\\": "src/"
 		}
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"Autarky\\Tests\\": "tests/classes/"
+		}
+	},
 	"extra": {
 		"branch-alias": {
 			"dev-develop": "0.8-dev",

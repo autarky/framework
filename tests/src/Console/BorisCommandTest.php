@@ -31,7 +31,7 @@ class BorisCommandTest extends PHPUnit_Framework_TestCase
 			$this->markTestSkipped('Class Boris\Boris must not exist for this test to work');
 		}
 
-		$app = m::mock('Autarky\Kernel\Application');
+		$app = m::mock('Autarky\Application');
 		$cmd = $this->makeCommand($app);
 		$this->setExpectedException('RuntimeException', 'Install d11wtq/boris via composer to use this command.');
 		$cmd->run(new ArrayInput([]), new NullOutput);
@@ -42,7 +42,7 @@ class BorisCommandTest extends PHPUnit_Framework_TestCase
 	{
 		$classExists = class_exists('Boris\Boris');
 
-		$app = m::mock('Autarky\Kernel\Application');
+		$app = m::mock('Autarky\Application');
 		$cmd = $this->makeCommand($app);
 		$app->shouldReceive('getErrorHandler')->andReturn($ehm = m::mock('Autarky\Errors\ErrorHandlerManagerInterface'));
 		$ehm->shouldReceive('prependHandler')->with(m::type('Closure'))->once();
