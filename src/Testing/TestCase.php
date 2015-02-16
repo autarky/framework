@@ -26,13 +26,6 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 	protected $app;
 
 	/**
-	 * The browserkit client instance.
-	 *
-	 * @var \Autarky\Testing\Client
-	 */
-	protected $client;
-
-	/**
 	 * {@inheritdoc}
 	 */
 	public function setUp()
@@ -41,7 +34,6 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 		$this->app->setEnvironment('testing');
 		$this->app->boot();
 		$this->app->getErrorHandler()->setRethrow(true);
-		$this->client = $this->createClient();
 	}
 
 	/**
@@ -77,17 +69,4 @@ abstract class TestCase extends PHPUnit_Framework_TestCase
 	 * @return \Autarky\Application
 	 */
 	abstract protected function createApplication();
-
-	/**
-	 * Create a httpkernel\browserkit client.
-	 *
-	 * Override this method if you want to provide custom parameters to the
-	 * client like fake $_SERVER data, browser history or cookies.
-	 *
-	 * @return \Symfony\Component\HttpKernel\Client
-	 */
-	protected function createClient()
-	{
-		return new Client($this->app);
-	}
 }
