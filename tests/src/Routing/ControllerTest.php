@@ -26,9 +26,12 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function renderMethod()
 	{
+		if (!class_exists('Autarky\TwigTemplating\TemplatingEngine')) {
+			$this->markTestSkipped('twig templating package not installed');
+		}
 		$ctrl = $this->makeController($container = $this->mockContainer());
-		$container->shouldReceive('resolve')->with('Autarky\Templating\TemplatingEngine')
-			->once()->andReturn($mockTemplating = m::mock('Autarky\Templating\TemplatingEngine'));
+		$container->shouldReceive('resolve')->with('Autarky\TwigTemplating\TemplatingEngine')
+			->once()->andReturn($mockTemplating = m::mock('Autarky\TwigTemplating\TemplatingEngine'));
 		$mockTemplating->shouldReceive('render')->with('template', ['foo' => 'bar'])->once();
 		$ctrl->call('render', ['template', ['foo' => 'bar']]);
 	}
