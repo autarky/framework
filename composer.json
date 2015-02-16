@@ -13,7 +13,6 @@
 		"nikic/fast-route": "0.3.*",
 		"psr/log": "~1.0",
 		"stack/builder": "~1.0",
-		"symfony/browser-kit": "~2.3",
 		"symfony/console": "~2.3",
 		"symfony/http-foundation": "~2.4",
 		"symfony/http-kernel": "~2.4",
