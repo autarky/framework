@@ -434,10 +434,8 @@ class Router implements RouterInterface
 		$data = $this->routeCollector->getData();
 
 		if ($this->cachePath !== null) {
-			file_put_contents(
-				$this->cachePath,
-				'<?php return ' . var_export($data, true) . ';'
-			);
+			$writer = new LockingWriteOperation($this->cachePath);
+			$writer->write('<?php return '.var_export($data, true).";\n");
 		}
 
 		return $data;

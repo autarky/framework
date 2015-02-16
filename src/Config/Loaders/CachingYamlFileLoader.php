@@ -64,7 +64,8 @@ class CachingYamlFileLoader implements LoaderInterface
 
 		$data = $this->loader->load($path);
 
-		file_put_contents($cachePath, '<?php return '.var_export($data, true).";\n");
+		$writer = new LockingWriteOperation($cachePath);
+		$writer->write('<?php return '.var_export($data, true).";\n");
 
 		return $data;
 	}
