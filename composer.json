@@ -10,14 +10,14 @@
 		}
 	],
 	"require": {
-		"symfony/http-kernel": "~2.4",
-		"symfony/http-foundation": "~2.4",
+		"nikic/fast-route": "0.3.*",
+		"psr/log": "~1.0",
+		"stack/builder": "~1.0",
 		"symfony/browser-kit": "~2.3",
 		"symfony/console": "~2.3",
-		"stack/builder": "~1.0",
-		"nikic/fast-route": "0.3.*",
-		"twig/twig": "~1.16",
-		"psr/log": "~1.0"
+		"symfony/http-foundation": "~2.4",
+		"symfony/http-kernel": "~2.4",
+		"twig/twig": "~1.16"
 	},
 	"require-dev": {
 		"mockery/mockery": "~0.9.1",
