@@ -41,7 +41,7 @@ trait ControllerTrait
 	 */
 	protected function render($name, array $data = array())
 	{
-		return $this->container->resolve('Autarky\Templating\TemplatingEngine')
+		return $this->container->resolve('Autarky\TwigTemplating\TemplatingEngine')
 			->render($name, $data);
 	}
 
