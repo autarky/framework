@@ -25,12 +25,12 @@ class LoggingProvider extends Provider
 	 */
 	public function register()
 	{
-		$this->dic = $this->app->getContainer();
+		$dic = $this->app->getContainer();
 
-		$this->dic->define('Autarky\Logging\ChannelManager',
+		$dic->define('Autarky\Logging\ChannelManager',
 			[$this, 'makeChannelManager']);
-		$this->dic->share('Autarky\Logging\ChannelManager');
-		$this->dic->define('Psr\Log\LoggerInterface',
+		$dic->share('Autarky\Logging\ChannelManager');
+		$dic->define('Psr\Log\LoggerInterface',
 			['Autarky\Logging\ChannelManager', 'getChannel']);
 	}
 

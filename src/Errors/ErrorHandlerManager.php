@@ -256,7 +256,9 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 *
 	 * @param  \Exception $exception
 	 *
-	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @return Response
+	 *
+	 * @throws Exception  If PHP_SAPI is 'cli'
 	 */
 	public function handleUncaught(Exception $exception)
 	{

@@ -40,6 +40,7 @@ EOS
 		$router = $this->app->getContainer()
 			->resolve('Autarky\Routing\Router');
 
+		/** @var \Autarky\Routing\Route $route */
 		foreach ($router->getRoutes() as $route) {
 			$methods = implode('|', $route->getMethods());
 			$controller = $route->getController();

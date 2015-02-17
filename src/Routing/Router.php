@@ -116,11 +116,17 @@ class Router implements RouterInterface
 		);
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isCaching()
 	{
 		return $this->dispatchData !== null;
 	}
 
+	/**
+	 * @return \SplObjectStorage
+	 */
 	public function getRoutes()
 	{
 		return $this->routes;
