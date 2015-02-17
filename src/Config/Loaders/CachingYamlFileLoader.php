@@ -73,12 +73,12 @@ class CachingYamlFileLoader implements LoaderInterface
 
 	protected function shouldLoadCache($path, $cachePath)
 	{
-		if (!file_exists($cachePath)) {
-			return false;
-		}
-
 		if (!$this->stat) {
 			return true;
+		}
+
+		if (!file_exists($cachePath)) {
+			return false;
 		}
 
 		return filemtime($cachePath) >= filemtime($path);
