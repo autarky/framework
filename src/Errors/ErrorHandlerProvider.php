@@ -18,12 +18,19 @@ use Autarky\Provider;
 class ErrorHandlerProvider extends Provider
 {
 	/**
-	 * @var boolean Whether or not the error handler should register itself as handler of native PHP errors as well as application exceptions.
+	 * @var boolean  Whether or not the error handler should register itself as
+	 * handler of native PHP errors as well as application exceptions.
 	 */
 	protected $register;
 
 	/**
-	 * @param boolean $register Whether or not the error handler should register itself as handler of native PHP errors as well as application exceptions.
+	 * @var ErrorHandlerManager
+	 */
+	protected $manager;
+
+	/**
+	 * @param boolean $register Whether or not the error handler should register
+	 * itself as handler of native PHP errors as well as application exceptions.
 	 */
 	public function __construct($register = true)
 	{
@@ -38,19 +45,30 @@ class ErrorHandlerProvider extends Provider
 		$dic = $this->app->getContainer();
 		$debug = $this->app->getConfig()->get('app.debug');
 
-		$manager = new ErrorHandlerManager(
+		$this->manager = new ErrorHandlerManager(
 			new HandlerResolver($dic)
 		);
 
-		$manager->setDefaultHandler(new DefaultErrorHandler($debug));
+		$this->manager->setDefaultHandler(new DefaultErrorHandler($debug));
 
-		$this->app->setErrorHandler($manager);
+		$this->app->setErrorHandler($this->manager);
 
 		if ($this->register) {
-			$manager->register();
+			$this->manager->register();
 		}
 
-		$dic->instance('Autarky\Errors\ErrorHandlerManager', $manager);
+		$dic->instance('Autarky\Errors\ErrorHandlerManager', $this->manager);
 		$dic->alias('Autarky\Errors\ErrorHandlerManager', 'Autarky\Errors\ErrorHandlerManagerInterface');
+
+		$this->app->config([$this, 'configureErrorHandler']);
+	}
+
+	public function configureErrorHandler()
+	{
+		$errorHandlers = $this->app->getConfig()->get('app.error_handlers', []);
+
+		foreach ($errorHandlers as $errorHandler) {
+			$this->manager->appendHandler($errorHandler);
+		}
 	}
 }
