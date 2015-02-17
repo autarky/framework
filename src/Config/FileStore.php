@@ -76,9 +76,7 @@ class FileStore implements ConfigInterface
 	 */
 	public function has($key)
 	{
-		list($namespace, $group, $key) = $this->parseKey($key);
-
-		$dataKey = $this->getDataKeyAndLoadData($namespace, $group, $key);
+		$dataKey = $this->getDataKeyAndLoadData($key);
 
 		return ArrayUtils::has($this->data, $dataKey);
 	}
@@ -88,9 +86,7 @@ class FileStore implements ConfigInterface
 	 */
 	public function get($key, $default = null)
 	{
-		list($namespace, $group, $key) = $this->parseKey($key);
-
-		$dataKey = $this->getDataKeyAndLoadData($namespace, $group, $key);
+		$dataKey = $this->getDataKeyAndLoadData($key);
 
 		return ArrayUtils::get($this->data, $dataKey, $default);
 	}
@@ -98,21 +94,17 @@ class FileStore implements ConfigInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function set($fullKey, $value)
+	public function set($key, $value)
 	{
-		list($namespace, $group, $key) = $this->parseKey($fullKey);
+		$dataKey = $this->getDataKeyAndLoadData($key);
 
-		$dataKey = $namespace === null ? $group : $namespace.':'.$group;
-
-		if (!array_key_exists($dataKey, $this->data)) {
-			$this->loadData($namespace, $group, $dataKey);
-		}
-
-		ArrayUtils::set($this->data, $fullKey, $value);
+		ArrayUtils::set($this->data, $dataKey, $value);
 	}
 
-	protected function getDataKeyAndLoadData($namespace, $group, $key)
+	protected function getDataKeyAndLoadData($key)
 	{
+		list($namespace, $group, $key) = $this->parseKey($key);
+
 		$dataKey = $namespace === null ? $group : $namespace.':'.$group;
 
 		if (!array_key_exists($dataKey, $this->data)) {
