@@ -79,6 +79,8 @@ class CachingYamlFileLoader implements LoaderInterface
 			return true;
 		}
 
-		return filemtime($cachePath) >= filemtime($path);
+		// if the cache file is more recent than the real file,
+		// the cache file should be loaded
+		return filemtime($cachePath) > filemtime($path);
 	}
 }

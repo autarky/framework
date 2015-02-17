@@ -42,7 +42,9 @@ class YamlLoaderTest extends PHPUnit_Framework_TestCase
 		$path = $this->getYmlPath('test.yml');
 		$loader = $this->makeCacheLoader($parser = $this->mockParser(), TESTS_RSC_DIR.'/yaml-cache');
 		$parser->shouldReceive('parse')->once()->andReturn($data = ['foo' => 'bar']);
+		touch($path, time());
 		$this->assertEquals($data, $loader->load($path));
+		touch($path, time() - 1);
 		$this->assertEquals($data, $loader->load($path));
 	}
 }
