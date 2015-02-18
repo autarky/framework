@@ -25,7 +25,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Autarky\\": "src/"
+			"Autarky\\": "classes/"
 		}
 	},
 	"autoload-dev": {

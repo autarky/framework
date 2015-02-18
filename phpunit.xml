@@ -2,7 +2,7 @@
 <phpunit backupGlobals="false" bootstrap="tests/phpunit.php" colors="true">
 	<testsuites>
 		<testsuite name="Framework Test Suite">
-			<directory>./tests/src</directory>
+			<directory>./tests/unit</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>
