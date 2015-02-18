@@ -66,7 +66,7 @@ class ConfigProvider extends Provider
 		$dic->alias('Autarky\Config\FileStore', 'Autarky\Config\ConfigInterface');
 
 		// set up the PHP file loader
-		$dic->share('Autarky\Config\Loaders\CachingYamlFileLoader');
+		$dic->share('Autarky\Config\Loaders\PhpFileLoader');
 		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
 
 		// set up the YAML config file loader
