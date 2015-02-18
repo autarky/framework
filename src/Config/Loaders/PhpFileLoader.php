@@ -10,6 +10,7 @@
 
 namespace Autarky\Config\Loaders;
 
+use Autarky\Config\LoadException;
 use Autarky\Config\LoaderInterface;
 
 /**
@@ -28,7 +29,7 @@ class PhpFileLoader implements LoaderInterface
 		$data = static::requireFile($path);
 
 		if (!is_array($data)) {
-			throw new \RuntimeException("Config file \"$path\" must return an array");
+			throw new LoadException("Config file \"$path\" must return an array");
 		}
 
 		return $data;
@@ -40,17 +41,11 @@ class PhpFileLoader implements LoaderInterface
 	 * Static method to make it impossible to reference $this in the file.
 	 *
 	 * @param  string     $_path
-	 * @param  array|null $_variables
 	 *
 	 * @return mixed
 	 */
-	protected static function requireFile($_path, array $_variables = null)
+	protected static function requireFile($_path)
 	{
-		if ($_variables) {
-			extract($_variables, EXTR_REFS);
-		}
-		unset($_variables);
-
 		return require $_path;
 	}
 }

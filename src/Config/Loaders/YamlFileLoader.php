@@ -11,7 +11,9 @@
 namespace Autarky\Config\Loaders;
 
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Exception\ParseException;
 
+use Autarky\Config\LoadException;
 use Autarky\Config\LoaderInterface;
 
 /**
@@ -41,6 +43,10 @@ class YamlFileLoader implements LoaderInterface
 	{
 		$yaml = file_get_contents($path);
 
-		return $this->parser->parse($yaml);
+		try {
+			return $this->parser->parse($yaml);
+		} catch (ParseException $e) {
+			throw new LoadException($e->getMessage(), $e->getCode(), $e);
+		}
 	}
 }

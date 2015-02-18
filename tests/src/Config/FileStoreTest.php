@@ -111,8 +111,8 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function fileReturningNonArrayThrowsException()
 	{
-		$this->setExpectedException('RuntimeException');
 		$config = $this->makeConfig();
+		$this->setExpectedException('Autarky\Config\LoadException');
 		$config->get('notarray.foo');
 	}
 
