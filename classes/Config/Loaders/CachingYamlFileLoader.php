@@ -10,22 +10,15 @@
 
 namespace Autarky\Config\Loaders;
 
+use Symfony\Component\Yaml\Parser;
+
 use Autarky\Config\LoaderInterface;
-use Autarky\Files\LockingWriteOperation;
 
 /**
  * Caching wrapper for the YAML/YML config file loader.
  */
-class CachingYamlFileLoader implements LoaderInterface
+class CachingYamlFileLoader extends YamlFileLoader
 {
-	/**
-	 * The internal YAML file loader instance. It will be responsible for
-	 * parsing files that haven't been cached.
-	 *
-	 * @var YamlFileLoader
-	 */
-	protected $loader;
-
 	/**
 	 * The directory in which to look for cached files.
 	 *
@@ -41,13 +34,15 @@ class CachingYamlFileLoader implements LoaderInterface
 	protected $stat;
 
 	/**
-	 * @param YamlFileLoader $loader
-	 * @param string         $cacheDir
-	 * @param bool           $stat
+	 * Constructor.
+	 *
+	 * @param Parser $parser
+	 * @param string $cacheDir
+	 * @param bool   $stat
 	 */
-	public function __construct(YamlFileLoader $loader, $cacheDir, $stat = true)
+	public function __construct(Parser $parser, $cacheDir, $stat = true)
 	{
-		$this->loader = $loader;
+		parent::__construct($parser);
 		$this->cacheDir = $cacheDir;
 		$this->stat = (bool) $stat;
 	}
@@ -63,22 +58,21 @@ class CachingYamlFileLoader implements LoaderInterface
 			return require $cachePath;
 		}
 
-		$data = $this->loader->load($path);
+		$data = parent::load($path);
 
-		$writer = new LockingWriteOperation($cachePath);
-		$writer->write('<?php return '.var_export($data, true).";\n");
+		$this->filesys->write($cachePath, '<?php return '.var_export($data, true).";\n");
 
 		return $data;
 	}
 
 	protected function shouldLoadCache($path, $cachePath)
 	{
-		if (!$this->stat) {
-			return true;
-		}
-
 		if (!file_exists($cachePath)) {
 			return false;
+		}
+
+		if (!$this->stat) {
+			return true;
 		}
 
 		// if the cache file is more recent than the real file,

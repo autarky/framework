@@ -56,21 +56,31 @@ class ConfigProvider extends Provider
 	{
 		$dic = $this->app->getContainer();
 
+		// set up the factory
 		$loaderFactory = new LoaderFactory($dic);
 		$dic->instance('Autarky\Config\Loaders\LoaderFactory', $loaderFactory);
 
+		// set up the config store
 		$store = new FileStore($loaderFactory, $this->configPath, $this->app->getEnvironment());
 		$dic->instance('Autarky\Config\FileStore', $store);
 		$dic->alias('Autarky\Config\FileStore', 'Autarky\Config\ConfigInterface');
 
+		// set up the PHP file loader
+		$dic->share('Autarky\Config\Loaders\CachingYamlFileLoader');
 		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
 
-		$dic->define('Autarky\Config\Loaders\CachingYamlFileLoader', function() {
-			return new CachingYamlFileLoader(new YamlFileLoader(new Parser), $this->getYamlCachePath());
+		// set up the YAML config file loader
+		$dic->define('Autarky\Config\Loaders\CachingYamlFileLoader', function($dic) {
+			return new CachingYamlFileLoader(
+				$dic->resolve('Symfony\Component\Yaml\Parser'),
+				$this->getYamlCachePath(),
+				$this->app->getConfig()->get('app.debug')
+			);
 		});
 		$dic->share('Autarky\Config\Loaders\CachingYamlFileLoader');
 		$loaderFactory->addLoader(['yml', 'yaml'], 'Autarky\Config\Loaders\CachingYamlFileLoader');
 
+		// done!
 		return $store;
 	}
 

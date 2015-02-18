@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
 
 use Autarky\Config\LoadException;
 use Autarky\Config\LoaderInterface;
+use Autarky\Files\LockingFilesystem;
 
 /**
  * YAML/YML config file loader.
@@ -29,11 +30,19 @@ class YamlFileLoader implements LoaderInterface
 	protected $parser;
 
 	/**
+	 * The filesystem instance.
+	 *
+	 * @var LockingFilesystem
+	 */
+	protected $filesys;
+
+	/**
 	 * @param Parser $parser
 	 */
 	public function __construct(Parser $parser)
 	{
 		$this->parser = $parser;
+		$this->filesys = new LockingFilesystem;
 	}
 
 	/**
@@ -41,7 +50,7 @@ class YamlFileLoader implements LoaderInterface
 	 */
 	public function load($path)
 	{
-		$yaml = file_get_contents($path);
+		$yaml = $this->filesys->read($path);
 
 		try {
 			return $this->parser->parse($yaml);

@@ -22,7 +22,7 @@ use FastRoute\RouteParser\Std as RouteParser;
 use FastRoute\Dispatcher\GroupCountBased as Dispatcher;
 use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 
-use Autarky\Files\LockingWriteOperation;
+use Autarky\Files\LockingFilesystem;
 
 /**
  * FastRoute implementation of the router.
@@ -442,8 +442,8 @@ class Router implements RouterInterface
 		$data = $this->routeCollector->getData();
 
 		if ($this->cachePath !== null) {
-			$writer = new LockingWriteOperation($this->cachePath);
-			$writer->write('<?php return '.var_export($data, true).";\n");
+			$filesys = new LockingFilesystem;
+			$filesys->write($cachePath, '<?php return '.var_export($data, true).";\n");
 		}
 
 		return $data;

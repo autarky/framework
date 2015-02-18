@@ -18,9 +18,13 @@ class YamlLoaderTest extends PHPUnit_Framework_TestCase
 		return new \Autarky\Config\Loaders\YamlFileLoader($parser);
 	}
 
-	public function makeCacheLoader($parser, $cachePath = null)
+	public function makeCacheLoader($parser, $cachePath = null, $stat = true)
 	{
-		return new \Autarky\Config\Loaders\CachingYamlFileLoader($this->makeLoader($parser), $cachePath);
+		if ($parser === null) {
+			$parser = new \Symfony\Component\Yaml\Parser;
+		}
+
+		return new \Autarky\Config\Loaders\CachingYamlFileLoader($parser, $cachePath, $stat);
 	}
 
 	public function mockParser()
