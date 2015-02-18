@@ -106,10 +106,6 @@ class SessionProvider extends Provider
 	 */
 	public function makeSessionStorage()
 	{
-		if (!$this->config->has('session.storage')) {
-			return $this->legacyMakeSessionStorage();
-		}
-
 		$storage = $this->config->get('session.storage');
 
 		if ($storage == 'mock_array') {
@@ -136,24 +132,6 @@ class SessionProvider extends Provider
 		}
 
 		throw new \RuntimeException("Unknown session storage driver: $storage");
-	}
-
-	/**
-	 * Legacy method for making the session storage, for installations that have
-	 * not updated their config to the 0.7 structure.
-	 *
-	 * @return \Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface
-	 */
-	public function legacyMakeSessionStorage()
-	{
-		if ($this->config->get('session.mock') === true) {
-			return new MockArraySessionStorage;
-		}
-
-		$options = $this->config->get('session.storage_options', []);
-		$handler = $this->dic->resolve('SessionHandlerInterface');
-
-		return new NativeSessionStorage($options, $handler);
 	}
 
 	/**
