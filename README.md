@@ -11,6 +11,8 @@ Documentation is available in the [wiki](https://github.com/autarky/framework/wi
 
 Changelog and upgrade instructions are available in Github's [releases](https://github.com/autarky/framework/releases).
 
+Related repositories: [Container](https://github.com/autarky/container), [Twig templating](https://github.com/autarky/twig-templating)
+
 ### Installation
 
 Try the framework out by creating a skeleton project using composer.
