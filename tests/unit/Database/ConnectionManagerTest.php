@@ -11,7 +11,7 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 
 	public function makeManager($config)
 	{
-		return new \Autarky\Database\ConnectionManager($config);
+		return new \Autarky\Database\ConnectionManager($config, new Autarky\Database\ConnectionFactory);
 	}
 
 	public function makeConfig($connection = 'default', array $connections = array())
@@ -53,17 +53,6 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 		$this->setExpectedException('InvalidArgumentException',
 			'No config found for connection: other');
 		$pdo = $container->getPdo('other');
-	}
-
-	/** @test */
-	public function missingDsnThrowsException()
-	{
-		$connections = ['default' => ['foo' => 'bar']];
-		$config = $this->makeConfig('default', $connections);
-		$container = $this->makeManager($config);
-		$this->setExpectedException('InvalidArgumentException',
-			'Missing DSN for connection: default');
-		$pdo = $container->getPdo('default');
 	}
 
 	/** @test */

@@ -21,9 +21,14 @@ use Autarky\Config\ConfigInterface;
 class ConnectionManager
 {
 	/**
-	 * @var \Autarky\Config\ConfigInterface
+	 * @var ConfigInterface
 	 */
 	protected $config;
+
+	/**
+	 * @var ConnectionFactory
+	 */
+	protected $factory;
 
 	/**
 	 * The default connection to use
@@ -40,26 +45,16 @@ class ConnectionManager
 	protected $instances = [];
 
 	/**
-	 * The default PDO options.
-	 *
-	 * @var array
-	 */
-	protected $defaultPdoOptions = [
-		PDO::ATTR_CASE               => PDO::CASE_NATURAL,
-		PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-		PDO::ATTR_EMULATE_PREPARES   => false,
-		PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-		PDO::ATTR_ORACLE_NULLS       => PDO::NULL_NATURAL,
-		PDO::ATTR_STRINGIFY_FETCHES  => false,
-	];
-
-	/**
 	 * @param ConfigInterface $config
 	 * @param string|null     $defaultConnection If null, "database.connection" is retrieved from $config
 	 */
-	public function __construct(ConfigInterface $config, $defaultConnection = null)
-	{
+	public function __construct(
+		ConfigInterface $config,
+		ConnectionFactory $factory,
+		$defaultConnection = null
+	) {
 		$this->config = $config;
+		$this->factory = $factory;
 		$this->defaultConnection = $defaultConnection ?: $config->get('database.connection');
 	}
 
@@ -68,9 +63,7 @@ class ConnectionManager
 	 *
 	 * @param  string|null $connection Null fetches the default connection.
 	 *
-	 * @return PDO
-	 *
-	 * @throws \InvalidArgumentException if connection is not configured
+	 * @return \PDO
 	 */
 	public function getPdo($connection = null)
 	{
@@ -82,40 +75,9 @@ class ConnectionManager
 			return $this->instances[$connection];
 		}
 
-		return $this->instances[$connection] = $this->makePdo($connection);
-	}
-
-	protected function makePdo($connection)
-	{
 		$config = $this->getConnectionConfig($connection);
 
-		if (!isset($config['dsn']) || !$config['dsn']) {
-			throw new \InvalidArgumentException("Missing DSN for connection: $connection");
-		}
-
-		if (strpos($config['dsn'], 'sqlite') === 0) {
-			$username = $password = '';
-		} else {
-			if (!isset($config['username']) || !$config['username']) {
-				throw new \InvalidArgumentException("Missing username for connection: $connection");
-			}
-			$username = $config['username'];
-			if (!isset($config['password'])) {
-				throw new \InvalidArgumentException("Missing password for connection: $connection");
-			}
-			$password = $config['password'];
-		}
-
-		$options = array_key_exists('options', $config) ? $config['options'] : [];
-		$options = array_replace($this->defaultPdoOptions, $options);
-
-		try {
-			return new PDO($config['dsn'], $username, $password, $options);
-		} catch (\PDOException $e) {
-			$newException = new CannotConnectException($e->getMessage(), $e->getCode(), $e);
-			$newException->errorInfo = $e->errorInfo;
-			throw $newException;
-		}
+		return $this->instances[$connection] = $this->factory->makePdo($config, $connection);
 	}
 
 	/**
