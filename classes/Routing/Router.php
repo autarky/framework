@@ -444,7 +444,8 @@ class Router implements RouterInterface
 
 		if ($this->cachePath !== null) {
 			$filesys = new LockingFilesystem;
-			$filesys->write($cachePath, '<?php return '.var_export($data, true).";\n");
+			$php = '<?php return '.var_export($data, true).";\n";
+			$filesys->write($this->cachePath, $php);
 		}
 
 		return $data;
