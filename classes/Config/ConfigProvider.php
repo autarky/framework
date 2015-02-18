@@ -73,8 +73,7 @@ class ConfigProvider extends Provider
 		$dic->define('Autarky\Config\Loaders\CachingYamlFileLoader', function($dic) {
 			return new CachingYamlFileLoader(
 				$dic->resolve('Symfony\Component\Yaml\Parser'),
-				$this->getYamlCachePath(),
-				$this->app->getConfig()->get('app.debug')
+				$this->getYamlCachePath()
 			);
 		});
 		$dic->share('Autarky\Config\Loaders\CachingYamlFileLoader');
