@@ -90,18 +90,19 @@ class ConnectionManager
 		$config = $this->getConnectionConfig($connection);
 
 		if (!isset($config['dsn']) || !$config['dsn']) {
-			throw new \InvalidArgumentException("Connection $connection missing data: dsn");
+			throw new \InvalidArgumentException("Missing DSN for connection: $connection");
 		}
 
 		if (strpos($config['dsn'], 'sqlite') === 0) {
 			$username = $password = '';
 		} else {
-			foreach (['username', 'password'] as $key) {
-				if (!isset($config[$key])) {
-					throw new \InvalidArgumentException("Connection $connection missing data: $key");
-				}
+			if (!isset($config['username']) || !$config['username']) {
+				throw new \InvalidArgumentException("Missing username for connection: $connection");
 			}
 			$username = $config['username'];
+			if (!isset($config['password'])) {
+				throw new \InvalidArgumentException("Missing password for connection: $connection");
+			}
 			$password = $config['password'];
 		}
 
@@ -139,7 +140,7 @@ class ConnectionManager
 				$connection = gettype($connection);
 			}
 
-			throw new \InvalidArgumentException("Connection $connection not defined");
+			throw new \InvalidArgumentException("No config found for connection: $connection");
 		}
 
 		return $config;

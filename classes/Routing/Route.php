@@ -10,6 +10,7 @@
 
 namespace Autarky\Routing;
 
+// this must match the parser used in Router.php
 use FastRoute\RouteParser\Std as FastRoute;
 
 /**
@@ -52,7 +53,10 @@ class Route
 	 */
 	protected $afterFilters = [];
 
-	protected $params;
+	/**
+	 * @var array|null
+	 */
+	protected $params = null;
 
 	/**
 	 * @param array    $methods    HTTP methods allowed for this route
@@ -68,42 +72,34 @@ class Route
 		$this->controller = $controller;
 	}
 
+	/**
+	 * Get the methods the route responds to.
+	 *
+	 * @return string[]
+	 */
 	public function getMethods()
 	{
 		return $this->methods;
 	}
 
+	/**
+	 * Get the URI pattern the route should match against.
+	 *
+	 * @return string
+	 */
 	public function getPattern()
 	{
 		return $this->pattern;
 	}
 
 	/**
-	 * Given a set of parameters, get the relative path to the route.
+	 * Get the callable controller for the route.
 	 *
-	 * @param array $params
-	 *
-	 * @return string
+	 * @return callable
 	 */
-	public function getPath(array $params = array())
+	public function getController()
 	{
-		// for each regex match in $this->pattern, get the first param in
-		// $params and replace the match with that
-		$callback = function () use (&$params, &$matches) {
-			if (count($params) < 1) {
-				throw new \InvalidArgumentException('Too few parameters given');
-			}
-
-			return array_shift($params);
-		};
-
-		$path = preg_replace_callback(FastRoute::VARIABLE_REGEX, $callback, $this->pattern);
-
-		if (count($params) > 0) {
-			$path .= '?' . http_build_query($params);
-		}
-
-		return $path;
+		return $this->controller;
 	}
 
 	/**
@@ -168,23 +164,59 @@ class Route
 	}
 
 	/**
-	 * Get the callable controller for the route.
+	 * When a match against the route has been confirmed, extract the parameters
+	 * from the URI and pass them as an associative array to this method.
 	 *
-	 * @return callable
+	 * @param array $params
 	 */
-	public function getController()
-	{
-		return $this->controller;
-	}
-
 	public function setParams(array $params)
 	{
 		$this->params = $params;
 	}
 
+	/**
+	 * Get the parameters. Can only be called on a route that has been matched
+	 * against an URI (i.e. setParams has been called)
+	 *
+	 * @return array
+	 *
+	 * @throws \BadMethodCallException If route has not been matched yet
+	 */
 	public function getParams()
 	{
+		if ($this->params === null) {
+			throw new \BadMethodCallException("Cannot get params from a route that has not been matched yet");
+		}
+
 		return $this->params;
+	}
+
+	/**
+	 * Given a set of parameters, get the relative path to the route.
+	 *
+	 * @param array $params
+	 *
+	 * @return string
+	 */
+	public function getPath(array $params = array())
+	{
+		// for each regex match in $this->pattern, get the first param in
+		// $params and replace the match with that
+		$callback = function () use (&$params, &$matches) {
+			if (count($params) < 1) {
+				throw new \InvalidArgumentException('Too few parameters given');
+			}
+
+			return array_shift($params);
+		};
+
+		$path = preg_replace_callback(FastRoute::VARIABLE_REGEX, $callback, $this->pattern);
+
+		if (count($params) > 0) {
+			$path .= '?' . http_build_query($params);
+		}
+
+		return $path;
 	}
 
 	/**

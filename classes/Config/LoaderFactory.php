@@ -60,7 +60,7 @@ class LoaderFactory
 	 * Add a loader.
 	 *
 	 * @param  string $extensions
-	 * @param  string $loaderClass
+	 * @param  string|LoaderInterface $loaderClass
 	 *
 	 * @return void
 	 */
@@ -70,7 +70,7 @@ class LoaderFactory
 			$this->extensions[] = $extension;
 			if (is_string($loaderClass)) {
 				$this->loaderClasses[$extension] = $loaderClass;
-			} else if (is_object($loaderClass)) {
+			} elseif ($loaderClass instanceof LoaderInterface) {
 				$this->loaders[$extension] = $loaderClass;
 			}
 		}
@@ -83,12 +83,6 @@ class LoaderFactory
 	 */
 	public function getExtensions()
 	{
-		if ($this->extensions === null) {
-			$this->extensions = array_unique(array_merge(
-				array_keys($this->loaderClasses), array_keys($this->loaders)
-			));
-		}
-
 		return $this->extensions;
 	}
 
@@ -113,7 +107,7 @@ class LoaderFactory
 	protected function resolveLoader($extension)
 	{
 		if (!isset($this->loaderClasses[$extension])) {
-			throw new \RuntimeException("Invalid extension: $extension");
+			throw new LoadException("No loader registered for extension: $extension");
 		}
 
 		$this->loaders[$extension] = $this->container

@@ -10,6 +10,7 @@
 
 namespace Autarky\Database;
 
-class CannotConnectException extends \PDOException
-{
-}
+/**
+ * Exception thrown specifically when a PDO connection cannot be established.
+ */
+class CannotConnectException extends \PDOException {}

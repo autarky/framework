@@ -50,18 +50,20 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 		$connections = ['default' => ['dsn' => 'sqlite::memory:']];
 		$config = $this->makeConfig('default', $connections);
 		$container = $this->makeManager($config);
-		$this->setExpectedException('InvalidArgumentException');
+		$this->setExpectedException('InvalidArgumentException',
+			'No config found for connection: other');
 		$pdo = $container->getPdo('other');
 	}
 
 	/** @test */
 	public function missingDsnThrowsException()
 	{
-		$connections = ['default' => []];
+		$connections = ['default' => ['foo' => 'bar']];
 		$config = $this->makeConfig('default', $connections);
 		$container = $this->makeManager($config);
-		$this->setExpectedException('InvalidArgumentException');
-		$pdo = $container->getPdo('other');
+		$this->setExpectedException('InvalidArgumentException',
+			'Missing DSN for connection: default');
+		$pdo = $container->getPdo('default');
 	}
 
 	/** @test */

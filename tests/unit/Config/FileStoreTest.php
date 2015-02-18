@@ -120,7 +120,11 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	public function customConfigFileLoaderIsCalled()
 	{
 		$config = $this->makeConfig();
-		$config->getLoaderFactory()->addLoader('mock', m::mock(['load' => ['foo' => 'bar']]));
+		$mock = m::mock('Autarky\Config\LoaderInterface');
+		$mock->shouldReceive('load')->once()
+			->with(TESTS_RSC_DIR.'/config/mockedfile.mock')
+			->andReturn(['foo' => 'bar']);
+		$config->getLoaderFactory()->addLoader('mock', $mock);
 		$this->assertEquals('bar', $config->get('mockedfile.foo'));
 		$this->assertEquals(null, $config->get('mockedfile.bar'));
 	}

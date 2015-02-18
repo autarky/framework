@@ -139,7 +139,7 @@ class FileStore implements ConfigInterface
 		}
 
 		if (!is_readable($path)) {
-			throw new \RuntimeException("File is not readable: $path");
+			throw new LoadException("File is not readable: $path");
 		}
 
 		$loader = $this->loaderFactory->getForPath($path);
