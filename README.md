@@ -5,7 +5,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/autarky/framework/v/unstable.svg)](https://github.com/autarky/framework/branches/active)
 [![License](https://poser.pugx.org/autarky/framework/license.svg)](http://opensource.org/licenses/MIT)
 
-Autarky is a PHP framework for experienced developers and/or quick learners, with a focus on developer freedom of choice, configuration over convention and the right mix of rapid/pleasant development and sturdy application architecture.
+Autarky is a PHP framework for experienced developers and/or quick learners, with a focus on developer freedom of choice, configuration over convention, and the right mix of rapid/pleasant development and sturdy application architecture.
 
 Documentation is available in the [wiki](https://github.com/autarky/framework/wiki). [API docs](http://autarky.lutro.me/api/) are also available.
 
