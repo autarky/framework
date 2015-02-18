@@ -243,8 +243,8 @@ class Route
 		$route = new static($data['methods'], $data['pattern'], $data['controller'], $data['name']);
 		$route->beforeFilters = $data['beforeFilters'];
 		$route->afterFilters = $data['afterFilters'];
-		if (static::$router !== null && array_key_exists('name', $data) && $data['name']) {
-			static::$router->addNamedRoute($data['name'], $route);
+		if (static::$router !== null) {
+			static::$router->addCachedRoute($route);
 		}
 		return $route;
 	}

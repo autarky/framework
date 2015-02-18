@@ -287,6 +287,14 @@ class Router implements RouterInterface
 		return $route;
 	}
 
+	public function addCachedRoute(Route $route)
+	{
+		$this->routes->attach($route);
+		if ($name = $route->getName()) {
+			$this->addNamedRoute($name, $route);
+		}
+	}
+
 	protected function makePath($path)
 	{
 		if ($this->currentPrefix !== null) {
@@ -304,13 +312,7 @@ class Router implements RouterInterface
 		return rtrim($path, '/');
 	}
 
-	/**
-	 * Add a named route to the router.
-	 *
-	 * @param string $name
-	 * @param Route  $route
-	 */
-	public function addNamedRoute($name, Route $route)
+	protected function addNamedRoute($name, Route $route)
 	{
 		if (array_key_exists($name, $this->namedRoutes)) {
 			throw new \InvalidArgumentException("Route with name $name already exists");
@@ -352,6 +354,16 @@ class Router implements RouterInterface
 		return $this->getResponse($request, $route, $route->getParams());
 	}
 
+	/**
+	 * Get the Route object corresponding to a given request.
+	 *
+	 * @param  Request $request
+	 *
+	 * @return Route
+	 *
+	 * @throws NotFoundHttpException
+	 * @throws MethodNotAllowedHttpException
+	 */
 	public function getRouteForRequest(Request $request)
 	{
 		$method = $request->getMethod();
