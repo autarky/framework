@@ -19,9 +19,26 @@ use Autarky\Config\ConfigInterface;
  */
 class DefaultRouteConfigurator implements ConfiguratorInterface
 {
+	/**
+	 * The config instance.
+	 *
+	 * @var ConfigInterface
+	 */
 	protected $config;
+
+	/**
+	 * The router instance.
+	 *
+	 * @var RouterInterface
+	 */
 	protected $router;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param RouterInterface $router
+	 * @param ConfigInterface $config
+	 */
 	public function __construct(
 		RouterInterface $router,
 		ConfigInterface $config
@@ -30,6 +47,9 @@ class DefaultRouteConfigurator implements ConfiguratorInterface
 		$this->config = $config;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function configure()
 	{
 		$this->router->mount($this->config->get('routes'), '/');
