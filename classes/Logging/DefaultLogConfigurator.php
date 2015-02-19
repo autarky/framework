@@ -19,9 +19,14 @@ use Monolog\Logger;
 
 /**
  * Default log configurator.
+ *
+ * You can easily change the path to log to by extending this class and
+ * overriding either getLogDirectory, getLogFilename or getLogPath.
  */
 class DefaultLogConfigurator implements ConfiguratorInterface
 {
+	const LOG_TS_FORMAT = 'Y-m-d H:i:s.u P';
+
 	/**
 	 * Channel manager instance.
 	 *
@@ -65,16 +70,18 @@ class DefaultLogConfigurator implements ConfiguratorInterface
 	 */
 	public function configure()
 	{
-		$this->channelManager->setChannel('default', $this->makeLogger());
+		$this->channelManager->setChannel('default', $this->makeDefaultLogger());
 	}
 
-	protected function makeLogger()
+	protected function makeDefaultLogger()
 	{
 		$logger = new Logger($this->environment);
 
 		if ($logpath = $this->getLogPath()) {
-			$logger->pushHandler($handler = new StreamHandler($logpath, Logger::DEBUG));
-			$handler->setFormatter(new LineFormatter(null, 'Y-m-d H:i:s.u P', true));
+			$handler = new StreamHandler($logpath, Logger::DEBUG);
+			$logger->pushHandler($handler);
+			$formatter = new LineFormatter(null, static::LOG_TS_FORMAT, true);
+			$handler->setFormatter($formatter);
 		}
 
 		return $logger;
@@ -90,7 +97,7 @@ class DefaultLogConfigurator implements ConfiguratorInterface
 			throw new \RuntimeException("Log directory $logdir does not exist or is not a directory.");
 		}
 
-		$logpath = rtrim($logdir, '\\/').'/'.PHP_SAPI.'.log';
+		$logpath = rtrim($logdir, '\\/').DIRECTORY_SEPARATOR.$this->getLogFilename();
 
 		if (file_exists($logpath) && !is_writable($logpath)) {
 			throw new \RuntimeException("Log file $logpath is not writeable.");
@@ -114,5 +121,10 @@ class DefaultLogConfigurator implements ConfiguratorInterface
 		}
 
 		return null;
+	}
+
+	protected function getLogFilename()
+	{
+		return PHP_SAPI.'.log';
 	}
 }
