@@ -64,7 +64,7 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 		];
 		$connections = ['default' => [
 			'dsn' => 'sqlite::memory:',
-			'options' => $options
+			'pdo_options' => $options
 		]];
 		$config = $this->makeConfig('default', $connections);
 		$container = $this->makeManager($config);

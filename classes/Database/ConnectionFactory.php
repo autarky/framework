@@ -67,9 +67,12 @@ class ConnectionFactory
 			$this->validate($config, 'dsn', $connection);
 		}
 
-		$options = array_key_exists('options', $config) ? $config['options'] : [];
-		unset($config['options']);
+		$options = array_key_exists('pdo_options', $config) ? $config['pdo_options'] : [];
+		unset($config['pdo_options']);
 		$options = array_replace($this->defaultPdoOptions, $options);
+
+		$initCommands = isset($config['pdo_init_commands']) ? $config['pdo_init_commands'] : [];
+		unset($config['pdo_init_commands']);
 
 		if (isset($config['dsn'])) {
 			$dsn = $config['dsn'];
@@ -89,12 +92,18 @@ class ConnectionFactory
 		}
 
 		try {
-			return new PDO($dsn, $username, $password, $options);
+			$pdo = new PDO($dsn, $username, $password, $options);
 		} catch (PDOException $e) {
 			$newException = new CannotConnectException($e->getMessage(), $e->getCode(), $e);
 			$newException->errorInfo = $e->errorInfo;
 			throw $newException;
 		}
+
+		foreach ($initCommands as $command) {
+			$pdo->exec($command);
+		}
+
+		return $pdo;
 	}
 
 	protected function makeSqliteDsn($path)
