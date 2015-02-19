@@ -10,9 +10,8 @@
 
 namespace Autarky\Database;
 
-use PDO;
-
 use Autarky\Config\ConfigInterface;
+use PDO;
 
 /**
  * Manager for multiple database connections in the form of PDO instances and
@@ -45,12 +44,16 @@ class ConnectionManager
 	protected $instances = [];
 
 	/**
+	 * Constructor.
+	 *
 	 * @param ConfigInterface $config
-	 * @param string|null     $defaultConnection If null, "database.connection" is retrieved from $config
+	 * @param ConnectionFactoryInterface $config
+	 * @param string|null $defaultConnection If null, "database.connection" is
+	 * retrieved from $config
 	 */
 	public function __construct(
 		ConfigInterface $config,
-		ConnectionFactory $factory,
+		ConnectionFactoryInterface $factory,
 		$defaultConnection = null
 	) {
 		$this->config = $config;

@@ -26,10 +26,14 @@ class DatabaseProvider extends Provider
 	{
 		$dic = $this->app->getContainer();
 
-		$dic->define('Autarky\Database\ConnectionManager', function() {
+		$dic->share('Autarky\Database\ConnectionFactory');
+		$dic->alias('Autarky\Database\ConnectionFactory',
+			'Autarky\Database\ConnectionFactoryInterface');
+
+		$dic->define('Autarky\Database\ConnectionManager', function($dic) {
 			return new ConnectionManager(
 				$this->app->getConfig(),
-				new ConnectionFactory
+				$dic->resolve('Autarky\Database\ConnectionFactoryInterface')
 			);
 		});
 		$dic->share('Autarky\Database\ConnectionManager');

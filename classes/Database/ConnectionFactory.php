@@ -14,7 +14,7 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 
-class ConnectionFactory
+class ConnectionFactory implements ConnectionFactoryInterface
 {
 	/**
 	 * The default PDO options.
@@ -34,14 +34,15 @@ class ConnectionFactory
 	 * Create a new PDO instance.
 	 *
 	 * @param  array  $config
-	 * @param  string  $connection Name of the connection
+	 * @param  string $connection Name of the connection - used for exception
+	 * messages
 	 *
 	 * @return PDO
 	 *
 	 * @throws InvalidArgumentException If connection is incorrectly configured
 	 * @throws CannotConnectException If construction of PDO object fails
 	 */
-	public function makePdo(array $config, $connection)
+	public function makePdo(array $config, $connection = null)
 	{
 		// extract the username and password
 		if (

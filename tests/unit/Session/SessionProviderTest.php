@@ -2,6 +2,7 @@
 
 use Autarky\Tests\TestCase;
 use Autarky\Session\SessionProvider;
+use Autarky\Database\DatabaseProvider;
 use Mockery as m;
 
 class SessionProviderTest extends TestCase
@@ -41,6 +42,9 @@ class SessionProviderTest extends TestCase
 		$app = $this->makeApplication([new SessionProvider]);
 		$app->getConfig()->set('session.handler', $handler);
 		if ($handler == 'pdo') {
+			$sp = new DatabaseProvider;
+			$sp->setApplication($app);
+			$sp->register();
 			$app->getConfig()->set('session.handler_options', ['db_table' => 'sessions']);
 			$app->getConfig()->set('session.db_connection', 'default');
 			$app->getConfig()->set('database.connections.default', ['dsn' => 'sqlite::memory:']);
