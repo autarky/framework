@@ -1,7 +1,7 @@
 <?php
 namespace Autarky\Tests;
 
-class StubPDO extends \PDO
+class DummyPDO extends \PDO
 {
 	public function __construct()
 	{

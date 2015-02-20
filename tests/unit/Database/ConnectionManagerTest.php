@@ -1,7 +1,7 @@
 <?php
 
 use Mockery as m;
-use Autarky\Tests\StubPDO;
+use Autarky\Tests\DummyPDO;
 
 class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 {
@@ -40,7 +40,7 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 		$this->config->set('database.connections', $config);
 		$this->factory->shouldReceive('makePdo')->once()
 			->with($config['default'], 'default')
-			->andReturn(new StubPDO);
+			->andReturn(new DummyPDO);
 
 		$pdo = $manager->getPdo();
 
@@ -58,9 +58,9 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 		];
 		$this->config->set('database.connections', $config);
 		$this->factory->shouldReceive('makePdo')->once()
-			->with($config['default'], 'default')->andReturn(new StubPDO);
+			->with($config['default'], 'default')->andReturn(new DummyPDO);
 		$this->factory->shouldReceive('makePdo')->once()
-			->with($config['other'], 'other')->andReturn(new StubPDO);
+			->with($config['other'], 'other')->andReturn(new DummyPDO);
 
 		$pdo = $manager->getPdo('other');
 
