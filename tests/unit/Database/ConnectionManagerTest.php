@@ -1,76 +1,82 @@
 <?php
 
 use Mockery as m;
+use Autarky\Tests\StubPDO;
 
 class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 {
+	protected $manager;
+	protected $config;
+	protected $factory;
+
 	public function tearDown()
 	{
 		m::close();
 	}
 
-	public function makeManager($config)
+	private function makeManager($config = null, $factory = null)
 	{
-		return new \Autarky\Database\ConnectionManager($config, new Autarky\Database\ConnectionFactory);
+		return $this->manager = new \Autarky\Database\ConnectionManager(
+			$this->config = ($config ?: $this->makeConfig()),
+			$this->factory = ($factory ?: $this->mockFactory())
+		);
 	}
 
-	public function makeConfig($connection = 'default', array $connections = array())
+	private function makeConfig($connection = 'default', array $connections = array())
 	{
 		return new \Autarky\Config\ArrayStore(['database' => ['connection' => $connection, 'connections' => $connections]]);
+	}
+
+	private function mockFactory()
+	{
+		return m::mock('Autarky\Database\ConnectionFactory');
 	}
 
 	/** @test */
 	public function getDefaultConnection()
 	{
-		$connections = ['default' => ['dsn' => 'sqlite::memory:']];
-		$config = $this->makeConfig('default', $connections);
-		$container = $this->makeManager($config);
-		$pdo = $container->getPdo();
+		$manager = $this->makeManager();
+		$config = ['default' => ['dsn' => 'sqlite::memory:']];
+		$this->config->set('database.connections', $config);
+		$this->factory->shouldReceive('makePdo')->once()
+			->with($config['default'], 'default')
+			->andReturn(new StubPDO);
+
+		$pdo = $manager->getPdo();
+
 		$this->assertInstanceOf('PDO', $pdo);
-		$this->assertSame($pdo, $container->getPdo());
+		$this->assertSame($pdo, $manager->getPdo());
 	}
 
 	/** @test */
 	public function getNonDefaultConnection()
 	{
-		$connections = [
+		$manager = $this->makeManager();
+		$config = [
 			'default' => ['dsn' => 'sqlite::memory:'],
 			'other' => ['dsn' => 'sqlite::memory:']
 		];
-		$config = $this->makeConfig('default', $connections);
-		$container = $this->makeManager($config);
-		$pdo = $container->getPdo('other');
+		$this->config->set('database.connections', $config);
+		$this->factory->shouldReceive('makePdo')->once()
+			->with($config['default'], 'default')->andReturn(new StubPDO);
+		$this->factory->shouldReceive('makePdo')->once()
+			->with($config['other'], 'other')->andReturn(new StubPDO);
+
+		$pdo = $manager->getPdo('other');
+
 		$this->assertInstanceOf('PDO', $pdo);
-		$this->assertNotSame($pdo, $container->getPdo());
+		$this->assertNotSame($pdo, $manager->getPdo('default'));
 	}
 
 	/** @test */
 	public function undefinedConnectionThrowsException()
 	{
-		$connections = ['default' => ['dsn' => 'sqlite::memory:']];
-		$config = $this->makeConfig('default', $connections);
-		$container = $this->makeManager($config);
+		$manager = $this->makeManager();
+		$config = ['default' => ['dsn' => 'sqlite::memory:']];
+		$this->config->set('database.connections', $config);
+
 		$this->setExpectedException('InvalidArgumentException',
 			'No config found for connection: other');
-		$pdo = $container->getPdo('other');
-	}
-
-	/** @test */
-	public function pdoOptionsAreReplaced()
-	{
-		$options = [
-			PDO::ATTR_CASE               => PDO::CASE_LOWER,
-			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-		];
-		$connections = ['default' => [
-			'dsn' => 'sqlite::memory:',
-			'pdo_options' => $options
-		]];
-		$config = $this->makeConfig('default', $connections);
-		$container = $this->makeManager($config);
-		$pdo = $container->getPdo('default');
-		foreach ($options as $key => $value) {
-			$this->assertEquals($value, $pdo->getAttribute($key));
-		}
+		$pdo = $manager->getPdo('other');
 	}
 }
