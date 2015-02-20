@@ -150,7 +150,7 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 			'pdo_init_commands' => ['foo', 'bar'],
 		];
 		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo($config);
-		$this->assertEquals([['foo'], ['bar']], $pdo->getExecLog());
+		$this->assertEquals(['foo', 'bar'], $pdo->getExecLog());
 	}
 
 	/** @test */

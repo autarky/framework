@@ -42,9 +42,9 @@ class SpyPDO extends \PDO
 		return [$this->dsn, $this->username, $this->password, $this->options];
 	}
 
-	public function exec()
+	public function exec($query)
 	{
-		$this->execLog[] = func_get_args();
+		$this->execLog[] = $query;
 	}
 
 	public function getExecLog()
