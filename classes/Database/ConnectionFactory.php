@@ -17,6 +17,13 @@ use PDOException;
 class ConnectionFactory implements ConnectionFactoryInterface
 {
 	/**
+	 * PDO instantiator instance.
+	 *
+	 * @var PDOInstantiator
+	 */
+	protected $instantiator;
+
+	/**
 	 * The default PDO options.
 	 *
 	 * @var array
@@ -29,6 +36,16 @@ class ConnectionFactory implements ConnectionFactoryInterface
 		PDO::ATTR_ORACLE_NULLS       => PDO::NULL_NATURAL,
 		PDO::ATTR_STRINGIFY_FETCHES  => false,
 	];
+
+	/**
+	 * Constructor.
+	 *
+	 * @param PDOInstantiator|null $instantiator
+	 */
+	public function __construct(PDOInstantiator $instantiator = null)
+	{
+		$this->instantiator = $instantiator ?: new PDOInstantiator;
+	}
 
 	/**
 	 * Create a new PDO instance.
@@ -44,58 +61,58 @@ class ConnectionFactory implements ConnectionFactoryInterface
 	 */
 	public function makePdo(array $config, $connection = null)
 	{
-		// extract the username and password
-		if (
-			(isset($config['driver']) && $config['driver'] == 'sqlite') ||
-			(isset($config['dsn']) && strpos($config['dsn'], 'sqlite:') === 0)
-		) {
-			$username = $password = '';
-		} else {
-			$this->validate($config, 'username', $connection, false);
-			$username = $config['username'];
-			unset($config['username']);
-
-			$this->validate($config, 'password', $connection, true);
-			$password = $config['password'];
-			unset($config['password']);
+		if (!isset($config['driver']) && !isset($config['dsn'])) {
+			throw new \InvalidArgumentException('DSN or driver must be set');
 		}
 
-		// either DSN or driver must be present
-		if (!isset($config['dsn'])) {
-			$this->validate($config, 'driver', $connection);
-		}
-		if (!isset($config['driver'])) {
-			$this->validate($config, 'dsn', $connection);
-		}
-
-		$options = array_key_exists('pdo_options', $config) ? $config['pdo_options'] : [];
+		$options = array_key_exists('pdo_options', $config)
+			? $config['pdo_options'] : [];
 		unset($config['pdo_options']);
 		$options = array_replace($this->defaultPdoOptions, $options);
 
-		$initCommands = isset($config['pdo_init_commands']) ? $config['pdo_init_commands'] : [];
+		$initCommands = isset($config['pdo_init_commands'])
+			? $config['pdo_init_commands'] : [];
 		unset($config['pdo_init_commands']);
+
+		// SQLite needs special treatment
+		if (isset($config['driver']) && $config['driver'] == 'sqlite') {
+			$this->validate($config, 'path', $connection);
+			$dsn = $this->makeSqliteDsn($config['path']);
+			return $this->makePdoInner($dsn, null, null, $options, $initCommands);
+		} elseif (isset($config['dsn']) && strpos($config['dsn'], 'sqlite:') === 0) {
+			return $this->makePdoInner($config['dsn'], null, null,
+				$options, $initCommands);
+		}
+
+		$this->validate($config, 'username', $connection, false);
+		$username = $config['username'];
+		unset($config['username']);
+
+		$this->validate($config, 'password', $connection, true);
+		$password = $config['password'];
+		unset($config['password']);
 
 		if (isset($config['dsn'])) {
 			$dsn = $config['dsn'];
 		} else {
 			$driver = $config['driver'];
 			unset($config['driver']);
-			if ($driver == 'sqlite') {
-				$this->validate($config, 'path', $connection);
-				$path = $config['path'];
-				unset($config['path']);
-				$dsn = $this->makeSqliteDsn($path);
-			} else {
-				$this->validate($config, 'host', $connection);
-				$this->validate($config, 'dbname', $connection);
-				$dsn = $this->makeDsn($values, $config);
-			}
+			$this->validate($config, 'host', $connection);
+			$this->validate($config, 'dbname', $connection);
+			$dsn = $this->makeDsn($driver, $config);
 		}
 
+		return $this->makePdoInner($dsn, $username, $password, $options, $initCommands);
+	}
+
+	protected function makePdoInner($dsn, $username, $password, array $options, array $initCommands)
+	{
 		try {
-			$pdo = new PDO($dsn, $username, $password, $options);
+			$pdo = $this->instantiator->instantiate(
+				$dsn, $username, $password, $options);
 		} catch (PDOException $e) {
-			$newException = new CannotConnectException($e->getMessage(), $e->getCode(), $e);
+			$newException = new CannotConnectException(
+				$e->getMessage(), $e->getCode(), $e);
 			$newException->errorInfo = $e->errorInfo;
 			throw $newException;
 		}
