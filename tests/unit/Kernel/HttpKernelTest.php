@@ -19,7 +19,7 @@ class HttpKernelTest extends PHPUnit_Framework_TestCase
 		$this->errorHandler = m::mock('Autarky\Errors\ErrorHandlerInterface');
 		$this->requests = new \Symfony\Component\HttpFoundation\RequestStack;
 		$this->eventDispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher;
-		return new HttpKernel($this->router, $this->errorHandler, $this->requests, $events ? $this->eventDispatcher : null);
+		return new HttpKernel($this->router, $this->requests, $this->errorHandler, $events ? $this->eventDispatcher : null);
 	}
 
 	/** @test */

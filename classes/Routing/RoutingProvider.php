@@ -28,10 +28,16 @@ class RoutingProvider extends Provider
 		$dic->share('Symfony\Component\HttpFoundation\RequestStack');
 
 		$dic->define('Autarky\Routing\Router', function(ContainerInterface $container) {
+			$eventDispatcher = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
+			$eventDispatcher = $container->isBound($eventDispatcher)
+				? $container->resolve($eventDispatcher) : null;
+
+			$config = $this->app->getConfig();
+			$cachePath = $config ? $config->get('path.route_cache') : null;
+
 			return new Router(
 				$container->resolve('Autarky\Routing\Invoker'),
-				$container->resolve('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
-				$this->app->getConfig()->get('path.route_cache')
+				$eventDispatcher, $cachePath
 			);
 		});
 		$dic->share('Autarky\Routing\Router');

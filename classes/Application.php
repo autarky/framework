@@ -409,7 +409,7 @@ class Application implements HttpKernelInterface
 			$this->container->resolve($class) : null;
 
 		$kernel = new HttpKernel(
-			$this->getRouter(), $this->errorHandler, $this->requests, $eventDispatcher
+			$this->getRouter(), $this->requests, $this->errorHandler, $eventDispatcher
 		);
 
 		return $this->kernel = $this->resolveStack()

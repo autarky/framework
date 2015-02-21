@@ -54,14 +54,14 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
 	/**
 	 * @param RouterInterface          $router
-	 * @param ErrorHandlerInterface    $errorHandler
 	 * @param RequestStack             $requests
+	 * @param ErrorHandlerInterface    $errorHandler Optional
 	 * @param EventDispatcherInterface $eventDispatcher Optional
 	 */
 	public function __construct(
 		RouterInterface $router,
-		ErrorHandlerInterface $errorHandler,
 		RequestStack $requests,
+		ErrorHandlerInterface $errorHandler = null,
 		EventDispatcherInterface $eventDispatcher = null
 	) {
 		$this->router = $router;
@@ -104,6 +104,10 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 
 	protected function handleException(Exception $exception, Request $request, $type)
 	{
+		if ($this->errorHandler === null) {
+			throw $exception;
+		}
+
 		if ($this->eventDispatcher !== null) {
 			$event = new GetResponseForExceptionEvent($this, $request, $type, $exception);
 			$this->eventDispatcher->dispatch(KernelEvents::EXCEPTION, $event);

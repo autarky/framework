@@ -90,13 +90,13 @@ class Router implements RouterInterface
 	protected $namedRoutes = [];
 
 	/**
-	 * @param InvokerInterface         $invoker
-	 * @param EventDispatcherInterface $eventDispatcher
-	 * @param string|null              $cachePath
+	 * @param InvokerInterface $invoker
+	 * @param EventDispatcherInterface|null $eventDispatcher
+	 * @param string|null $cachePath
 	 */
 	public function __construct(
 		InvokerInterface $invoker,
-		EventDispatcherInterface $eventDispatcher,
+		EventDispatcherInterface $eventDispatcher = null,
 		$cachePath = null
 	) {
 		$this->routes = new \SplObjectStorage;
@@ -197,6 +197,10 @@ class Router implements RouterInterface
 
 	protected function addEventListener($name, $handler, $when, $priority)
 	{
+		if ($this->eventDispatcher === null) {
+			return;
+		}
+
 		if ($name) {
 			if (array_key_exists($name, $this->filters)) {
 				throw new \LogicException("Filter with name $name already defined");
@@ -287,6 +291,13 @@ class Router implements RouterInterface
 		return $route;
 	}
 
+	/**
+	 * Add a cached route.
+	 *
+	 * @param Route $route
+	 *
+	 * @internal
+	 */
 	public function addCachedRoute(Route $route)
 	{
 		$this->routes->attach($route);
@@ -394,29 +405,49 @@ class Router implements RouterInterface
 
 	protected function getResponse(Request $request, Route $route, array $params)
 	{
+		// convert route params into container params
 		$params = $this->getContainerParams($params, $request);
 
 		$this->currentRoute = $route;
 
-		$event = new Events\BeforeFilterEvent($request, $route);
-		$this->eventDispatcher->dispatch("route.before", $event);
-		foreach ($route->getBeforeFilters() as $filter) {
-			$this->eventDispatcher->dispatch("route.before.$filter", $event);
+		if ($this->eventDispatcher !== null) {
+			$event = new Events\BeforeFilterEvent($request, $route);
+			$this->eventDispatcher->dispatch("route.before", $event);
+
+			foreach ($route->getBeforeFilters() as $filter) {
+				$this->eventDispatcher->dispatch("route.before.$filter", $event);
+			}
 		}
 
-		if (!$response = $event->getResponse()) {
+		// if the event has been dispatched, check if the event has a response
+		// that should override the route's response. if the event doesn't have
+		// a response, check if the event has a controller that should override
+		// the route's controller
+		if (isset($event) && !($response = $event->getResponse())) {
 			$callable = $event->getController() ?: $route->getController();
+		} else {
+			$callable = $route->getController();
+		}
+
+		// if the event hasn't been dispatched, or the event hasn't had a
+		// response set onto it, invoke the controller
+		if (!isset($response) || !$response) {
 			$response = $this->invoker->invoke($callable, $params);
 		}
 
+		// ensure that the response is a Response object before dispatching
+		// after events and returning it
 		if (!$response instanceof Response) {
 			$response = new Response($response);
 		}
 
-		$event = new Events\AfterFilterEvent($request, $route, $response);
-		$this->eventDispatcher->dispatch("route.after", $event);
-		foreach ($route->getAfterFilters() as $filter) {
-			$this->eventDispatcher->dispatch("route.after.$filter", $event);
+		if ($this->eventDispatcher !== null) {
+			$event = new Events\AfterFilterEvent($request, $route, $response);
+			$this->eventDispatcher->dispatch("route.after", $event);
+
+			foreach ($route->getAfterFilters() as $filter) {
+				$this->eventDispatcher->dispatch("route.after.$filter", $event);
+			}
 		}
 
 		$this->currentRoute = null;
@@ -428,10 +459,14 @@ class Router implements RouterInterface
 	{
 		$params = [];
 
+		// the container expects a dollar sign in front of non-class function
+		// arguments
 		foreach ($routeParams as $key => $value) {
 			$params["\$$key"] = $value;
 		}
 
+		// this allows controllers to type-hint against the Request class to get
+		// access to it directly
 		$params['Symfony\Component\HttpFoundation\Request'] = $request;
 
 		return $params;

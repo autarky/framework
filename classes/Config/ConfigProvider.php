@@ -69,27 +69,39 @@ class ConfigProvider extends Provider
 		$dic->share('Autarky\Config\Loaders\PhpFileLoader');
 		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
 
-		// set up the YAML config file loader
-		$dic->define('Autarky\Config\Loaders\CachingYamlFileLoader', function($dic) {
+		// set up the YAML config file loaders
+		$dic->define('Autarky\Config\Loaders\YamlFileLoader', function($dic) {
+			return new YamlFileLoader(
+				$dic->resolve('Symfony\Component\Yaml\Parser')
+			);
+		});
+		$dic->share('Autarky\Config\Loaders\YamlFileLoader');
+
+		$yamlCachePath = $this->getYamlCachePath($store);
+		$dic->define('Autarky\Config\Loaders\CachingYamlFileLoader', function($dic) use($yamlCachePath) {
 			return new CachingYamlFileLoader(
 				$dic->resolve('Symfony\Component\Yaml\Parser'),
-				$this->getYamlCachePath()
+				$yamlCachePath
 			);
 		});
 		$dic->share('Autarky\Config\Loaders\CachingYamlFileLoader');
-		$loaderFactory->addLoader(['yml', 'yaml'], 'Autarky\Config\Loaders\CachingYamlFileLoader');
+
+		$loader = $yamlCachePath
+			? 'Autarky\Config\Loaders\CachingYamlFileLoader'
+			: 'Autarky\Config\Loaders\YamlFileLoader';
+		$loaderFactory->addLoader(['yml', 'yaml'], $loader);
 
 		// done!
 		return $store;
 	}
 
-	protected function getYamlCachePath()
+	protected function getYamlCachePath(ConfigInterface $config = null)
 	{
 		if (file_exists($this->configPath.'/path.yml')) {
 			throw new \RuntimeException("The 'path' config file cannot be YAML when using the caching YAML config file loader.");
 		}
 
-		$config = $this->app->getConfig();
+		$config = $config ?: $this->app->getConfig();
 
 		$path = $config->get('path.storage').'/yaml';
 
