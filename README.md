@@ -48,6 +48,12 @@ The develop branch is the next minor version. New features are applied to this b
 
 Read the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
 
+### Contact
+
+Feel free to open an issue on GitHub if you have any problems or suggestions. Alternatively (or additionally), you may want to ask on [Stack Overflow](http://stackoverflow.com) using the ["autarky" tag](http://stackoverflow.com/questions/ask?tags=autarky,php).
+
+Contact [Andreas Lutro](https://github.com/anlutro) personally for potential security issues.
+
 ### License
 
 The contents of this repository is released under the [MIT license](http://opensource.org/licenses/MIT). See the [LICENSE](LICENSE) file included for more information.
