@@ -14,7 +14,7 @@ php:
 
 env:
   - COMPOSER_ARGS=""
-  - COMPOSER_ARGS="--prefer-lowest"
+  - COMPOSER_ARGS="--prefer-lowest --prefer-stable"
 
 before_install:
   - ./scripts/setup-travis.bash
