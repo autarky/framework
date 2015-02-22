@@ -3,7 +3,7 @@
 git_branch=$(git branch | sed -n '/\* /s///p')
 
 # only master branch + minor version branches should be checked
-if [[ $git_branch != "master" && ! $git_branch =~ [0-9].[0-9] ]]; then
+if [[ $git_branch != "master" && ! $git_branch =~ ^[0-9]+.[0-9]+$ ]]; then
 	exit 0
 fi
 
