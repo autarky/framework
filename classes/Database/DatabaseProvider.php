@@ -30,7 +30,7 @@ class DatabaseProvider extends Provider
 		$dic->alias('Autarky\Database\ConnectionFactory',
 			'Autarky\Database\ConnectionFactoryInterface');
 
-		$dic->define('Autarky\Database\ConnectionManager', function($dic) {
+		$dic->define('Autarky\Database\ConnectionManager', function(ContainerInterface $dic) {
 			return new ConnectionManager(
 				$this->app->getConfig(),
 				$dic->resolve('Autarky\Database\ConnectionFactoryInterface')
@@ -38,6 +38,7 @@ class DatabaseProvider extends Provider
 		});
 		$dic->share('Autarky\Database\ConnectionManager');
 
+		// TOOD: the following assume Container, not ContainerInterface
 		$factory = $dic->makeFactory(['Autarky\Database\ConnectionManager', 'getPdo']);
 		$factory->addScalarArgument('$connection', 'string', false, null);
 		$dic->define('PDO', $factory);

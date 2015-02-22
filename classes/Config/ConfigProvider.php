@@ -13,6 +13,7 @@ namespace Autarky\Config;
 use Symfony\Component\Yaml\Parser;
 
 use Autarky\Provider;
+use Autarky\Container\ContainerInterface;
 use Autarky\Config\Loaders\YamlFileLoader;
 use Autarky\Config\Loaders\CachingYamlFileLoader;
 
@@ -70,7 +71,7 @@ class ConfigProvider extends Provider
 		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
 
 		// set up the YAML config file loaders
-		$dic->define('Autarky\Config\Loaders\YamlFileLoader', function($dic) {
+		$dic->define('Autarky\Config\Loaders\YamlFileLoader', function(ContainerInterface $dic) {
 			return new YamlFileLoader(
 				$dic->resolve('Symfony\Component\Yaml\Parser')
 			);
@@ -78,7 +79,7 @@ class ConfigProvider extends Provider
 		$dic->share('Autarky\Config\Loaders\YamlFileLoader');
 
 		$yamlCachePath = $this->getYamlCachePath($store);
-		$dic->define('Autarky\Config\Loaders\CachingYamlFileLoader', function($dic) use($yamlCachePath) {
+		$dic->define('Autarky\Config\Loaders\CachingYamlFileLoader', function(ContainerInterface $dic) use($yamlCachePath) {
 			return new CachingYamlFileLoader(
 				$dic->resolve('Symfony\Component\Yaml\Parser'),
 				$yamlCachePath

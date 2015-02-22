@@ -31,6 +31,14 @@ abstract class WebTestCase extends TestCase
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function tearDown()
+	{
+		$this->client = null;
+	}
+
+	/**
 	* Create a httpkernel\browserkit client.
 	*
 	* Override this method if you want to provide custom parameters to the

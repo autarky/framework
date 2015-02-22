@@ -24,6 +24,7 @@
 	"require-dev": {
 		"autarky/twig-templating": "*",
 		"mockery/mockery": "~0.9.1",
+		"monolog/monolog": "~1.3",
 		"symfony/yaml": "~2.3"
 	},
 	"autoload": {

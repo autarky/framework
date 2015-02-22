@@ -32,7 +32,7 @@ class RouteDispatchCommand extends Command
 			->setHelp(<<<'EOS'
 This command fakes an HTTP request and returns information about the route that was matched against the request. For example:
 
-    php bin/console.php route:dispatch GET /foo/bar/baz
+	php bin/console.php route:dispatch GET /foo/bar/baz
 
 This example will fake a HTTP GET request to the path /foo/bar/baz.
 EOS
@@ -44,6 +44,7 @@ EOS
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
+		/** @var \Autarky\Routing\Router $router */
 		$router = $this->app->getContainer()
 			->resolve('Autarky\Routing\Router');
 
