@@ -1,9 +1,15 @@
 <?php
 
+use Mockery as m;
 use Autarky\Tests\TestCase;
 
 class DatabaseProviderTest extends TestCase
 {
+	public function tearDown()
+	{
+		m::close();
+	}
+
 	/** @test */
 	public function canResolve()
 	{
@@ -23,7 +29,8 @@ class DatabaseProviderTest extends TestCase
 			'default' => ['dsn' => 'sqlite::memory:'],
 		]);
 		$app->boot();
-		$app->resolve('PDO');
+		$pdo = $app->resolve('PDO');
+		$this->assertInstanceOf('PDO', $pdo);
 	}
 
 	/** @test */
@@ -31,24 +38,28 @@ class DatabaseProviderTest extends TestCase
 	{
 		$app = $this->makeApplication('Autarky\Database\DatabaseProvider');
 		$container = $app->getContainer();
-		$app->getConfig()->set('database.connection', 'default');
-		$app->getConfig()->set('database.connections', [
-			'custom' => ['dsn' => 'sqlite::memory:'],
-		]);
 		$app->boot();
+		$mock = m::mock('Autarky\Database\ConnectionManager');
+		$mockPDO = new Autarky\Tests\DummyPDO;
+		$mock->shouldReceive('getPdo')->with('custom')->times(3)
+			->andReturn($mockPDO);
+		$container->instance('Autarky\Database\ConnectionManager', $mock);
 
-		$container->resolve(__NAMESPACE__.'\PdoDependentStub', [
+		$o = $container->resolve(__NAMESPACE__.'\PdoDependentStub', [
 			'PDO' => $container->getFactory('PDO', ['$connection' => 'custom']),
 		]);
+		$this->assertSame($mockPDO, $o->pdo);
 
-		$container->resolve(__NAMESPACE__.'\PdoDependentStub', [
+		$o = $container->resolve(__NAMESPACE__.'\PdoDependentStub', [
 			'$pdo' => $container->getFactory('PDO', ['$connection' => 'custom']),
 		]);
+		$this->assertSame($mockPDO, $o->pdo);
 
 		$container->params(__NAMESPACE__.'\PdoDependentStub', [
 			'$pdo' => $container->getFactory('PDO', ['$connection' => 'custom']),
 		]);
-		$container->resolve(__NAMESPACE__.'\PdoDependentStub');
+		$o = $container->resolve(__NAMESPACE__.'\PdoDependentStub');
+		$this->assertSame($mockPDO, $o->pdo);
 	}
 }
 

@@ -27,15 +27,13 @@ class LoggingProvider extends Provider
 	{
 		$dic = $this->app->getContainer();
 
-		$dic->define('Autarky\Logging\ChannelManager',
-			[$this, 'makeChannelManager']);
+		$dic->define('Autarky\Logging\ChannelManager', function() {
+			return new ChannelManager();
+		});
 		$dic->share('Autarky\Logging\ChannelManager');
-		$dic->define('Psr\Log\LoggerInterface',
-			['Autarky\Logging\ChannelManager', 'getChannel']);
-	}
 
-	public function makeChannelManager(ContainerInterface $container)
-	{
-		return new ChannelManager();
+		$factory = $dic->makeFactory(['Autarky\Logging\ChannelManager', 'getChannel']);
+		$factory->addScalarArgument('$channel', 'string', false, null);
+		$dic->define('Psr\Log\LoggerInterface', $factory);
 	}
 }
