@@ -26,7 +26,7 @@ abstract class WebTestCase extends TestCase
 	 */
 	public function setUp()
 	{
-		parent::setup();
+		parent::setUp();
 		$this->client = $this->createClient();
 	}
 
@@ -36,6 +36,7 @@ abstract class WebTestCase extends TestCase
 	public function tearDown()
 	{
 		$this->client = null;
+		parent::tearDown();
 	}
 
 	/**
