@@ -245,7 +245,7 @@ class Application implements HttpKernelInterface
 	/**
 	 * Get the application's container.
 	 *
-	 * @return \Autarky\Container\ContainerInterface
+	 * @return \Autarky\Container\Container|ContainerInterface
 	 */
 	public function getContainer()
 	{

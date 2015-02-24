@@ -38,7 +38,6 @@ class DatabaseProvider extends Provider
 		});
 		$dic->share('Autarky\Database\ConnectionManager');
 
-		// TOOD: the following assume Container, not ContainerInterface
 		$factory = $dic->makeFactory(['Autarky\Database\ConnectionManager', 'getPdo']);
 		$factory->addScalarArgument('$connection', 'string', false, null);
 		$dic->define('PDO', $factory);
