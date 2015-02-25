@@ -1,7 +1,0 @@
-main: Autarky
-title: Autarky Framework API
-baseUrl: http://autarky.lutro.me/api
-source:
-	- classes
-	
-destination: build/apigen
