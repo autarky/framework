@@ -19,7 +19,7 @@ class LoaderFactoryTest extends PHPUnit_Framework_TestCase
 	{
 		$factory = $this->makeFactory();
 		$mock = m::mock('Autarky\Config\LoaderInterface');
-		$factory->addLoader('mock', $mock);
+		$factory->addLoader('.mock', $mock);
 		$this->assertEquals($mock, $factory->getForPath('/foo/bar.mock'));
 	}
 

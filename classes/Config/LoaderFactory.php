@@ -116,6 +116,6 @@ class LoaderFactory
 
 	protected function getExtension($path)
 	{
-		return substr($path, strrpos($path, '.') + 1);
+		return substr($path, strrpos($path, '.'));
 	}
 }

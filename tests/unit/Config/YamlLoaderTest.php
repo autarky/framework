@@ -9,7 +9,7 @@ class YamlLoaderTest extends PHPUnit_Framework_TestCase
 		m::close();
 	}
 
-	public function makeLoader($parser)
+	private function makeLoader($parser)
 	{
 		if ($parser === null) {
 			$parser = new \Symfony\Component\Yaml\Parser;
@@ -18,7 +18,7 @@ class YamlLoaderTest extends PHPUnit_Framework_TestCase
 		return new \Autarky\Config\Loaders\YamlFileLoader($parser);
 	}
 
-	public function makeCacheLoader($parser, $cachePath = null, $stat = true)
+	private function makeCacheLoader($parser, $cachePath = null, $stat = true)
 	{
 		if ($parser === null) {
 			$parser = new \Symfony\Component\Yaml\Parser;
@@ -27,12 +27,12 @@ class YamlLoaderTest extends PHPUnit_Framework_TestCase
 		return new \Autarky\Config\Loaders\CachingYamlFileLoader($parser, $cachePath, $stat);
 	}
 
-	public function mockParser()
+	private function mockParser()
 	{
 		return m::mock('Symfony\Component\Yaml\Parser');
 	}
 
-	public function getYmlPath($file)
+	private function getYmlPath($file)
 	{
 		$path = TESTS_RSC_DIR.'/yaml/'.$file;
 		$cachePath = $path.'/cache/'.md5($path);
@@ -45,6 +45,7 @@ class YamlLoaderTest extends PHPUnit_Framework_TestCase
 	{
 		$path = $this->getYmlPath('test.yml');
 		$loader = $this->makeCacheLoader($parser = $this->mockParser(), TESTS_RSC_DIR.'/yaml/cache');
+		// if parser is called more than once, the cached data is not being read
 		$parser->shouldReceive('parse')->once()->andReturn($data = ['foo' => 'bar']);
 		touch($path, time());
 		$this->assertEquals($data, $loader->load($path));

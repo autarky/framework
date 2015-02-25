@@ -12,10 +12,12 @@ namespace Autarky\Config;
 
 use Symfony\Component\Yaml\Parser;
 
-use Autarky\Provider;
-use Autarky\Container\ContainerInterface;
-use Autarky\Config\Loaders\YamlFileLoader;
 use Autarky\Config\Loaders\CachingYamlFileLoader;
+use Autarky\Config\Loaders\YamlFileLoader;
+use Autarky\Container\ContainerInterface;
+use Autarky\Files\Locator;
+use Autarky\Files\PathResolver;
+use Autarky\Provider;
 
 /**
  * Provides config to the application.
@@ -62,13 +64,18 @@ class ConfigProvider extends Provider
 		$dic->instance('Autarky\Config\Loaders\LoaderFactory', $loaderFactory);
 
 		// set up the config store
-		$store = new FileStore($loaderFactory, $this->configPath, $this->app->getEnvironment());
+		$store = new FileStore(
+			new PathResolver($this->configPath),
+			new Locator(),
+			$loaderFactory,
+			$this->app->getEnvironment()
+		);
 		$dic->instance('Autarky\Config\FileStore', $store);
 		$dic->alias('Autarky\Config\FileStore', 'Autarky\Config\ConfigInterface');
 
 		// set up the PHP file loader
 		$dic->share('Autarky\Config\Loaders\PhpFileLoader');
-		$loaderFactory->addLoader('php', 'Autarky\Config\Loaders\PhpFileLoader');
+		$loaderFactory->addLoader('.php', 'Autarky\Config\Loaders\PhpFileLoader');
 
 		// set up the YAML config file loaders
 		$dic->define('Autarky\Config\Loaders\YamlFileLoader', function(ContainerInterface $dic) {
@@ -90,7 +97,7 @@ class ConfigProvider extends Provider
 		$loader = $yamlCachePath
 			? 'Autarky\Config\Loaders\CachingYamlFileLoader'
 			: 'Autarky\Config\Loaders\YamlFileLoader';
-		$loaderFactory->addLoader(['yml', 'yaml'], $loader);
+		$loaderFactory->addLoader(['.yml', '.yaml'], $loader);
 
 		// done!
 		return $store;

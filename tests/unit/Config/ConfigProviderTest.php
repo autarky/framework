@@ -9,7 +9,7 @@ class ConfigProviderTest extends TestCase
 	{
 		$app = new Application($env, [
 			new \Autarky\Container\ContainerProvider(),
-			new \Autarky\Config\ConfigProvider(TESTS_RSC_DIR.'/config')
+			new \Autarky\Config\ConfigProvider(TESTS_RSC_DIR.'/config/app')
 		]);
 		$app->setErrorHandler(new \Autarky\Errors\StubErrorHandler);
 		$app->boot();
@@ -29,7 +29,7 @@ class ConfigProviderTest extends TestCase
 	/** @test */
 	public function yamlCachePathIsPassedAndFilesAreCached()
 	{
-		$configDir = TESTS_RSC_DIR.'/cached-config';
+		$configDir = TESTS_RSC_DIR.'/config/cached';
 		$cacheDir = $configDir.'/storage/yaml';
 		$this->clearCacheDir($configDir);
 		$app = new Application('testing', [
@@ -41,7 +41,6 @@ class ConfigProviderTest extends TestCase
 		$data = $app->getConfig()->get('testfile');
 		$configPath = $configDir.'/testfile.yml';
 		$cachePath = $cacheDir.'/'.md5($configPath);
-		$this->assertTrue(file_exists($configPath));
 		$this->assertTrue(file_exists($cachePath));
 		$this->assertEquals($data, require $cachePath);
 	}

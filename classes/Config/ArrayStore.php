@@ -54,7 +54,7 @@ class ArrayStore implements ConfigInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function addNamespace($namespace, $location)
+	public function mount($namespace, $location)
 	{
 		// do nothing
 	}

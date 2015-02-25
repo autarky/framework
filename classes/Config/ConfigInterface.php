@@ -10,12 +10,10 @@
 
 namespace Autarky\Config;
 
-use Autarky\Support\NamespacedResourceResolverInterface;
-
 /**
  * Interface for configuration stores.
  */
-interface ConfigInterface extends NamespacedResourceResolverInterface
+interface ConfigInterface
 {
 	/**
 	 * Determine if a key exists in the store.
@@ -44,6 +42,25 @@ interface ConfigInterface extends NamespacedResourceResolverInterface
 	 *
 	 * @param string $key
 	 * @param mixed  $value
+	 *
+	 * @return void
 	 */
 	public function set($key, $value);
+
+	/**
+	 * Mount a path to a specific location in the config tree.
+	 *
+	 * @param  string $location
+	 * @param  string $path
+	 *
+	 * @return void
+	 */
+	public function mount($location, $path);
+
+	/**
+	 * Set the environment.
+	 *
+	 * @param string $environment
+	 */
+	public function setEnvironment($environment);
 }

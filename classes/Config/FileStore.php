@@ -10,8 +10,9 @@
 
 namespace Autarky\Config;
 
-use Autarky\Support\NamespacedResourceResolver;
 use Autarky\Support\ArrayUtils;
+use Autarky\Files\PathResolver;
+use Autarky\Files\Locator;
 
 /**
  * File-based config implementation.
@@ -21,7 +22,19 @@ use Autarky\Support\ArrayUtils;
  */
 class FileStore implements ConfigInterface
 {
-	use NamespacedResourceResolver;
+	/**
+	 * The path resolver instance.
+	 *
+	 * @var PathResolver
+	 */
+	protected $pathResolver;
+
+	/**
+	 * The file locator instance.
+	 *
+	 * @var Locator
+	 */
+	protected $fileLocator;
 
 	/**
 	 * The loader factory instance.
@@ -38,15 +51,24 @@ class FileStore implements ConfigInterface
 	protected $data = [];
 
 	/**
+	 * Constructor.
+	 *
+	 * @param PathResolver  $pathResolver
+	 * @param Locator       $fileLocator
 	 * @param LoaderFactory $loaderFactory
 	 * @param string        $path          Path to config files in the global namespace.
-	 * @param string        $environment
+	 * @param string|null   $environment
 	 */
-	public function __construct(LoaderFactory $loaderFactory, $path, $environment)
-	{
+	public function __construct(
+		PathResolver $pathResolver,
+		Locator $fileLocator,
+		LoaderFactory $loaderFactory,
+		$environment = null
+	) {
+		$this->pathResolver = $pathResolver;
+		$this->fileLocator = $fileLocator;
 		$this->loaderFactory = $loaderFactory;
 		$this->environment = $environment;
-		$this->setLocation($path);
 	}
 
 	/**
@@ -62,13 +84,17 @@ class FileStore implements ConfigInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function addNamespace($namespace, $location)
+	public function mount($location, $path)
 	{
-		if (!array_key_exists($namespace, $this->locations)) {
-			$this->locations[$namespace] = [];
-		}
+		$this->pathResolver->mount($location, $path);
+	}
 
-		$this->locations[$namespace][] = $location;
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setEnvironment($environment)
+	{
+		$this->environment = $environment;
 	}
 
 	/**
@@ -76,9 +102,9 @@ class FileStore implements ConfigInterface
 	 */
 	public function has($key)
 	{
-		$dataKey = $this->getDataKeyAndLoadData($key);
+		$this->loadData($key);
 
-		return ArrayUtils::has($this->data, $dataKey);
+		return ArrayUtils::has($this->data, $key);
 	}
 
 	/**
@@ -86,9 +112,9 @@ class FileStore implements ConfigInterface
 	 */
 	public function get($key, $default = null)
 	{
-		$dataKey = $this->getDataKeyAndLoadData($key);
+		$this->loadData($key);
 
-		return ArrayUtils::get($this->data, $dataKey, $default);
+		return ArrayUtils::get($this->data, $key, $default);
 	}
 
 	/**
@@ -96,48 +122,60 @@ class FileStore implements ConfigInterface
 	 */
 	public function set($key, $value)
 	{
-		$dataKey = $this->getDataKeyAndLoadData($key);
+		$this->loadData($key);
 
-		ArrayUtils::set($this->data, $dataKey, $value);
+		ArrayUtils::set($this->data, $key, $value);
 	}
 
-	protected function getDataKeyAndLoadData($key)
+	protected function loadData($key)
 	{
-		list($namespace, $group, $key) = $this->parseKey($key);
+		$basename = $this->getBasename($key);
 
-		$dataKey = $namespace === null ? $group : $namespace.':'.$group;
-
-		if (!array_key_exists($dataKey, $this->data)) {
-			$this->loadData($namespace, $group, $dataKey);
+		if (array_key_exists($basename, $this->data)) {
+			return;
 		}
 
-		return $key === null ? $dataKey : $dataKey.'.'.$key;
-	}
+		$basenames = $this->getBasenames($basename);
+		$paths = $this->getPaths($basenames);
 
-	protected function loadData($namespace, $group, $dataKey)
-	{
-		$locations = $this->getLocations($namespace);
-		$extensions = $this->loaderFactory->getExtensions();
-		$data = [];
+		foreach ($paths as $path) {
+			$data = $this->getDataFromFile($path);
 
-		// iterate through possible locations and merge the data array.
-		// locations are sorted so that overrrides come last.
-		foreach ($locations as $location) {
-			foreach ($extensions as $extension) {
-				$path = "{$location}/{$group}.{$extension}";
-				$data = array_replace($data, $this->getDataFromFile($path));
+			if (isset($this->data[$basename])) {
+				$this->data[$basename] = array_replace(
+					$this->data[$basename], $data);
+			} else {
+				$this->data[$basename] = $data;
 			}
 		}
+	}
 
-		$this->data[$dataKey] = $data;
+	protected function getBasename($key)
+	{
+		return current(explode('.', $key));
+		return $parts[0];
+	}
+
+	protected function getBasenames($basename)
+	{
+		$basenames = $this->pathResolver->resolve($basename);
+
+		$envBasenames = array_map(function($basename) {
+			return $basename.'.'.$this->environment;
+		}, $basenames);
+
+		return array_merge($basenames, $envBasenames);
+	}
+
+	protected function getPaths($basenames)
+	{
+		$extensions = $this->loaderFactory->getExtensions();
+
+		return $this->fileLocator->locate($basenames, $extensions);
 	}
 
 	protected function getDataFromFile($path)
 	{
-		if (!file_exists($path)) {
-			return [];
-		}
-
 		if (!is_readable($path)) {
 			throw new LoadException("File is not readable: $path");
 		}
