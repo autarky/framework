@@ -15,11 +15,10 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	protected function makeConfig($env = 'default')
 	{
 		$pathResolver = new Autarky\Files\PathResolver($this->getConfigPath());
-		$fileLocator = new Autarky\Files\Locator();
 		$loaderFactory = new LoaderFactory(new \Autarky\Container\Container);
 		$loaderFactory->addLoader('.php', 'Autarky\Config\Loaders\PhpFileLoader');
 		$loaderFactory->addLoader('.yml', 'Autarky\Config\Loaders\YamlFileLoader');
-		return new FileStore($pathResolver, $fileLocator, $loaderFactory, $env);
+		return new FileStore($pathResolver, $loaderFactory, $env);
 	}
 
 	/** @test */

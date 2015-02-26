@@ -1,34 +1,73 @@
 <?php
+/**
+ * This file is part of the Autarky package.
+ *
+ * (c) Andreas Lutro <anlutro@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Autarky\Files;
 
+/**
+ * Class that resolves possible paths based on various factors.
+ */
 class PathResolver
 {
+	/**
+	 * Main paths.
+	 *
+	 * @var string[]
+	 */
 	protected $paths;
+
+	/**
+	 * External paths mounted onto locations on the main path.
+	 *
+	 * @var string[][]
+	 */
 	protected $mounts;
 
+	/**
+	 * Constructor
+	 *
+	 * @param string|array $pathOrPaths
+	 */
 	public function __construct($pathOrPaths = [])
 	{
 		$this->paths = (array) $pathOrPaths;
 	}
 
+	/**
+	 * Add a main path.
+	 *
+	 * @param string $path
+	 */
 	public function addPath($path)
 	{
 		$this->paths[] = $path;
 	}
 
+	/**
+	 * Mount a path onto a location.
+	 *
+	 * @param  string $location
+	 * @param  string $path
+	 */
 	public function mount($location, $path)
 	{
 		$this->mounts[$location][] = $path;
 	}
 
+	/**
+	 * Resolve possible paths for a relative path.
+	 *
+	 * @param  string $path
+	 *
+	 * @return array
+	 */
 	public function resolve($path)
-	{
-		$paths = $this->getPaths($path);
-
-		return $paths;
-	}
-
-	protected function getPaths($path)
 	{
 		$paths = [];
 
@@ -60,5 +99,33 @@ class PathResolver
 		}
 
 		return array_merge($mountPaths, $paths);
+	}
+
+	/**
+	 * Based on a set of basenames (filename without extension) and a set of
+	 * possible extensions, find the files that exist.
+	 *
+	 * @param  string|string[] $basenameOrNames
+	 * @param  string|string[] $extensionOrExtensions
+	 *
+	 * @return string[]
+	 */
+	public function locate($basenameOrNames, $extensionOrExtensions)
+	{
+		$basenames = (array) $basenameOrNames;
+		$extensions = (array) $extensionOrExtensions;
+
+		$located = [];
+
+		foreach ($basenames as $basename) {
+			foreach ($extensions as $ext) {
+				$path = $basename.$ext;
+				if (file_exists($path)) {
+					$located[] = $path;
+				}
+			}
+		}
+
+		return $located;
 	}
 }

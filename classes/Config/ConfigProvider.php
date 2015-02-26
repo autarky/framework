@@ -66,7 +66,6 @@ class ConfigProvider extends Provider
 		// set up the config store
 		$store = new FileStore(
 			new PathResolver($this->configPath),
-			new Locator(),
 			$loaderFactory,
 			$this->app->getEnvironment()
 		);

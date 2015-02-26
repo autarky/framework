@@ -54,19 +54,15 @@ class FileStore implements ConfigInterface
 	 * Constructor.
 	 *
 	 * @param PathResolver  $pathResolver
-	 * @param Locator       $fileLocator
 	 * @param LoaderFactory $loaderFactory
-	 * @param string        $path          Path to config files in the global namespace.
 	 * @param string|null   $environment
 	 */
 	public function __construct(
 		PathResolver $pathResolver,
-		Locator $fileLocator,
 		LoaderFactory $loaderFactory,
 		$environment = null
 	) {
 		$this->pathResolver = $pathResolver;
-		$this->fileLocator = $fileLocator;
 		$this->loaderFactory = $loaderFactory;
 		$this->environment = $environment;
 	}
@@ -135,8 +131,7 @@ class FileStore implements ConfigInterface
 			return;
 		}
 
-		$basenames = $this->getBasenames($basename);
-		$paths = $this->getPaths($basenames);
+		$paths = $this->getPaths($basename);
 
 		foreach ($paths as $path) {
 			$data = $this->getDataFromFile($path);
@@ -153,10 +148,9 @@ class FileStore implements ConfigInterface
 	protected function getBasename($key)
 	{
 		return current(explode('.', $key));
-		return $parts[0];
 	}
 
-	protected function getBasenames($basename)
+	protected function getPaths($basename)
 	{
 		$basenames = $this->pathResolver->resolve($basename);
 
@@ -164,14 +158,11 @@ class FileStore implements ConfigInterface
 			return $basename.'.'.$this->environment;
 		}, $basenames);
 
-		return array_merge($basenames, $envBasenames);
-	}
+		$basenames = array_merge($basenames, $envBasenames);
 
-	protected function getPaths($basenames)
-	{
 		$extensions = $this->loaderFactory->getExtensions();
 
-		return $this->fileLocator->locate($basenames, $extensions);
+		return $this->pathResolver->locate($basenames, $extensions);
 	}
 
 	protected function getDataFromFile($path)
