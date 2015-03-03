@@ -35,7 +35,7 @@ class YamlLoaderTest extends PHPUnit_Framework_TestCase
 	public function getYmlPath($file)
 	{
 		$path = TESTS_RSC_DIR.'/yaml/'.$file;
-		$cachePath = TESTS_RSC_DIR.'/yaml-cache/'.md5($path);
+		$cachePath = $path.'/cache/'.md5($path);
 		if (file_exists($cachePath)) unlink($cachePath);
 		return $path;
 	}
@@ -44,7 +44,7 @@ class YamlLoaderTest extends PHPUnit_Framework_TestCase
 	public function writesToCachePath()
 	{
 		$path = $this->getYmlPath('test.yml');
-		$loader = $this->makeCacheLoader($parser = $this->mockParser(), TESTS_RSC_DIR.'/yaml-cache');
+		$loader = $this->makeCacheLoader($parser = $this->mockParser(), TESTS_RSC_DIR.'/yaml/cache');
 		$parser->shouldReceive('parse')->once()->andReturn($data = ['foo' => 'bar']);
 		touch($path, time());
 		$this->assertEquals($data, $loader->load($path));
