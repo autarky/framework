@@ -89,7 +89,7 @@ trait NamespacedResourceResolver
 			return $this->getDefaultLocations();
 		}
 
-		if (!array_key_exists($namespace, $this->locations)) {
+		if (!isset($this->locations[$namespace])) {
 			throw new \InvalidArgumentException("No locations registered for $namespace");
 		}
 

@@ -65,8 +65,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
 			throw new \InvalidArgumentException('DSN or driver must be set');
 		}
 
-		$options = array_key_exists('pdo_options', $config)
-			? $config['pdo_options'] : [];
+		$options = isset($config['pdo_options']) ? $config['pdo_options'] : [];
 		unset($config['pdo_options']);
 		$options = array_replace($this->defaultPdoOptions, $options);
 

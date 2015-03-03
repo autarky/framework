@@ -202,7 +202,7 @@ class Router implements RouterInterface
 		}
 
 		if ($name) {
-			if (array_key_exists($name, $this->filters)) {
+			if (isset($this->filters[$name])) {
 				throw new \LogicException("Filter with name $name already defined");
 			}
 
@@ -239,14 +239,14 @@ class Router implements RouterInterface
 		$oldFilters = $this->currentFilters;
 
 		foreach (['before', 'after'] as $when) {
-			if (array_key_exists($when, $flags)) {
+			if (isset($flags[$when])) {
 				foreach ((array) $flags[$when] as $filter) {
 					$this->currentFilters[] = [$when, $this->getFilter($filter)];
 				}
 			}
 		}
 
-		if (array_key_exists('prefix', $flags)) {
+		if (isset($flags['prefix'])) {
 			$this->currentPrefix .= '/' . trim($flags['prefix'], '/');
 		}
 
@@ -258,7 +258,7 @@ class Router implements RouterInterface
 
 	protected function getFilter($name)
 	{
-		if (!array_key_exists($name, $this->filters)) {
+		if (!isset($this->filters[$name])) {
 			throw new \InvalidArgumentException("Filter with name $name is not defined");
 		}
 
@@ -325,7 +325,7 @@ class Router implements RouterInterface
 
 	protected function addNamedRoute($name, Route $route)
 	{
-		if (array_key_exists($name, $this->namedRoutes)) {
+		if (isset($this->namedRoutes[$name])) {
 			throw new \InvalidArgumentException("Route with name $name already exists");
 		}
 
@@ -348,7 +348,7 @@ class Router implements RouterInterface
 	 */
 	public function getRoute($name)
 	{
-		if (!array_key_exists($name, $this->namedRoutes)) {
+		if (!isset($this->namedRoutes[$name])) {
 			throw new \InvalidArgumentException("Route with name $name not found.");
 		}
 

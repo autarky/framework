@@ -74,7 +74,7 @@ class ConnectionManager
 			$connection = $this->defaultConnection;
 		}
 
-		if (array_key_exists($connection, $this->instances)) {
+		if (isset($this->instances[$connection])) {
 			return $this->instances[$connection];
 		}
 

@@ -87,7 +87,7 @@ class HandlerFactory
 	 */
 	public function makeHandler($ident)
 	{
-		if (!array_key_exists($ident, $this->factories)) {
+		if (!isset($this->factories[$ident])) {
 			throw new \InvalidArgumentException("Unknown session handler: $ident");
 		}
 
