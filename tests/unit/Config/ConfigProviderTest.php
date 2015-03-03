@@ -44,7 +44,6 @@ class ConfigProviderTest extends TestCase
 		$this->assertTrue(file_exists($configPath));
 		$this->assertTrue(file_exists($cachePath));
 		$this->assertEquals($data, require $cachePath);
-		$this->clearCacheDir($configDir);
 	}
 
 	protected function clearCacheDir($configDir)
