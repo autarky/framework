@@ -11,7 +11,6 @@
 namespace Autarky\Database;
 
 use Autarky\Config\ConfigInterface;
-use PDO;
 
 /**
  * Manager for multiple database connections in the form of PDO instances and
