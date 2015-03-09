@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Support;
+namespace Autarky\Utils;
 
 /**
  * Array utility functions.
  */
-class ArrayUtils
+class ArrayUtil
 {
 	/**
 	 * This class is a static class and should not be instantiated.

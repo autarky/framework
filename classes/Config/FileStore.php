@@ -10,7 +10,7 @@
 
 namespace Autarky\Config;
 
-use Autarky\Support\ArrayUtils;
+use Autarky\Utils\ArrayUtil;
 use Autarky\Files\PathResolver;
 use Autarky\Files\Locator;
 
@@ -100,7 +100,7 @@ class FileStore implements ConfigInterface
 	{
 		$this->loadData($key);
 
-		return ArrayUtils::has($this->data, $key);
+		return ArrayUtil::has($this->data, $key);
 	}
 
 	/**
@@ -110,7 +110,7 @@ class FileStore implements ConfigInterface
 	{
 		$this->loadData($key);
 
-		return ArrayUtils::get($this->data, $key, $default);
+		return ArrayUtil::get($this->data, $key, $default);
 	}
 
 	/**
@@ -120,7 +120,7 @@ class FileStore implements ConfigInterface
 	{
 		$this->loadData($key);
 
-		ArrayUtils::set($this->data, $key, $value);
+		ArrayUtil::set($this->data, $key, $value);
 	}
 
 	protected function loadData($key)
