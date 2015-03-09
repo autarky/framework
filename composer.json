@@ -21,7 +21,7 @@
 		"autarky/twig-templating": "Twig templating integration (removed from framework package in 0.8)"
 	},
 	"require-dev": {
-		"autarky/twig-templating": "*",
+		"autarky/twig-templating": "~0.2",
 		"mockery/mockery": "~0.9.1",
 		"monolog/monolog": "~1.3",
 		"symfony/console": "~2.3",
