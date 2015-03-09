@@ -29,6 +29,8 @@ use Autarky\Routing\RouterInterface;
 
 /**
  * The framework's HTTP kernel.
+ *
+ * @internal
  */
 class HttpKernel implements HttpKernelInterface, TerminableInterface
 {

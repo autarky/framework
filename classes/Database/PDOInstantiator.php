@@ -12,6 +12,11 @@ namespace Autarky\Database;
 
 use PDO;
 
+/**
+ * PDO instantiator.
+ *
+ * @internal
+ */
 class PDOInstantiator
 {
 	public function instantiate($dsn, $username = null, $password = null, array $options = array())

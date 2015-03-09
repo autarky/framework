@@ -14,6 +14,8 @@ use Autarky\Container\ContainerInterface;
 
 /**
  * {@inheritdoc}
+ *
+ * @internal
  */
 class Invoker implements InvokerInterface
 {

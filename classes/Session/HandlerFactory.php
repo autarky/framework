@@ -22,6 +22,8 @@ use Autarky\Container\ContainerInterface;
 
 /**
  * Session handler factory.
+ *
+ * @internal
  */
 class HandlerFactory
 {

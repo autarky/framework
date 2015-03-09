@@ -14,6 +14,8 @@ use Autarky\Container\ContainerInterface;
 
 /**
  * Class that resolves listeners.
+ *
+ * @internal
  */
 class ListenerResolver
 {

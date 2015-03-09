@@ -14,6 +14,11 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 
+/**
+ * Connection factory.
+ *
+ * @internal
+ */
 class ConnectionFactory implements ConnectionFactoryInterface
 {
 	/**

@@ -18,6 +18,8 @@ use Whoops\Handler\PrettyPageHandler;
 /**
  * The default default error handler. Returns a whoops error screen if the
  * filp/whoops package is installed, otherwise a simple symfony error screen.
+ *
+ * @internal
  */
 class DefaultErrorHandler implements ErrorHandlerInterface
 {

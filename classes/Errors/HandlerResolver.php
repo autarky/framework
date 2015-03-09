@@ -14,6 +14,8 @@ use Autarky\Container\ContainerInterface;
 
 /**
  * Class for resolving error handlers.
+ *
+ * @internal
  */
 class HandlerResolver
 {

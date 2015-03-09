@@ -26,9 +26,6 @@ use Autarky\Container\ContainerAwareTrait;
  */
 trait ControllerTrait
 {
-	/**
-	 * 
-	 */
 	use ContainerAwareTrait;
 
 	/**
