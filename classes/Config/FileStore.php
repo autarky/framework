@@ -44,6 +44,13 @@ class FileStore implements ConfigInterface
 	protected $loaderFactory;
 
 	/**
+	 * The current environment.
+	 *
+	 * @var string
+	 */
+	protected $environment;
+
+	/**
 	 * The loaded config data.
 	 *
 	 * @var array
