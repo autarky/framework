@@ -160,11 +160,13 @@ class FileStore implements ConfigInterface
 	{
 		$basenames = $this->pathResolver->resolve($basename);
 
-		$envBasenames = array_map(function($basename) {
-			return $basename.'.'.$this->environment;
-		}, $basenames);
+		if ($this->environment) {
+			$envBasenames = array_map(function($basename) {
+				return $basename.'.'.$this->environment;
+			}, $basenames);
 
-		$basenames = array_merge($basenames, $envBasenames);
+			$basenames = array_merge($basenames, $envBasenames);
+		}
 
 		$extensions = $this->loaderFactory->getExtensions();
 
