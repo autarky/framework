@@ -26,11 +26,6 @@ class LoggingErrorHandler implements ErrorHandlerInterface
 		$this->logger = $logger;
 	}
 
-	public function handles(Exception $exception)
-	{
-		return true;
-	}
-
 	public function handle(Exception $exception)
 	{
 		$this->logger->error($exception);

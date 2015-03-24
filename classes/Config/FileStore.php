@@ -12,7 +12,6 @@ namespace Autarky\Config;
 
 use Autarky\Utils\ArrayUtil;
 use Autarky\Files\PathResolver;
-use Autarky\Files\Locator;
 
 /**
  * File-based config implementation.

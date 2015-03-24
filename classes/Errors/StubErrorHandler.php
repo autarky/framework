@@ -84,12 +84,4 @@ class StubErrorHandler implements ErrorHandlerManagerInterface
 	{
 		throw $exception;
 	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function handles(Exception $exception)
-	{
-		return true;
-	}
 }

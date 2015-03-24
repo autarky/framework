@@ -159,14 +159,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	}
 
 	/**
-	 * {@inheritdoc}
-	 */
-	public function handles(Exception $exception)
-	{
-		return true;
-	}
-
-	/**
 	 * Transform an exception handler's response into a Response object.
 	 *
 	 * @param  mixed      $response
@@ -203,7 +195,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	protected function matchesTypehint($handler, Exception $exception)
 	{
 		if ($handler instanceof ErrorHandlerInterface) {
-			return $handler->handles($exception);
+			return true;
 		}
 
 		if (is_array($handler)) {

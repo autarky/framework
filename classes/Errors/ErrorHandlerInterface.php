@@ -25,13 +25,4 @@ interface ErrorHandlerInterface
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handle(Exception $exception);
-
-	/**
-	 * Whether or not the handler handles a given exception.
-	 *
-	 * @param  \Exception $exception
-	 *
-	 * @return boolean
-	 */
-	public function handles(Exception $exception);
 }

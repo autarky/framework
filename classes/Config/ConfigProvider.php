@@ -15,7 +15,6 @@ use Symfony\Component\Yaml\Parser;
 use Autarky\Config\Loaders\CachingYamlFileLoader;
 use Autarky\Config\Loaders\YamlFileLoader;
 use Autarky\Container\ContainerInterface;
-use Autarky\Files\Locator;
 use Autarky\Files\PathResolver;
 use Autarky\Provider;
 
