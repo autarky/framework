@@ -10,12 +10,12 @@
 
 namespace Autarky\Errors;
 
-use Autarky\Provider;
+use Autarky\Providers\AbstractProvider;
 
 /**
  * Provides error handling.
  */
-class ErrorHandlerProvider extends Provider
+class ErrorHandlerProvider extends AbstractProvider
 {
 	/**
 	 * @var boolean  Whether or not the error handler should register itself as

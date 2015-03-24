@@ -11,13 +11,13 @@
 namespace Autarky\Database;
 
 use Autarky\Container\ContainerInterface;
-use Autarky\Provider;
+use Autarky\Providers\AbstractProvider;
 
 /**
  * Simple service provider that binds a shared PDO instance onto the container,
  * using settings found in the database config file.
  */
-class DatabaseProvider extends Provider
+class DatabaseProvider extends AbstractProvider
 {
 	/**
 	 * {@inheritdoc}

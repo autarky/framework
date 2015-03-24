@@ -16,14 +16,14 @@ use Autarky\Config\Loaders\CachingYamlFileLoader;
 use Autarky\Config\Loaders\YamlFileLoader;
 use Autarky\Container\ContainerInterface;
 use Autarky\Files\PathResolver;
-use Autarky\Provider;
+use Autarky\Providers\AbstractProvider;
 
 /**
  * Provides config to the application.
  *
  * This service provider is vital to the framework.
  */
-class ConfigProvider extends Provider
+class ConfigProvider extends AbstractProvider
 {
 	/**
 	 * The path in which config files are located.

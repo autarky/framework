@@ -175,7 +175,7 @@ class MiddlewareC extends AbstractMiddleware
 	}
 }
 
-class StubServiceProvider extends \Autarky\Provider
+class StubServiceProvider extends \Autarky\Providers\AbstractProvider
 {
 	public static $called = false;
 	public function register()

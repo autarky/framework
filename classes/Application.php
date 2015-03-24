@@ -24,6 +24,10 @@ use Autarky\Console\Application as ConsoleApplication;
 use Autarky\Container\ContainerInterface;
 use Autarky\Errors\ErrorHandlerManagerInterface;
 use Autarky\Kernel\HttpKernel;
+use Autarky\Providers\ProviderInterface;
+use Autarky\Providers\DependantProviderInterface;
+use Autarky\Providers\ConsoleProviderInterface;
+use Autarky\Providers\AbstractProvider;
 
 /**
  * The main application of the framework.
@@ -106,7 +110,7 @@ class Application implements HttpKernelInterface
 	 * Construct a new application instance.
 	 *
 	 * @param \Closure|string   $environment
-	 * @param Provider[] $providers
+	 * @param ProviderInterface[] $providers
 	 */
 	public function __construct($environment, array $providers)
 	{
@@ -348,28 +352,78 @@ class Application implements HttpKernelInterface
 	 */
 	protected function registerProviders()
 	{
+		$dependants = [];
+
 		foreach ($this->providers as $provider) {
 			if (is_string($provider)) {
 				$provider = new $provider();
 			}
+
 			$this->registerProvider($provider);
+
+			if ($provider instanceof DependantProviderInterface) {
+				$dependants[] = $provider;
+			}
+		}
+
+		foreach ($dependants as $dependant) {
+			$this->checkProviderDependencies($dependant);
 		}
 	}
 
 	/**
 	 * Register a single service provider.
 	 *
-	 * @param  Provider $provider
+	 * @param  ProviderInterface $provider
 	 *
 	 * @return void
 	 */
-	protected function registerProvider(Provider $provider)
+	protected function registerProvider(ProviderInterface $provider)
 	{
-		$provider->setApplication($this);
+		if ($provider instanceof AbstractProvider) {
+			$provider->setApplication($this);
+		}
+
 		$provider->register();
 
-		if ($this->console) {
+		if ($this->console && $provider instanceof ConsoleProviderInterface) {
 			$provider->registerConsole($this->console);
+		}
+	}
+
+	protected function checkProviderDependencies(DependantProviderInterface $provider)
+	{
+		$errors = [];
+
+		foreach ($provider->getClassDependencies() as $class) {
+			if (!class_exists($class)) {
+				$errors[] = "Class must exist: $class";
+			}
+		}
+
+		foreach ($provider->getContainerDependencies() as $class) {
+			if (!$this->container->isBound($class)) {
+				$errors[] = "Class must be bound to the container: $class";
+			}
+		}
+
+		foreach ($provider->getProviderDependencies() as $class) {
+			if (!isset($this->providers[$class])) {
+				$errors[] = "Provider must be loaded: $class";
+			}
+		}
+
+		if ($errors) {
+			$providerClass = get_class($provider);
+			$message = "Errors while registering provider: $providerClass";
+
+			if (count($errors) > 1) {
+				$message .= "\n".implode("\n", $errors);
+			} else {
+				$message .= " - {$errors[0]}";
+			}
+
+			throw new Providers\ProviderException($message, $errors);
 		}
 	}
 

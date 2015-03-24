@@ -11,12 +11,12 @@
 namespace Autarky\Routing;
 
 use Autarky\Container\ContainerInterface;
-use Autarky\Provider;
+use Autarky\Providers\AbstractProvider;
 
 /**
  * Simple service provider for the FastRoute implementation.
  */
-class RoutingProvider extends Provider
+class RoutingProvider extends AbstractProvider
 {
 	public function register()
 	{

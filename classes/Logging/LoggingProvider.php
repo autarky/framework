@@ -10,7 +10,7 @@
 
 namespace Autarky\Logging;
 
-use Autarky\Provider;
+use Autarky\Providers\AbstractProvider;
 use Autarky\Container\ContainerInterface;
 
 /**
@@ -18,7 +18,7 @@ use Autarky\Container\ContainerInterface;
  *
  * Provides a channel manager which can store multiple loggers.
  */
-class LoggingProvider extends Provider
+class LoggingProvider extends AbstractProvider
 {
 	/**
 	 * {@inheritdoc}
