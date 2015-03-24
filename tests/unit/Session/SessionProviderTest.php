@@ -42,6 +42,9 @@ class SessionProviderTest extends TestCase
 		$app = $this->makeApplication([new SessionProvider]);
 		$app->getConfig()->set('session.handler', $handler);
 		if ($handler == 'pdo') {
+			if (!extension_loaded('pdo_sqlite')) {
+				$this->markTestSkipped('PDO SQLite extension not loaded');
+			}
 			$sp = new DatabaseProvider;
 			$sp->setApplication($app);
 			$sp->register();

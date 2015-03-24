@@ -82,6 +82,9 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 	 */
 	public function getSqliteConnectionWithDsn($config)
 	{
+		if (!extension_loaded('pdo_sqlite')) {
+			$this->markTestSkipped('PDO SQLite extension not loaded');
+		}
 		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo($config);
 		$this->assertInstanceOf('Autarky\Tests\SpyPDO', $pdo);
 		$this->assertEquals('sqlite::memory:', $pdo->getDsn());
@@ -128,6 +131,9 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function pdoOptionsAreReplaced()
 	{
+		if (!extension_loaded('pdo_sqlite')) {
+			$this->markTestSkipped('PDO SQLite extension not loaded');
+		}
 		$options = [
 			PDO::ATTR_CASE               => PDO::CASE_LOWER,
 			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

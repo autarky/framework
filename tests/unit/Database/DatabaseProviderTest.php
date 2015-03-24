@@ -23,6 +23,9 @@ class DatabaseProviderTest extends TestCase
 	/** @test */
 	public function canResolvePdo()
 	{
+		if (!extension_loaded('pdo_sqlite')) {
+			$this->markTestSkipped('PDO SQLite extension not loaded');
+		}
 		$app = $this->makeApplication('Autarky\Database\DatabaseProvider');
 		$app->getConfig()->set('database.connection', 'default');
 		$app->getConfig()->set('database.connections', [
