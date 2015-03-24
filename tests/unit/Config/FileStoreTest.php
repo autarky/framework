@@ -71,7 +71,10 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function valuesAreOverridenDependingOnEnvironment()
 	{
-		$config = $this->makeConfig('dummyenv');
+		$config = $this->makeConfig(null);
+		$this->assertEquals('bar', $config->get('testfile.foo'));
+		$config = $this->makeConfig(null);
+		$config->setEnvironment('dummyenv');
 		$this->assertEquals('baz', $config->get('testfile.foo'));
 	}
 
