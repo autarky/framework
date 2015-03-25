@@ -67,7 +67,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
 	public function makePdo(array $config, $connection = null)
 	{
 		if (!isset($config['driver']) && !isset($config['dsn'])) {
-			throw new \InvalidArgumentException('DSN or driver must be set');
+			throw new InvalidArgumentException('DSN or driver must be set');
 		}
 
 		$options = isset($config['pdo_options']) ? $config['pdo_options'] : [];
