@@ -284,9 +284,7 @@ class Router implements RouterInterface
 			$this->addNamedRoute($name, $route);
 		}
 
-		foreach ($route->getMethods() as $method) {
-			$this->routeCollector->addRoute($method, $path, $route);
-		}
+		$this->routeCollector->addRoute($route->getMethods(), $path, $route);
 
 		return $route;
 	}
