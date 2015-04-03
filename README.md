@@ -13,7 +13,7 @@ Changelog and upgrade instructions are available in Github's [releases](https://
 
 Related repositories: [Container](https://github.com/autarky/container), [Twig templating](https://github.com/autarky/twig-templating)
 
-### Installation
+## Installation
 
 Try the framework out by creating a skeleton project using composer.
 
@@ -33,7 +33,7 @@ cd myproject && php -S localhost:8000 -t ./public
 
 Visit the url "localhost:8000" in your browser to make sure it's working.
 
-### Contributing
+## Contributing
 
 ```
 git clone https://github.com/autarky/framework /path/to/autarky
@@ -48,12 +48,12 @@ The develop branch is the next minor version. New features are applied to this b
 
 Read the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
 
-### Contact
+## Contact
 
 Feel free to open an issue on GitHub if you have any problems or suggestions. Alternatively (or additionally), you may want to ask on [Stack Overflow](http://stackoverflow.com) using the ["autarky" tag](http://stackoverflow.com/questions/ask?tags=autarky,php).
 
 Contact [Andreas Lutro](https://github.com/anlutro) personally for potential security issues.
 
-### License
+## License
 
 The contents of this repository is released under the [MIT license](http://opensource.org/licenses/MIT). See the [LICENSE](LICENSE) file included for more information.
