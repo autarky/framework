@@ -114,15 +114,6 @@ class ApplicationTest extends TestCase
 		$mock->shouldReceive('configure')->once();
 		$app->boot();
 	}
-
-	/** @test */
-	public function serviceProvidersAreCalledOnBoot()
-	{
-		$app = $this->makeApplication([__NAMESPACE__.'\\StubServiceProvider']);
-		$this->assertFalse(StubServiceProvider::$called);
-		$app->boot();
-		$this->assertTrue(StubServiceProvider::$called);
-	}
 }
 
 abstract class AbstractMiddleware implements HttpKernelInterface
@@ -172,14 +163,5 @@ class MiddlewareC extends AbstractMiddleware
 	{
 		$affix = 'b' . $this->affix;
 		$response->setContent($response->getContent().$affix);
-	}
-}
-
-class StubServiceProvider extends \Autarky\Providers\AbstractProvider
-{
-	public static $called = false;
-	public function register()
-	{
-		static::$called = true;
 	}
 }
