@@ -46,18 +46,16 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function routesAddedWithoutLeadingSlashAreNormalized()
+	public function getRouteUrlCanReturnAbsoluteOrRelativePath()
 	{
-		list($router, $url) = $this->makeRouterAndGenerator($request = Request::create('/foo/foo'));
-		$router->addRoute('get', 'foo/{v}', function() { return 'test'; }, 'name');
-		$response = $router->dispatch($request);
-		$this->assertEquals('test', $response->getContent());
-		$this->assertEquals('//localhost/foo/bar', $url->getRouteUrl('name', ['bar']));
-		$this->assertEquals('/foo/bar', $url->getRouteUrl('name', ['bar'], true));
+		list($router, $url) = $this->makeRouterAndGenerator($request = Request::create('/'));
+		$router->addRoute('get', '/foo/bar', function() {}, 'name');
+		$this->assertEquals('//localhost/foo/bar', $url->getRouteUrl('name', [], false));
+		$this->assertEquals('/foo/bar', $url->getRouteUrl('name', [], true));
 	}
 
 	/** @test */
-	public function assetUrlIsBasedOnCurrentRequestRoot()
+	public function routeUrlIsBasedOnCurrentRequestRoot()
 	{
 		list($router, $url) = $this->makeRouterAndGenerator($request = Request::create('http://some.host/'));
 		$router->addRoute('get', 'foo/{v}', function() {}, 'name');
@@ -68,11 +66,12 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	public function canGenerateRelativeAssetUrls()
 	{
 		list($router, $url) = $this->makeRouterAndGenerator($request = Request::create('http://some.host/'));
+		$this->assertEquals('//some.host/foo/bar', $url->getAssetUrl('foo/bar', false));
 		$this->assertEquals('/foo/bar', $url->getAssetUrl('foo/bar', true));
 	}
 
 	/** @test */
-	public function canGenerateRelativeAssetUrlsInSubdirectory()
+	public function canGenerateRelativeUrlsInSubdirectory()
 	{
 		$server = [
 			'PHP_SELF' => '/path/to/subdir/index.php',
@@ -81,13 +80,15 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 		];
 		$request = Request::create('http://some.host/subdir/bar/baz', 'GET', [], [], [], $server);
 		list($router, $url) = $this->makeRouterAndGenerator($request);
+		$router->addRoute('get', 'foo/bar', function() {}, 'name');
 		$this->assertEquals('/subdir/foo/bar', $url->getAssetUrl('foo/bar', true));
+		$this->assertEquals('/subdir/foo/bar', $url->getRouteUrl('name', [], true));
 	}
 
 	/** @test */
 	public function canSetAssetRoot()
 	{
-		list($router, $url) = $this->makeRouterAndGenerator($request = Request::create('/foo/foo'));
+		list($router, $url) = $this->makeRouterAndGenerator($request = Request::create('http://localhost/foo'));
 		$url->setAssetRoot('//some.cdn.com');
 		$this->assertEquals('//some.cdn.com/foo/bar', $url->getAssetUrl('foo/bar'));
 	}
