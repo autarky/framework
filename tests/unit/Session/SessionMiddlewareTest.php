@@ -99,4 +99,38 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase
 		$middleware->handle($request);
 		$this->assertEquals('1234', $session->getId());
 	}
+
+	public function getSessionStartData()
+	{
+		// args: force, cookie is set, session is expected to be started
+		return [
+			[false, false, false],
+			[false, true, false],
+			[true, false, true],
+			[true, true, true],
+		];
+	}
+
+	/**
+	 * @test
+	 * @dataProvider getSessionStartData
+	 */
+	public function sessionStartsCorrectly($force, $sessionExists, $sessionStarted)
+	{
+		$app = $this->makeApplication($session = $this->makeSession());
+		$app->getConfig()->set('session.force', $force);
+		$kernel = m::mock('Symfony\Component\HttpKernel\HttpKernelInterface');
+		$kernel->shouldReceive('handle')->once()->andReturnUsing(function() use($session, $sessionStarted) {
+			$this->assertEquals($sessionStarted, $session->isStarted());
+			return new Response('foo');
+		});
+		$middleware = $this->makeMiddleware($kernel, $app);
+		$request = Request::create('/');
+		if ($sessionExists) {
+			$request->cookies->set($session->getName(), '12345678');
+		}
+		$middleware->handle($request);
+		$this->assertSame($session, $request->getSession());
+		$this->assertEquals(false, $session->isStarted());
+	}
 }
