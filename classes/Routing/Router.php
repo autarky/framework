@@ -390,9 +390,12 @@ class Router implements RouterInterface
 			throw new \RuntimeException('Unknown result from FastRoute: '.$result[0]);
 		}
 
-		/** @var Route $route */
-		$route = $result[1];
-		$route->setParams($result[2]);
+		return $this->matchRoute($result[1], $result[2], $request);
+	}
+
+	protected function matchRoute(Route $route, array $params, Request $request)
+	{
+		$route->setParams($params);
 
 		if ($this->eventDispatcher !== null) {
 			$event = new Events\RouteMatchedEvent($request, $route);
