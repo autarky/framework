@@ -146,7 +146,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
 
 	protected function validate(array &$config, $key, $connection, $allowEmpty = false)
 	{
-		if (!isset($config[$key]) || (!$allowEmpty && !$config[$key])) {
+		if (!array_key_exists($key, $config) || (!$allowEmpty && !$config[$key])) {
 			throw new InvalidArgumentException("Missing $key for connection: $connection");
 		}
 	}
