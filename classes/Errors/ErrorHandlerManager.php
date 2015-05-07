@@ -116,7 +116,6 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 		set_error_handler([$this, 'handleError']);
 
 		if (!$this->rethrow) {
-			ini_set('display_errors', 0);
 			set_exception_handler([$this, 'handleUncaught']);
 			register_shutdown_function([$this, 'handleShutdown']);
 		} else {
