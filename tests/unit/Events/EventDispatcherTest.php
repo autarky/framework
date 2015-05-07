@@ -22,30 +22,67 @@ class EventDispatcherTest extends PHPUnit_Framework_TestCase
 		return new EventDispatcher(new ListenerResolver(new Container));
 	}
 
+	protected function dispatchMockEvent($dispatcher, $method = 'doStuff')
+	{
+		$mockEvent = $this->mockEvent();
+		$mockEvent->shouldReceive($method)->once();
+		$event = $dispatcher->dispatch('foo', $mockEvent);
+		$this->assertSame($event, $mockEvent);
+	}
+
 	/** @test */
 	public function listenersAreResolved()
 	{
 		$resolver = m::mock('Autarky\Events\ListenerResolver');
-		$events = new EventDispatcher($resolver);
-		$resolver->shouldReceive('resolve')->with('class')->once()->andReturn(new StubListener);
-		$events->addListener('foo', ['class', 'bar']);
-		$mockEvent = $this->mockEvent();
-		$mockEvent->shouldReceive('doStuff')->once();
-		$event = $events->dispatch('foo', $mockEvent);
-		$this->assertSame($event, $mockEvent);
+		$dispatcher = new EventDispatcher($resolver);
+		$dispatcher->addListener('foo', 'StubListener');
+		$resolver->shouldReceive('resolve')->with('StubListener')->once()->andReturn(new StubListener);
+		$this->dispatchMockEvent($dispatcher, 'doOtherStuff');
+	}
+
+	/** @test */
+	public function listenerIsResolvedAndCorrectMethodIsCalled()
+	{
+		$resolver = m::mock('Autarky\Events\ListenerResolver');
+		$dispatcher = new EventDispatcher($resolver);
+		$dispatcher->addListener('foo', ['StubListener', 'bar']);
+		$resolver->shouldReceive('resolve')->with('StubListener')->once()->andReturn(new StubListener);
+		$this->dispatchMockEvent($dispatcher);
+	}
+
+	/** @test */
+	public function closureListenersStillWork()
+	{
+		$resolver = m::mock('Autarky\Events\ListenerResolver');
+		$dispatcher = new EventDispatcher($resolver);
+		$dispatcher->addListener('foo', function($event) { $event->doStuff(); });
+		$this->dispatchMockEvent($dispatcher);
+	}
+
+	/** @test */
+	public function callableArrayListenersStillWork()
+	{
+		$resolver = m::mock('Autarky\Events\ListenerResolver');
+		$dispatcher = new EventDispatcher($resolver);
+		$dispatcher->addListener('foo', [new StubListener, 'bar']);
+		$this->dispatchMockEvent($dispatcher);
 	}
 }
 
 class StubListener
 {
+	public function handle($event)
+	{
+		$event->doOtherStuff();
+	}
 	public function bar($event)
 	{
 		$event->doStuff();
-		return $event;
 	}
 }
 
 class StubEvent extends \Symfony\Component\EventDispatcher\Event
 {
 	public function doStuff() {}
+	public function doOtherStuff() {}
 }

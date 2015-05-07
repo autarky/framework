@@ -102,13 +102,9 @@ class Middleware implements HttpKernelInterface
 		// the name of the session cookie name.
 		$sessionName = $this->session->getName();
 
+		// if a session cookie exists, load the appropriate session ID.
 		if ($request->cookies->has($sessionName)) {
-			// if a session cookie exists, load the appropriate session ID.
 			$this->session->setId($request->cookies->get($sessionName));
-		} else {
-			// if not, generate an ID and migrate existing session data onto
-			// the new ID.
-			$this->session->migrate(false);
 		}
 
 		// in some rare cases you may want to force the session to start on

@@ -76,6 +76,8 @@ class PathResolver
 		}
 
 		$parts = explode('/', $path);
+
+		// this doesn't change behaviour but will save some performance
 		if (count($parts) == 1) {
 			return $paths;
 		}

@@ -1,8 +1,8 @@
 branches:
   only:
-    - develop # 0.9
-    - master # 0.8
-    - 0.7
+    - develop # next
+    - master # 0.9
+    - 0.8
 
 language: php
 

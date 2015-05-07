@@ -119,13 +119,32 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 	 * @test
 	 * @dataProvider getRegularConfigs
 	 */
-	public function getRegularConnection($config)
+	public function canProvideDsnOrOptions($config)
 	{
 		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo($config);
 		$this->assertInstanceOf('Autarky\Tests\SpyPDO', $pdo);
 		$this->assertEquals('pgsql:host=localhost;port=1234;dbname=fakedb', $pdo->getDsn());
 		$this->assertEquals('fakeuser', $pdo->getUsername());
 		$this->assertEquals('fakepass', $pdo->getPassword());
+	}
+
+	/**
+	 * @test
+	 */
+	public function canProvideEmptyPassword()
+	{
+		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo([
+			'driver' => 'pgsql',
+			'host' => 'localhost',
+			'port' => '1234',
+			'dbname' => 'fakedb',
+			'username' => 'fakeuser',
+			'password' => null,
+		]);
+		$this->assertInstanceOf('Autarky\Tests\SpyPDO', $pdo);
+		$this->assertEquals('pgsql:host=localhost;port=1234;dbname=fakedb', $pdo->getDsn());
+		$this->assertEquals('fakeuser', $pdo->getUsername());
+		$this->assertEquals(null, $pdo->getPassword());
 	}
 
 	/** @test */
