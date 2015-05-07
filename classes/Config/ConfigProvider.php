@@ -10,8 +10,6 @@
 
 namespace Autarky\Config;
 
-use Symfony\Component\Yaml\Parser;
-
 use Autarky\Config\Loaders\CachingYamlFileLoader;
 use Autarky\Config\Loaders\YamlFileLoader;
 use Autarky\Container\ContainerInterface;

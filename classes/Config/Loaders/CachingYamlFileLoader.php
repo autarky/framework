@@ -12,8 +12,6 @@ namespace Autarky\Config\Loaders;
 
 use Symfony\Component\Yaml\Parser;
 
-use Autarky\Config\LoaderInterface;
-
 /**
  * Caching wrapper for the YAML/YML config file loader.
  */

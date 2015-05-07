@@ -11,7 +11,6 @@
 namespace Autarky\Logging;
 
 use Autarky\Providers\AbstractProvider;
-use Autarky\Container\ContainerInterface;
 
 /**
  * Logging provider.
