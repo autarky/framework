@@ -141,10 +141,12 @@ class HandlerFactory
 	{
 		if ($this->config->has('path.session')) {
 			return $this->config->get('path.session');
-		} else if ($this->config->has('path.storage')) {
-			return $this->config->get('path.storage').'/session';
-		} else {
-			return null;
 		}
+
+		if ($this->config->has('path.storage')) {
+			return $this->config->get('path.storage').'/session';
+		}
+
+		return null;
 	}
 }
