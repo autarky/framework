@@ -33,7 +33,8 @@ class RoutingProvider extends AbstractProvider
 				? $container->resolve($eventDispatcher) : null;
 
 			$config = $this->app->getConfig();
-			$cachePath = $config ? $config->get('path.route_cache') : null;
+			$cachePath = ($config && !$config->get('app.debug')) ?
+				$config->get('path.route_cache') : null;
 
 			return new Router(
 				$container->resolve('Autarky\Routing\Invoker'),
