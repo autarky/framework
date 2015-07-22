@@ -476,7 +476,7 @@ class Application implements HttpKernelInterface
 	 * @param  \Symfony\Component\HttpFoundation\Request $request
 	 * @param  bool $send
 	 *
-	 * @return mixed
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function run(Request $request = null, $send = true)
 	{

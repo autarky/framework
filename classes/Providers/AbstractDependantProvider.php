@@ -12,16 +12,25 @@ namespace Autarky\Providers;
 
 abstract class AbstractDependantProvider extends AbstractProvider implements DependantProviderInterface
 {
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getClassDependencies()
 	{
 		return [];
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getContainerDependencies()
 	{
 		return [];
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getProviderDependencies()
 	{
 		return [];
