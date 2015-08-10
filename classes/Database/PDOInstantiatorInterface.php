@@ -10,17 +10,22 @@
 
 namespace Autarky\Database;
 
-use PDO;
-
 /**
  * PDO instantiator.
  *
  * @internal
  */
-class PDOInstantiator implements PDOInstantiatorInterface
+interface PDOInstantiatorInterface
 {
-	public function instantiate($dsn, $username = null, $password = null, array $options = array())
-	{
-		return new PDO($dsn, $username, $password, $options);
-	}
+	/**
+	 * Instantiate a PDO instance.
+	 *
+	 * @param  string $dsn
+	 * @param  string $username
+	 * @param  string $password
+	 * @param  array  $options
+	 *
+	 * @return \PDO
+	 */
+	public function instantiate($dsn, $username = null, $password = null, array $options = array());
 }
