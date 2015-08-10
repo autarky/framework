@@ -26,6 +26,10 @@ class DatabaseProvider extends AbstractProvider
 	{
 		$dic = $this->app->getContainer();
 
+		$dic->share('Autarky\Database\PDOInstantiator');
+		$dic->alias('Autarky\Database\PDOInstantiator',
+			'Autarky\Database\PDOInstantiatorInterface');
+
 		$dic->share('Autarky\Database\ConnectionFactory');
 		$dic->alias('Autarky\Database\ConnectionFactory',
 			'Autarky\Database\ConnectionFactoryInterface');
