@@ -11,7 +11,7 @@
 	],
 	"require": {
 		"autarky/container": "~1.0",
-		"nikic/fast-route": "0.4.*",
+		"nikic/fast-route": "0.6.*",
 		"psr/log": "~1.0",
 		"stack/builder": "~1.0",
 		"symfony/http-foundation": "~2.4",
