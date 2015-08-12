@@ -210,7 +210,8 @@ class Route
 			return array_shift($params);
 		};
 
-		$path = preg_replace_callback(FastRoute::VARIABLE_REGEX, $callback, $this->pattern);
+		$regex = '~'.FastRoute::VARIABLE_REGEX.'~x';
+		$path = preg_replace_callback($regex, $callback, $this->pattern);
 
 		if (count($params) > 0) {
 			$path .= '?' . http_build_query($params);
