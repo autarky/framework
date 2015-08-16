@@ -42,18 +42,56 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 			['/foo/{v}', ['bar'], '/foo/bar'],
 			['/foo/{v:[a-z]+}', ['bar'], '/foo/bar'],
 			['/foo/{v:[0-9]+}', [123], '/foo/123'],
-			['/{v1}/{v2}', ['v1', 'v2'], '/v1/v2'],
+			['/{v1}', ['v1'], '/v1'],
+			// query strings
+			['/', ['foo'=>'bar'], '/?foo=bar'],
 			['/{v1}', ['v1', 'foo'=>'bar'], '/v1?foo=bar'],
+			// optional route params (FastRoute 0.6)
+			['/{v1}[/{v2}[/{v3}]]', ['v1'], '/v1'],
+			['/{v1}[/{v2}[/{v3}]]', ['v1', 'v2'], '/v1/v2'],
+			['/{v1}[/{v2}[/{v3}]]', ['v1', 'v2', 'v3'], '/v1/v2/v3'],
 		];
 	}
 
-	/** @test */
-	public function tooFewParamsThrowsException()
+	/**
+	 * @test
+	 * @dataProvider getTooFewParamsData
+	 */
+	public function tooFewParamsThrowsException($path, array $params)
 	{
 		list($router, $url) = $this->makeRouterAndGenerator(Request::create('/'));
-		$router->addRoute('get', '/{v1}/{v2}', function() {}, 'name');
-		$this->setExpectedException('InvalidArgumentException');
-		$url->getRouteUrl('name', ['v1']);
+		$router->addRoute('get', $path, function() {}, 'name');
+		$this->setExpectedException('InvalidArgumentException', 'Too few parameters given');
+		$url->getRouteUrl('name', $params, true);
+	}
+
+	public function getTooFewParamsData()
+	{
+		return [
+			['/{v1}', []],
+			['/{v1}', ['foo' => 'bar']],
+			['/{v1}/{v2}', ['v1']],
+		];
+	}
+
+	/**
+	 * @test
+	 * @dataProvider getTooManyParamsData
+	 */
+	public function tooManyParamsThrowsException($path, array $params)
+	{
+		list($router, $url) = $this->makeRouterAndGenerator(Request::create('/'));
+		$router->addRoute('get', $path, function() {}, 'name');
+		$this->setExpectedException('InvalidArgumentException', 'Too many parameters given');
+		$url->getRouteUrl('name', $params, true);
+	}
+
+	public function getTooManyParamsData()
+	{
+		return [
+			['/', ['v1']],
+			['/{v1}', ['v1', 'v2']],
+		];
 	}
 
 	/** @test */
