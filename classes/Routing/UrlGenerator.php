@@ -90,6 +90,7 @@ class UrlGenerator
 	public function getRouteUrl($name, array $params = array(), $relative = false)
 	{
 		$route = $this->router->getRoute($name);
+
 		$routeParams = [];
 		$query = [];
 		foreach ($params as $key => $value) {
@@ -99,6 +100,7 @@ class UrlGenerator
 				$query[$key] = $value;
 			}
 		}
+
 		$path = $this->getRoutePath($route, $routeParams);
 
 		if ($query) {
