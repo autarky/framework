@@ -10,7 +10,7 @@
 		}
 	],
 	"require": {
-		"autarky/container": "~1.0",
+		"autarky/container": "~1.1",
 		"nikic/fast-route": "0.6.*",
 		"psr/log": "~1.0",
 		"stack/builder": "~1.0",
