@@ -65,8 +65,14 @@ class UrlGenerator
 	 */
 	public function getRouteUrl($name, array $params = array(), $relative = false)
 	{
-		$path = $this->router->getRoute($name)
-			->getPath($params);
+		$route = $this->router->getRoute($name);
+		$query = array_filter($params, 'is_string', ARRAY_FILTER_USE_KEY);
+		$params = array_filter($params, 'is_int', ARRAY_FILTER_USE_KEY);
+		$path = $this->getRoutePath($route, $params);
+
+		if ($query) {
+			$path .= '?'.http_build_query($query);
+		}
 
 		if ($relative) {
 			$root = $this->requests->getCurrentRequest()
@@ -76,6 +82,37 @@ class UrlGenerator
 		}
 
 		return $root . $path;
+	}
+
+	protected function getRoutePath(Route $route, array $params)
+	{
+		$routes = $this->router->getRouteParser()->parse($route->getPattern());
+
+		foreach ($routes as $route) {
+			$path = '';
+			$index = 0;
+			foreach ($route as $part) {
+				// Fixed segment in the route
+				if (is_string($part)) {
+					$path .= $part;
+					continue;
+				}
+
+				// Placeholder in the route
+				if ($index === count($params)) {
+					throw new \InvalidArgumentException('Too few parameters given');
+				}
+				$path .= $params[$index++];
+			}
+
+			// If number of params in route matches with number of params given, use that route.
+			// Otherwise try to find a route that has more params
+			if ($index === count($params)) {
+				return $path;
+			}
+		}
+
+		throw new \InvalidArgumentException('Too many parameters given');
 	}
 
 	/**

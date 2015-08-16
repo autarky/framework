@@ -90,7 +90,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$router->group(['prefix' => 'foo'], function(Router $router) use(&$route) {
 			$route = $router->addRoute('get', '/bar', function() {});
 		});
-		$this->assertEquals('/foo/bar', $route->getPath([]));
+		$this->assertEquals('/foo/bar', $route->getPattern());
 	}
 
 	/**
@@ -101,7 +101,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	{
 		$router = $this->makeRouter();
 		$route = $router->addRoute(['get'], $path, function() {});
-		$this->assertEquals($expected, $route->getPath());
+		$this->assertEquals($expected, $route->getPattern());
 		// throws an exception if no route was found
 		$router->dispatch(Request::create($expected));
 	}
@@ -160,7 +160,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$router->group(['prefix' => $prefix], function(Router $router) use($path, &$route) {
 			$route = $router->addRoute(['get'], $path, function() { return; });
 		});
-		$this->assertEquals($expected, $route->getPath());
+		$this->assertEquals($expected, $route->getPattern());
 		// throws an exception if no route was found
 		$router->dispatch(Request::create($expected));
 	}

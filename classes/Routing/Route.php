@@ -10,9 +10,6 @@
 
 namespace Autarky\Routing;
 
-// this must match the parser used in Router.php
-use FastRoute\RouteParser\Std as FastRoute;
-
 /**
  * Class that represents a single route in the application.
  */
@@ -189,35 +186,6 @@ class Route
 		}
 
 		return $this->params;
-	}
-
-	/**
-	 * Given a set of parameters, get the relative path to the route.
-	 *
-	 * @param array $params
-	 *
-	 * @return string
-	 */
-	public function getPath(array $params = array())
-	{
-		// for each regex match in $this->pattern, get the first param in
-		// $params and replace the match with that
-		$callback = function () use (&$params, &$matches) {
-			if (count($params) < 1) {
-				throw new \InvalidArgumentException('Too few parameters given');
-			}
-
-			return array_shift($params);
-		};
-
-		$regex = '~'.FastRoute::VARIABLE_REGEX.'~x';
-		$path = preg_replace_callback($regex, $callback, $this->pattern);
-
-		if (count($params) > 0) {
-			$path .= '?' . http_build_query($params);
-		}
-
-		return $path;
 	}
 
 	/**

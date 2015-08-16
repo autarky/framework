@@ -42,7 +42,18 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 			['/foo/{v}', ['bar'], '/foo/bar'],
 			['/foo/{v:[a-z]+}', ['bar'], '/foo/bar'],
 			['/foo/{v:[0-9]+}', [123], '/foo/123'],
+			['/{v1}/{v2}', ['v1', 'v2'], '/v1/v2'],
+			['/{v1}', ['v1', 'foo'=>'bar'], '/v1?foo=bar'],
 		];
+	}
+
+	/** @test */
+	public function tooFewParamsThrowsException()
+	{
+		list($router, $url) = $this->makeRouterAndGenerator(Request::create('/'));
+		$router->addRoute('get', '/{v1}/{v2}', function() {}, 'name');
+		$this->setExpectedException('InvalidArgumentException');
+		$url->getRouteUrl('name', ['v1']);
 	}
 
 	/** @test */

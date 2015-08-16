@@ -46,6 +46,11 @@ class Router implements RouterInterface
 	protected $routeCollector;
 
 	/**
+	 * @var \FastRoute\RouteParser
+	 */
+	protected $routeParser;
+
+	/**
 	 * @var mixed
 	 */
 	protected $dispatchData;
@@ -113,7 +118,7 @@ class Router implements RouterInterface
 		}
 
 		$this->routeCollector = new RouteCollector(
-			new RouteParser, new DataGenerator
+			$this->routeParser = new RouteParser, new DataGenerator
 		);
 	}
 
@@ -499,5 +504,10 @@ class Router implements RouterInterface
 		}
 
 		return $data;
+	}
+
+	public function getRouteParser()
+	{
+		return $this->routeParser;
 	}
 }
