@@ -12,15 +12,17 @@ use Autarky\Routing\UrlGenerator;
 
 class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 {
-	protected function makeRouterAndGenerator($request = null)
+	protected function makeRouterAndGenerator($request = false)
 	{
 		$container = new Container;
-		$router = new Router(
-			new Invoker($container),
-			new EventDispatcher(new ListenerResolver($container))
-		);
+		$router = new Router(new Invoker($container));
 		$requests = new RequestStack;
-		if ($request) $requests->push($request);
+		if ($request === false) {
+			$request = Request::create('/');
+		}
+		if ($request !== null) {
+			$requests->push($request);
+		}
 		return [$router, new UrlGenerator($router, $requests)];
 	}
 
@@ -30,7 +32,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	 */
 	public function getRouteUrlReturnsCorrectUrl($path, array $params, $expected)
 	{
-		list($router, $url) = $this->makeRouterAndGenerator(Request::create('/'));
+		list($router, $url) = $this->makeRouterAndGenerator();
 		$router->addRoute('get', $path, function() {}, 'name');
 		$this->assertEquals('//localhost'.$expected, $url->getRouteUrl('name', $params));
 		$this->assertEquals($expected, $url->getRouteUrl('name', $params, true));
@@ -59,7 +61,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	 */
 	public function tooFewParamsThrowsException($path, array $params)
 	{
-		list($router, $url) = $this->makeRouterAndGenerator(Request::create('/'));
+		list($router, $url) = $this->makeRouterAndGenerator();
 		$router->addRoute('get', $path, function() {}, 'name');
 		$this->setExpectedException('InvalidArgumentException', 'Too few parameters given');
 		$url->getRouteUrl('name', $params, true);
@@ -80,7 +82,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	 */
 	public function tooManyParamsThrowsException($path, array $params)
 	{
-		list($router, $url) = $this->makeRouterAndGenerator(Request::create('/'));
+		list($router, $url) = $this->makeRouterAndGenerator();
 		$router->addRoute('get', $path, function() {}, 'name');
 		$this->setExpectedException('InvalidArgumentException', 'Too many parameters given');
 		$url->getRouteUrl('name', $params, true);
@@ -91,6 +93,27 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 		return [
 			['/', ['v1']],
 			['/{v1}', ['v1', 'v2']],
+		];
+	}
+
+	/**
+	 * @test
+	 * @dataProvider getRegexMismatchData
+	 */
+	public function regexMismatchThrowsException($path, array $params)
+	{
+		list($router, $url) = $this->makeRouterAndGenerator();
+		$url->setValidateParams(true);
+		$router->addRoute('get', $path, function() {}, 'name');
+		$this->setExpectedException('InvalidArgumentException', 'Route parameter pattern mismatch:');
+		$url->getRouteUrl('name', $params, true);
+	}
+
+	public function getRegexMismatchData()
+	{
+		return [
+			['/{v:[0-9]+}', ['v1']],
+			['/{v:[0-9]+|[a-z]+}', ['v1']],
 		];
 	}
 

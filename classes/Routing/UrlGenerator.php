@@ -35,13 +35,26 @@ class UrlGenerator
 	protected $assetRoot;
 
 	/**
+	 * Whether the regex pattern of route parameters should be validated on
+	 * runtime.
+	 *
+	 * @var bool
+	 */
+	protected $validateParams;
+
+	/**
 	 * @param RouterInterface $router
 	 * @param RequestStack    $requests
+	 * @param bool            $validateParams
 	 */
-	public function __construct(RouterInterface $router, RequestStack $requests)
-	{
+	public function __construct(
+		RouterInterface $router,
+		RequestStack $requests,
+		$validateParams = false
+	) {
 		$this->router = $router;
 		$this->requests = $requests;
+		$this->validateParams = (bool) $validateParams;
 	}
 
 	/**
@@ -52,6 +65,17 @@ class UrlGenerator
 	public function setAssetRoot($assetRoot)
 	{
 		$this->assetRoot = rtrim($assetRoot, '/');
+	}
+
+	/**
+	 * Set whether the regex pattern of route parameters should be validated on
+	 * runtime.
+	 *
+	 * @param bool $validateParams
+	 */
+	public function setValidateParams($validateParams)
+	{
+		$this->validateParams = (bool) $validateParams;
 	}
 
 	/**
@@ -102,6 +126,13 @@ class UrlGenerator
 				if ($index === count($params)) {
 					throw new \InvalidArgumentException('Too few parameters given');
 				}
+
+				if ($this->validateParams && $part[1] !== '[^/]+') {
+					if (!preg_match("/^{$part[1]}$/", $params[$index])) {
+						throw new \InvalidArgumentException("Route parameter pattern mismatch: \"{$params[$index]}\" does not match pattern {$part[1]}");
+					}
+				}
+
 				$path .= $params[$index++];
 			}
 
