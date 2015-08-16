@@ -10,7 +10,7 @@
 
 namespace Autarky\Errors;
 
-use Autarky\Container\ContainerInterface;
+use Autarky\Container\ClassResolverInterface;
 
 /**
  * Class for resolving error handlers.
@@ -20,14 +20,14 @@ use Autarky\Container\ContainerInterface;
 class HandlerResolver
 {
 	/**
-	 * @var ContainerInterface
+	 * @var ClassResolverInterface
 	 */
 	protected $container;
 
 	/**
-	 * @param ContainerInterface $container
+	 * @param ClassResolverInterface $container
 	 */
-	public function __construct(ContainerInterface $container)
+	public function __construct(ClassResolverInterface $container)
 	{
 		$this->container = $container;
 	}

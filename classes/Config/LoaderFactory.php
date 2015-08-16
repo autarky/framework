@@ -10,7 +10,7 @@
 
 namespace Autarky\Config;
 
-use Autarky\Container\ContainerInterface;
+use Autarky\Container\ClassResolverInterface;
 
 /**
  * Factory for file-based loaders.
@@ -23,7 +23,7 @@ class LoaderFactory
 	/**
 	 * The container instance.
 	 *
-	 * @var ContainerInterface
+	 * @var ClassResolverInterface
 	 */
 	protected $container;
 
@@ -49,9 +49,9 @@ class LoaderFactory
 	protected $extensions = [];
 
 	/**
-	 * @param ContainerInterface $container
+	 * @param ClassResolverInterface $container
 	 */
-	public function __construct(ContainerInterface $container)
+	public function __construct(ClassResolverInterface $container)
 	{
 		$this->container = $container;
 	}

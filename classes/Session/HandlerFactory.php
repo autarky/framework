@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
 use Autarky\Config\ConfigInterface;
-use Autarky\Container\ContainerInterface;
+use Autarky\Container\ClassResolverInterface;
 
 /**
  * Session handler factory.
@@ -28,7 +28,7 @@ use Autarky\Container\ContainerInterface;
 class HandlerFactory
 {
 	/**
-	 * @var ContainerInterface
+	 * @var ClassResolverInterface
 	 */
 	protected $container;
 
@@ -45,11 +45,11 @@ class HandlerFactory
 	/**
 	 * Constructor.
 	 *
-	 * @param ContainerInterface $container
+	 * @param ClassResolverInterface $container
 	 * @param ConfigInterface    $config
 	 */
 	public function __construct(
-		ContainerInterface $container,
+		ClassResolverInterface $container,
 		ConfigInterface $config
 	) {
 		$this->container = $container;
