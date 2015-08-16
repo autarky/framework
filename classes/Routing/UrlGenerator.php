@@ -90,9 +90,16 @@ class UrlGenerator
 	public function getRouteUrl($name, array $params = array(), $relative = false)
 	{
 		$route = $this->router->getRoute($name);
-		$query = array_filter($params, 'is_string', ARRAY_FILTER_USE_KEY);
-		$params = array_filter($params, 'is_int', ARRAY_FILTER_USE_KEY);
-		$path = $this->getRoutePath($route, $params);
+		$routeParams = [];
+		$query = [];
+		foreach ($params as $key => $value) {
+			if (is_int($key)) {
+				$routeParams[] = $value;
+			} else {
+				$query[$key] = $value;
+			}
+		}
+		$path = $this->getRoutePath($route, $routeParams);
 
 		if ($query) {
 			$path .= '?'.http_build_query($query);
