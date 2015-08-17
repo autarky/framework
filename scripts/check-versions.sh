@@ -1,9 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 git_branch=$(git branch | sed -n '/\* /s///p')
 
 # only master branch + minor version branches should be checked
-if [[ $git_branch != "master" && ! $git_branch =~ ^[0-9]+.[0-9]+$ ]]; then
+match=$(echo "$git_branch" | grep -E ^[0-9]+.[0-9]+$)
+if [ "$git_branch" != "master" ] && [ ! $match ]; then
 	exit 0
 fi
 
@@ -12,7 +13,7 @@ git_tag=$(git describe --abbrev=0)
 
 app_version=$(grep 'const VERSION' classes/Application.php | grep -E -o "[0-9\.]+")
 
-if [[ $git_tag != $app_version ]]; then
+if [ $git_tag != $app_version ]; then
 	echo "ERROR: version mismatch"
 	echo "Latest git tag is       $git_tag"
 	echo "Application::VERSION is $app_version"

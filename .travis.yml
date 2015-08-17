@@ -24,7 +24,7 @@ env:
   - COMPOSER_ARGS="--prefer-lowest --prefer-stable"
 
 before_install:
-  - ./scripts/setup-travis.bash
+  - ./scripts/setup-travis.sh
 
 install:
   - composer update ${COMPOSER_ARGS} --dev --no-interaction
