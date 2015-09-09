@@ -46,7 +46,7 @@ class ConnectionManager
 	 * Constructor.
 	 *
 	 * @param ConfigInterface $config
-	 * @param ConnectionFactoryInterface $config
+	 * @param ConnectionFactoryInterface $factory
 	 * @param string|null $defaultConnection If null, "database.connection" is
 	 * retrieved from $config
 	 */

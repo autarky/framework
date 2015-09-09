@@ -17,9 +17,9 @@ interface ConnectionFactoryInterface
 	 *
 	 * @param  array  $config
 	 *
-	 * @return PDO
+	 * @return \PDO
 	 *
-	 * @throws InvalidArgumentException If connection is incorrectly configured
+	 * @throws \InvalidArgumentException If connection is incorrectly configured
 	 * @throws CannotConnectException If construction of PDO object fails
 	 */
 	public function makePdo(array $config);

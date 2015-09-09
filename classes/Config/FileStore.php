@@ -29,13 +29,6 @@ class FileStore implements ConfigInterface
 	protected $pathResolver;
 
 	/**
-	 * The file locator instance.
-	 *
-	 * @var Locator
-	 */
-	protected $fileLocator;
-
-	/**
 	 * The loader factory instance.
 	 *
 	 * @var LoaderFactory

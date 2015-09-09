@@ -26,7 +26,7 @@ class LockingFilesystem
 	 * @param  bool   $blocking Wait for other locks to expire rather than
 	 * throwing an error when a lock cannot be aquired.
 	 *
-	 * @return void
+	 * @return string
 	 *
 	 * @throws IOException
 	 */
