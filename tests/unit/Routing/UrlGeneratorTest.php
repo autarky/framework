@@ -1,5 +1,6 @@
 <?php
 
+use FastRoute\RouteParser\Std as RouteParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -7,6 +8,7 @@ use Autarky\Container\Container;
 use Autarky\Events\EventDispatcher;
 use Autarky\Events\ListenerResolver;
 use Autarky\Routing\Router;
+use Autarky\Routing\RoutePathGenerator;
 use Autarky\Routing\Invoker;
 use Autarky\Routing\UrlGenerator;
 
@@ -15,7 +17,9 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	protected function makeRouterAndGenerator($request = false)
 	{
 		$container = new Container;
-		$router = new Router(new Invoker($container));
+		$routeParser = new RouteParser();
+		$router = new Router($routeParser, new Invoker($container));
+		$pathGenerator = new RoutePathGenerator($routeParser);
 		$requests = new RequestStack;
 		if ($request === false) {
 			$request = Request::create('/');
@@ -23,7 +27,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 		if ($request !== null) {
 			$requests->push($request);
 		}
-		return [$router, new UrlGenerator($router, $requests)];
+		return [$router, new UrlGenerator($router, $pathGenerator, $requests)];
 	}
 
 	/**

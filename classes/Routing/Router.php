@@ -18,8 +18,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use FastRoute\RouteCollector;
-// this must match the parser used in Route.php
-use FastRoute\RouteParser\Std as RouteParser;
+use FastRoute\RouteParser;
 use FastRoute\Dispatcher\GroupCountBased as Dispatcher;
 use FastRoute\DataGenerator\GroupCountBased as DataGenerator;
 
@@ -95,11 +94,13 @@ class Router implements RouterInterface
 	protected $namedRoutes = [];
 
 	/**
+	 * @param RouteParser $routeParser
 	 * @param InvokerInterface $invoker
 	 * @param EventDispatcherInterface|null $eventDispatcher
 	 * @param string|null $cachePath
 	 */
 	public function __construct(
+		RouteParser $routeParser,
 		InvokerInterface $invoker,
 		EventDispatcherInterface $eventDispatcher = null,
 		$cachePath = null
@@ -118,7 +119,7 @@ class Router implements RouterInterface
 		}
 
 		$this->routeCollector = new RouteCollector(
-			$this->routeParser = new RouteParser, new DataGenerator
+			$routeParser, new DataGenerator
 		);
 	}
 
@@ -504,10 +505,5 @@ class Router implements RouterInterface
 		}
 
 		return $data;
-	}
-
-	public function getRouteParser()
-	{
-		return $this->routeParser;
 	}
 }

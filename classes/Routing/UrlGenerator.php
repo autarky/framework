@@ -23,6 +23,11 @@ class UrlGenerator
 	protected $router;
 
 	/**
+	 * @var RoutePathGeneratorInterface
+	 */
+	protected $routePathGenerator;
+
+	/**
 	 * @var RequestStack
 	 */
 	protected $requests;
@@ -35,24 +40,19 @@ class UrlGenerator
 	protected $assetRoot;
 
 	/**
-	 * Whether the regex pattern of route parameters should be validated on
-	 * runtime.
-	 *
-	 * @var bool
-	 */
-	protected $validateParams;
-
-	/**
-	 * @param Router       $router
-	 * @param RequestStack $requests
-	 * @param bool         $validateParams
+	 * @param Router                      $router
+	 * @param RoutePathGeneratorInterface $routePathGenerator
+	 * @param RequestStack                $requests
+	 * @param bool                        $validateParams
 	 */
 	public function __construct(
 		Router $router,
+		RoutePathGenerator $routePathGenerator,
 		RequestStack $requests,
 		$validateParams = false
 	) {
 		$this->router = $router;
+		$this->routePathGenerator = $routePathGenerator;
 		$this->requests = $requests;
 		$this->validateParams = (bool) $validateParams;
 	}
@@ -75,7 +75,7 @@ class UrlGenerator
 	 */
 	public function setValidateParams($validateParams)
 	{
-		$this->validateParams = (bool) $validateParams;
+		$this->routePathGenerator->setValidateParams($validateParams);
 	}
 
 	/**
@@ -101,7 +101,7 @@ class UrlGenerator
 			}
 		}
 
-		$path = $this->getRoutePath($route, $routeParams);
+		$path = $this->routePathGenerator->getRoutePath($route, $routeParams);
 
 		if ($query) {
 			$path .= '?'.http_build_query($query);
@@ -115,45 +115,6 @@ class UrlGenerator
 		}
 
 		return $root . $path;
-	}
-
-	protected function getRoutePath(Route $route, array $params)
-	{
-		$routes = $this->router->getRouteParser()->parse($route->getPattern());
-
-		foreach ($routes as $route) {
-			$path = '';
-			$index = 0;
-			foreach ($route as $part) {
-				// Fixed segment in the route
-				if (is_string($part)) {
-					$path .= $part;
-					continue;
-				}
-
-				// Placeholder in the route
-				if ($index === count($params)) {
-					throw new \InvalidArgumentException('Too few parameters given');
-				}
-
-				if ($this->validateParams && $part[1] !== '[^/]+') {
-					if (!preg_match("/^{$part[1]}$/", $params[$index])) {
-						throw new \InvalidArgumentException("Route parameter pattern mismatch: "
-							."Parameter #{$index} \"{$params[$index]}\" does not match pattern {$part[1]}");
-					}
-				}
-
-				$path .= $params[$index++];
-			}
-
-			// If number of params in route matches with number of params given, use that route.
-			// Otherwise try to find a route that has more params
-			if ($index === count($params)) {
-				return $path;
-			}
-		}
-
-		throw new \InvalidArgumentException('Too many parameters given');
 	}
 
 	/**

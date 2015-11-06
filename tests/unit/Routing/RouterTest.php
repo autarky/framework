@@ -1,5 +1,6 @@
 <?php
 
+use FastRoute\RouteParser\Std as RouteParser;
 use Mockery as m;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	{
 		$container = new Container;
 		return new Router(
+			new RouteParser,
 			new Invoker($container),
 			new EventDispatcher(new ListenerResolver($container))
 		);

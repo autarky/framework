@@ -27,6 +27,8 @@ class RoutingProvider extends AbstractProvider
 		});
 		$dic->share('Symfony\Component\HttpFoundation\RequestStack');
 
+		$dic->alias('FastRoute\RouteParser\Std', 'FastRoute\RouteParser');
+
 		$dic->define('Autarky\Routing\Router', function(ContainerInterface $container) {
 			$eventDispatcher = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
 			$eventDispatcher = $container->isBound($eventDispatcher)
@@ -37,6 +39,7 @@ class RoutingProvider extends AbstractProvider
 				$config->get('path.route_cache') : null;
 
 			return new Router(
+				$container->resolve('FastRoute\RouteParser'),
 				$container->resolve('Autarky\Routing\Invoker'),
 				$eventDispatcher, $cachePath
 			);
