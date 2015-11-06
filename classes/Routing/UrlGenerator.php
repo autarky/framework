@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class UrlGenerator
 {
 	/**
-	 * @var RouterInterface
+	 * @var Router
 	 */
 	protected $router;
 
@@ -43,12 +43,12 @@ class UrlGenerator
 	protected $validateParams;
 
 	/**
-	 * @param RouterInterface $router
-	 * @param RequestStack    $requests
-	 * @param bool            $validateParams
+	 * @param Router       $router
+	 * @param RequestStack $requests
+	 * @param bool         $validateParams
 	 */
 	public function __construct(
-		RouterInterface $router,
+		Router $router,
 		RequestStack $requests,
 		$validateParams = false
 	) {
@@ -138,7 +138,8 @@ class UrlGenerator
 
 				if ($this->validateParams && $part[1] !== '[^/]+') {
 					if (!preg_match("/^{$part[1]}$/", $params[$index])) {
-						throw new \InvalidArgumentException("Route parameter pattern mismatch: Parameter #{$index} \"{$params[$index]}\" does not match pattern {$part[1]}");
+						throw new \InvalidArgumentException("Route parameter pattern mismatch: "
+							."Parameter #{$index} \"{$params[$index]}\" does not match pattern {$part[1]}");
 					}
 				}
 
