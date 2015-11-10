@@ -35,8 +35,16 @@ class Invoker implements InvokerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function invoke($callable, array $args = array())
+	public function invoke($callable, array $params = [], $constructorArgs = [])
 	{
-		return $this->container->invoke($callable, $args);
+		if (is_string($callable) && strpos($callable, '::') !== false) {
+			$callable = explode('::', $callable, 2);
+		}
+
+		if (is_array($callable) && is_string($callable[0]) && $constructorArgs) {
+			$callable[0] = $this->container->resolve($callable[0], $constructorArgs);
+		}
+
+		return $this->container->invoke($callable, $params);
 	}
 }

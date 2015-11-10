@@ -441,7 +441,8 @@ class Router implements RouterInterface
 		// if the event hasn't been dispatched, or the event hasn't had a
 		// response set onto it, invoke the controller
 		if (!isset($response) || !$response) {
-			$response = $this->invoker->invoke($callable, $params);
+			$constructorArgs = $route->getOption('constructor_params');
+			$response = $this->invoker->invoke($callable, $params, $constructorArgs);
 		}
 
 		// ensure that the response is a Response object before dispatching
@@ -468,7 +469,7 @@ class Router implements RouterInterface
 	{
 		$params = [];
 
-		if ($extraParams = $route->getOption('container_params')) {
+		if ($extraParams = $route->getOption('params')) {
 			$params = $extraParams;
 		}
 

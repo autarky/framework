@@ -20,8 +20,9 @@ interface InvokerInterface
 	 *
 	 * @param  string|array $callable
 	 * @param  array        $args
+	 * @param  array        $constructorArgs
 	 *
 	 * @return mixed
 	 */
-	public function invoke($callable, array $args = array());
+	public function invoke($callable, array $params = [], $constructorArgs = []);
 }

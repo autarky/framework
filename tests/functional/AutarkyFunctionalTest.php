@@ -34,11 +34,11 @@ class AutarkyFunctionalTest extends PHPUnit_Framework_TestCase
 		]);
 		$app->boot();
 
-		$app->route('GET', '/', ['StubControllerWithDependency', 'respond'],
-			'test.route', ['container_params' => [
-				'StubInterface' => 'StubDependency',
-				'$parameter' => 'test: ',
-			]]);
+		$ctrl = ['StubControllerWithDependency', 'respond'];
+		$app->route('GET', '/', $ctrl, 'test.route', [
+			'params' => ['$parameter' => 'test: '],
+			'constructor_params' => ['StubInterface' => 'StubDependency']
+		]);
 
 		$request = $this->makeRequest();
 		$response = $app->run($request, false);
