@@ -12,6 +12,8 @@ namespace Autarky\Errors;
 
 use Exception;
 use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\Response;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 
@@ -47,8 +49,7 @@ class DefaultErrorHandler implements ErrorHandlerInterface
 			return $this->handleWithWhoops($exception);
 		}
 
-		return (new ExceptionHandler($this->debug))
-			->createResponse($exception);
+		return $this->handleWithSymfony($exception);
 	}
 
 	protected function handleWithWhoops(Exception $exception)
@@ -59,5 +60,20 @@ class DefaultErrorHandler implements ErrorHandlerInterface
 		$whoops->pushHandler(new PrettyPageHandler());
 
 		return $whoops->handleException($exception);
+	}
+
+	protected function handleWithSymfony(Exception $exception)
+	{
+		if (!$exception instanceof FlattenException) {
+			$exception = FlattenException::create($exception);
+		}
+
+		$handler = new ExceptionHandler($this->debug);
+
+		return Response::create(
+			$handler->getHtml($exception),
+			$exception->getStatusCode(),
+			$exception->getHeaders()
+		);
 	}
 }
