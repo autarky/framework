@@ -36,6 +36,11 @@ class Route
 	protected $controller;
 
 	/**
+	 * @var array
+	 */
+	protected $options;
+
+	/**
 	 * @var null|string
 	 */
 	protected $name;
@@ -60,13 +65,15 @@ class Route
 	 * @param string   $pattern
 	 * @param callable $controller
 	 * @param string   $name
+	 * @param array    $options
 	 */
-	public function __construct(array $methods, $pattern, $controller, $name = null)
+	public function __construct(array $methods, $pattern, $controller, $name = null, array $options = [])
 	{
 		$this->methods = array_map('strtoupper', $methods);
 		$this->pattern = $pattern;
 		$this->name = $name;
 		$this->controller = $controller;
+		$this->options = $options;
 	}
 
 	/**
@@ -107,6 +114,28 @@ class Route
 	public function getName()
 	{
 		return $this->name;
+	}
+
+	/**
+	 * Get the route options.
+	 *
+	 * @return array
+	 */
+	public function getOptions()
+	{
+		return $this->options;
+	}
+
+	/**
+	 * Get a route option.
+	 *
+	 * @param  $option string
+	 *
+	 * @return mixed  Returns null if option not set.
+	 */
+	public function getOption($option)
+	{
+		return isset($this->options[$option]) ? $this->options[$option] : null;
 	}
 
 	/**

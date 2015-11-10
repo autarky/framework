@@ -3,6 +3,7 @@
 	<testsuites>
 		<testsuite name="Framework Test Suite">
 			<directory>./tests/unit</directory>
+			<directory>./tests/functional</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>

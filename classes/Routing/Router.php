@@ -274,7 +274,7 @@ class Router implements RouterInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function addRoute($methods, $path, $controller, $name = null)
+	public function addRoute($methods, $path, $controller, $name = null, array $options = [])
 	{
 		if ($this->isCaching()) {
 			return null;
@@ -283,7 +283,7 @@ class Router implements RouterInterface
 		$methods = (array) $methods;
 		$path = $this->makePath($path);
 
-		$route = $this->createRoute($methods, $path, $controller, $name);
+		$route = $this->createRoute($methods, $path, $controller, $name, $options);
 		$this->routes->attach($route);
 
 		if ($name) {
@@ -336,9 +336,9 @@ class Router implements RouterInterface
 		$this->namedRoutes[$name] = $route;
 	}
 
-	protected function createRoute($methods, $path, $controller, $name)
+	protected function createRoute($methods, $path, $controller, $name, array $options)
 	{
-		$route = new Route($methods, $path, $controller, $name);
+		$route = new Route($methods, $path, $controller, $name, $options);
 
 		foreach ($this->currentFilters as $filter) {
 			$route->addFilter($filter[0], $filter[1]);
@@ -415,7 +415,7 @@ class Router implements RouterInterface
 	protected function getResponse(Request $request, Route $route, array $params)
 	{
 		// convert route params into container params
-		$params = $this->getContainerParams($params, $request);
+		$params = $this->getContainerParams($route, $params, $request);
 
 		$this->currentRoute = $route;
 
@@ -464,9 +464,13 @@ class Router implements RouterInterface
 		return $response;
 	}
 
-	protected function getContainerParams(array $routeParams, Request $request)
+	protected function getContainerParams(Route $route, array $routeParams, Request $request)
 	{
 		$params = [];
+
+		if ($extraParams = $route->getOption('container_params')) {
+			$params = $extraParams;
+		}
 
 		// the container expects a dollar sign in front of non-class function
 		// arguments

@@ -174,18 +174,3 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		}, ['foo', '/foo', 'foo/', '/foo/'], ['bar', '/bar', 'bar/', '/bar/']);
 	}
 }
-
-class StubFilter {
-	public function f() {
-		return __FUNCTION__;
-	}
-	public function filter() {
-		return __FUNCTION__;
-	}
-}
-
-class StubResponder {
-	public function respond() {
-		return __FUNCTION__;
-	}
-}

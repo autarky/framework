@@ -112,6 +112,11 @@ class Configuration
 				$methods = ['GET'];
 			}
 
+			$options = [];
+			if (isset($route['container_params'])) {
+				$options['container_params'] = $route['container_params'];
+			}
+
 			if (array_filter(array_keys($methods), 'is_string')) {
 				foreach ($methods as $method => $controller) {
 					$this->router->addRoute([$method], $path, $controller, $name);
