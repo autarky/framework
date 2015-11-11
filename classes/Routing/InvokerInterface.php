@@ -19,7 +19,7 @@ interface InvokerInterface
 	 * Invoke a route's callable.
 	 *
 	 * @param  string|array $callable
-	 * @param  array        $args
+	 * @param  array        $params
 	 * @param  array        $constructorArgs
 	 *
 	 * @return mixed
