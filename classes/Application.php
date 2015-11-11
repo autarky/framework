@@ -77,7 +77,7 @@ class Application implements HttpKernelInterface
 	protected $errorHandler;
 
 	/**
-	 * @var \Symfony\Component\Console\Application
+	 * @var ConsoleApplication
 	 */
 	protected $console;
 
