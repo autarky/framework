@@ -113,8 +113,11 @@ class Configuration
 			}
 
 			$options = [];
-			if (isset($route['container_params'])) {
-				$options['container_params'] = $route['container_params'];
+			if (isset($route['params'])) {
+				$options['params'] = $route['params'];
+			}
+			if (isset($route['constructor_params'])) {
+				$options['constructor_params'] = $route['constructor_params'];
 			}
 
 			if (array_filter(array_keys($methods), 'is_string')) {
