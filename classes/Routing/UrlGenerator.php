@@ -47,7 +47,7 @@ class UrlGenerator
 	 */
 	public function __construct(
 		Router $router,
-		RoutePathGenerator $routePathGenerator,
+		RoutePathGeneratorInterface $routePathGenerator,
 		RequestStack $requests,
 		$validateParams = false
 	) {
