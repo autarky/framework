@@ -11,6 +11,7 @@
 namespace Autarky\Logging;
 
 use Autarky\Providers\AbstractProvider;
+use Autarky\Container\Factory\Definition;
 
 /**
  * Logging provider.
@@ -31,7 +32,7 @@ class LoggingProvider extends AbstractProvider
 		});
 		$dic->share('Autarky\Logging\ChannelManager');
 
-		$factory = $dic->makeFactory(['Autarky\Logging\ChannelManager', 'getChannel']);
+		$factory = new Definition(['Autarky\Logging\ChannelManager', 'getChannel']);
 		$factory->addScalarArgument('$channel', 'string', false, null);
 		$dic->define('Psr\Log\LoggerInterface', $factory);
 	}
