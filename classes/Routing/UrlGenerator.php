@@ -54,7 +54,7 @@ class UrlGenerator
 		$this->router = $router;
 		$this->routePathGenerator = $routePathGenerator;
 		$this->requests = $requests;
-		$this->validateParams = (bool) $validateParams;
+		$this->setValidateParams($validateParams);
 	}
 
 	/**
