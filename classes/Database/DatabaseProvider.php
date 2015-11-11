@@ -11,6 +11,7 @@
 namespace Autarky\Database;
 
 use Autarky\Container\ContainerInterface;
+use Autarky\Container\Factory\Definition;
 use Autarky\Providers\AbstractProvider;
 
 /**
@@ -42,7 +43,7 @@ class DatabaseProvider extends AbstractProvider
 		});
 		$dic->share('Autarky\Database\ConnectionManager');
 
-		$factory = $dic->makeFactory(['Autarky\Database\ConnectionManager', 'getPdo']);
+		$factory = new Definition(['Autarky\Database\ConnectionManager', 'getPdo']);
 		$factory->addScalarArgument('$connection', 'string', false, null);
 		$dic->define('PDO', $factory);
 	}
