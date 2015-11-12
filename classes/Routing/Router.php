@@ -493,7 +493,7 @@ class Router implements RouterInterface
 		} else if ($this->routeCollector !== null) {
 			$dispatchData = $this->generateDispatchData();
 		} else {
-			throw new \RuntimeException('No dipsatch data or route collector set');
+			throw new \RuntimeException('No dispatch data or route collector set');
 		}
 
 		return new Dispatcher($dispatchData);
