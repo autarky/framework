@@ -23,8 +23,7 @@ use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
 use Autarky\Container\ContainerInterface;
 use Autarky\Errors\ErrorHandlerManagerInterface;
-use Autarky\Http\HttpKernel;
-use Autarky\Http\CookieQueue;
+use Autarky\Http\Kernel;
 use Autarky\Providers\ProviderInterface;
 use Autarky\Providers\DependantProviderInterface;
 use Autarky\Providers\ConsoleProviderInterface;
@@ -53,7 +52,7 @@ class Application implements HttpKernelInterface
 	protected $middlewares;
 
 	/**
-	 * @var HttpKernel
+	 * @var Kernel
 	 */
 	protected $kernel;
 
@@ -108,11 +107,6 @@ class Application implements HttpKernelInterface
 	protected $requests;
 
 	/**
-	 * @var CookieQueue
-	 */
-	protected $cookies;
-
-	/**
 	 * Construct a new application instance.
 	 *
 	 * @param \Closure|string   $environment
@@ -123,7 +117,6 @@ class Application implements HttpKernelInterface
 		$this->middlewares = new SplPriorityQueue;
 		$this->configurators = new SplDoublyLinkedList;
 		$this->requests = new RequestStack;
-		$this->cookies = new CookieQueue;
 		$this->setEnvironment($environment);
 		
 		foreach ($providers as $provider) {
@@ -251,7 +244,6 @@ class Application implements HttpKernelInterface
 		$this->container = $container;
 		$container->instance('Autarky\Application', $this);
 		$container->instance('Symfony\Component\HttpFoundation\RequestStack', $this->requests);
-		$container->instance('Autarky\Http\CookieQueue', $this->cookies);
 	}
 
 	/**
@@ -470,10 +462,9 @@ class Application implements HttpKernelInterface
 		$eventDispatcher = $this->container->isBound($class) ?
 			$this->container->resolve($class) : null;
 
-		$kernel = new HttpKernel(
+		$kernel = new Kernel(
 			$this->getRouter(),
 			$this->requests,
-			$this->cookies,
 			$this->errorHandler,
 			$eventDispatcher
 		);

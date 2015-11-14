@@ -8,20 +8,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Session;
+namespace Autarky\Http;
 
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-
 use Autarky\Application;
 
 /**
  * Session middleware.
  */
-class Middleware implements HttpKernelInterface
+class SessionMiddleware implements HttpKernelInterface
 {
 	/**
 	 * @var HttpKernelInterface

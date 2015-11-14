@@ -15,7 +15,7 @@ class SessionMiddlewareTest extends PHPUnit_Framework_TestCase
 
 	public function makeMiddleware($kernel, $app)
 	{
-		return new \Autarky\Session\Middleware($kernel, $app);
+		return new \Autarky\Http\SessionMiddleware($kernel, $app);
 	}
 
 	public function makeKernel(Response $response = null)

@@ -1,7 +1,7 @@
 <?php
 
 use Autarky\Tests\TestCase;
-use Autarky\Session\SessionProvider;
+use Autarky\Http\SessionProvider;
 use Autarky\Database\DatabaseProvider;
 use Mockery as m;
 

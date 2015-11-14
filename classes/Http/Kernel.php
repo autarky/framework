@@ -32,7 +32,7 @@ use Autarky\Routing\RouterInterface;
  *
  * @internal
  */
-class HttpKernel implements HttpKernelInterface, TerminableInterface
+class Kernel implements HttpKernelInterface, TerminableInterface
 {
 	/**
 	 * @var RouterInterface
@@ -43,11 +43,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 	 * @var RequestStack
 	 */
 	protected $requests;
-
-	/**
-	 * @var CookieQueue
-	 */
-	protected $cookies;
 
 	/**
 	 * @var ErrorHandlerInterface
@@ -66,13 +61,11 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 	public function __construct(
 		RouterInterface $router,
 		RequestStack $requests,
-		CookieQueue $cookies,
 		ErrorHandlerInterface $errorHandler = null,
 		EventDispatcherInterface $eventDispatcher = null
 	) {
 		$this->router = $router;
 		$this->requests = $requests;
-		$this->cookies = $cookies;
 		$this->errorHandler = $errorHandler;
 		$this->eventDispatcher = $eventDispatcher;
 	}
@@ -139,10 +132,6 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 		}
 
 		$response->prepare($request);
-
-		foreach ($this->cookies->all() as $key => $value) {
-			$response->headers->setCookie($key, $value);
-		}
 
 		$this->finishRequest($request, $type);
 

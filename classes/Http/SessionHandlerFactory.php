@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Session;
+namespace Autarky\Http;
 
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcachedSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MemcacheSessionHandler;
@@ -25,7 +25,7 @@ use Autarky\Container\ClassResolverInterface;
  *
  * @internal
  */
-class HandlerFactory
+class SessionHandlerFactory
 {
 	/**
 	 * @var ClassResolverInterface

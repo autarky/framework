@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Session;
+namespace Autarky\Http;
 
 use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
@@ -44,10 +44,10 @@ class SessionProvider extends AbstractProvider
 		$this->config = $this->app->getConfig();
 		$this->dic = $this->app->getContainer();
 
-		$this->dic->define('Autarky\Session\HandlerFactory', function() {
-			return new HandlerFactory($this->dic, $this->config);
+		$this->dic->define('Autarky\Http\SessionHandlerFactory', function() {
+			return new SessionHandlerFactory($this->dic, $this->config);
 		});
-		$this->dic->share('Autarky\Session\HandlerFactory');
+		$this->dic->share('Autarky\Http\SessionHandlerFactory');
 		$this->dic->define('SessionHandlerInterface', [$this, 'makeSessionHandler']);
 		$this->dic->share('SessionHandlerInterface');
 
@@ -79,7 +79,7 @@ class SessionProvider extends AbstractProvider
 			'Symfony\Component\HttpFoundation\Session\SessionInterface'
 		);
 
-		$this->app->addMiddleware(['Autarky\Session\Middleware', $this->app]);
+		$this->app->addMiddleware(['Autarky\Http\SessionMiddleware', $this->app]);
 	}
 
 	/**
@@ -89,7 +89,7 @@ class SessionProvider extends AbstractProvider
 	 */
 	public function makeSessionHandler()
 	{
-		$handler = $this->dic->resolve('Autarky\Session\HandlerFactory')
+		$handler = $this->dic->resolve('Autarky\Http\SessionHandlerFactory')
 			->makeHandler($this->config->get('session.handler'));
 
 		if ($this->config->get('session.write_check') === true) {
