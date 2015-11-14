@@ -19,7 +19,8 @@ class CookieProvider extends AbstractProvider
 	 */
 	public function register()
 	{
-		$this->app->getContainer()->share('Autarky\Http\CookieQueue');
-		$this->app->addMiddleware(['Autarky\Http\CookieMiddleware', $this->app]);
+		$cookieQueue = new CookieQueue;
+		$this->app->getContainer()->instance('Autarky\Http\CookieQueue', $cookieQueue);
+		$this->app->addMiddleware(['Autarky\Http\CookieMiddleware', $cookieQueue]);
 	}
 }
