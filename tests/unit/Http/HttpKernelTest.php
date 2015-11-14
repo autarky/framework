@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-use Autarky\Kernel\HttpKernel;
+use Autarky\Http\HttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;

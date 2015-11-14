@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Autarky\Kernel;
+namespace Autarky\Http;
 
 use Exception;
 use Symfony\Component\HttpFoundation\Request;

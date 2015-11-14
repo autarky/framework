@@ -23,7 +23,7 @@ use Autarky\Config\ConfigInterface;
 use Autarky\Console\Application as ConsoleApplication;
 use Autarky\Container\ContainerInterface;
 use Autarky\Errors\ErrorHandlerManagerInterface;
-use Autarky\Kernel\HttpKernel;
+use Autarky\Http\HttpKernel;
 use Autarky\Providers\ProviderInterface;
 use Autarky\Providers\DependantProviderInterface;
 use Autarky\Providers\ConsoleProviderInterface;
@@ -52,7 +52,7 @@ class Application implements HttpKernelInterface
 	protected $middlewares;
 
 	/**
-	 * @var \Autarky\Kernel\HttpKernel
+	 * @var HttpKernel
 	 */
 	protected $kernel;
 
