@@ -29,6 +29,8 @@ class RoutingProvider extends AbstractProvider
 
 		$dic->alias('FastRoute\RouteParser\Std', 'FastRoute\RouteParser');
 
+		$dic->alias('Autarky\Routing\RoutePathGenerator', 'Autarky\Routing\RoutePathGeneratorInterface');
+
 		$dic->define('Autarky\Routing\Router', function(ContainerInterface $container) {
 			$eventDispatcher = 'Symfony\Component\EventDispatcher\EventDispatcherInterface';
 			$eventDispatcher = $container->isBound($eventDispatcher)
