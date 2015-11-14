@@ -12,14 +12,14 @@ namespace Autarky\Http;
 
 use Autarky\Providers\AbstractProvider;
 
-class SessionProvider extends AbstractProvider
+class CookieProvider extends AbstractProvider
 {
 	/**
 	 * {@inheritdoc}
 	 */
 	public function register()
 	{
-		$this->dic->share('Autarky\Http\CookieQueue');
+		$this->app->getContainer()->share('Autarky\Http\CookieQueue');
 		$this->app->addMiddleware(['Autarky\Http\CookieMiddleware', $this->app]);
 	}
 }
