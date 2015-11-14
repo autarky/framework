@@ -18,10 +18,13 @@ class HttpKernelTest extends PHPUnit_Framework_TestCase
 	{
 		$this->router = m::mock('Autarky\Routing\RouterInterface');
 		$this->errorHandler = m::mock('Autarky\Errors\ErrorHandlerInterface');
-		$this->errorHandler->shouldReceive('handle')->andReturnUsing(function($e) { throw $e; })->byDefault();
+		$this->errorHandler->shouldReceive('handle')->andReturnUsing(
+			function($e) { throw $e; })->byDefault();
+		$this->cookies = new \Autarky\Http\CookieQueue;
 		$this->requests = new \Symfony\Component\HttpFoundation\RequestStack;
 		$this->eventDispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher;
-		return new HttpKernel($this->router, $this->requests, $this->errorHandler, $events ? $this->eventDispatcher : null);
+		return new HttpKernel($this->router, $this->requests, $this->cookies,
+			$this->errorHandler, $events ? $this->eventDispatcher : null);
 	}
 
 	/** @test */

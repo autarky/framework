@@ -40,14 +40,19 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 	protected $router;
 
 	/**
-	 * @var ErrorHandlerInterface
-	 */
-	protected $errorHandler;
-
-	/**
 	 * @var RequestStack
 	 */
 	protected $requests;
+
+	/**
+	 * @var CookieQueue
+	 */
+	protected $cookies;
+
+	/**
+	 * @var ErrorHandlerInterface
+	 */
+	protected $errorHandler;
 
 	/**
 	 * @var EventDispatcherInterface
@@ -55,20 +60,20 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 	protected $eventDispatcher;
 
 	/**
-	 * @param RouterInterface          $router
-	 * @param RequestStack             $requests
-	 * @param ErrorHandlerInterface    $errorHandler Optional
+	 * @param ErrorHandlerInterface $errorHandler Optional
 	 * @param EventDispatcherInterface $eventDispatcher Optional
 	 */
 	public function __construct(
 		RouterInterface $router,
 		RequestStack $requests,
+		CookieQueue $cookies,
 		ErrorHandlerInterface $errorHandler = null,
 		EventDispatcherInterface $eventDispatcher = null
 	) {
 		$this->router = $router;
-		$this->errorHandler = $errorHandler;
 		$this->requests = $requests;
+		$this->cookies = $cookies;
+		$this->errorHandler = $errorHandler;
 		$this->eventDispatcher = $eventDispatcher;
 	}
 
@@ -134,6 +139,10 @@ class HttpKernel implements HttpKernelInterface, TerminableInterface
 		}
 
 		$response->prepare($request);
+
+		foreach ($this->cookies->all() as $key => $value) {
+			$response->headers->setCookie($key, $value);
+		}
 
 		$this->finishRequest($request, $type);
 
