@@ -65,11 +65,11 @@ class Router implements RouterInterface
 	protected $currentRoute;
 
 	/**
-	 * The filters that are currently applied to every route being added.
+	 * The hooks that are currently applied to every route being added.
 	 *
 	 * @var array
 	 */
-	protected $currentFilters = [];
+	protected $currentHooks = [];
 
 	/**
 	 * The URL prefix that is currently applied to every route being added.
@@ -81,7 +81,7 @@ class Router implements RouterInterface
 	/**
 	 * @var array
 	 */
-	protected $filters = [];
+	protected $hooks = [];
 
 	/**
 	 * @var \SplObjectStorage
@@ -156,7 +156,7 @@ class Router implements RouterInterface
 	 *
 	 * @return void
 	 */
-	public function onBefore($name, $handler, $priority = 0)
+	public function addBeforeHook($name, $handler, $priority = 0)
 	{
 		$this->addEventListener($name, $handler, 'before', $priority);
 	}
@@ -170,7 +170,7 @@ class Router implements RouterInterface
 	 *
 	 * @return void
 	 */
-	public function onAfter($name, $handler, $priority = 0)
+	public function addAfterHook($name, $handler, $priority = 0)
 	{
 		$this->addEventListener($name, $handler, 'after', $priority);
 	}
@@ -183,7 +183,7 @@ class Router implements RouterInterface
 	 *
 	 * @return void
 	 */
-	public function globalOnBefore($handler, $priority = 0)
+	public function addGlobalBeforeHook($handler, $priority = 0)
 	{
 		$this->addEventListener(null, $handler, 'before', $priority);
 	}
@@ -196,7 +196,7 @@ class Router implements RouterInterface
 	 *
 	 * @return void
 	 */
-	public function globalOnAfter($handler, $priority = 0)
+	public function addGlobalAfterHook($handler, $priority = 0)
 	{
 		$this->addEventListener(null, $handler, 'after', $priority);
 	}
@@ -208,11 +208,11 @@ class Router implements RouterInterface
 		}
 
 		if ($name) {
-			if (isset($this->filters[$name])) {
-				throw new \LogicException("Filter with name $name already defined");
+			if (isset($this->hooks[$name])) {
+				throw new \LogicException("Hook with name $name already defined");
 			}
 
-			$this->filters[$name] = $name;
+			$this->hooks[$name] = $name;
 		}
 
 		$name = $name ? "route.$when.$name" : "route.$when";
@@ -242,12 +242,12 @@ class Router implements RouterInterface
 		}
 
 		$oldPrefix = $this->currentPrefix;
-		$oldFilters = $this->currentFilters;
+		$oldHooks = $this->currentHooks;
 
 		foreach (['before', 'after'] as $when) {
 			if (isset($flags[$when])) {
-				foreach ((array) $flags[$when] as $filter) {
-					$this->currentFilters[] = [$when, $this->getFilter($filter)];
+				foreach ((array) $flags[$when] as $hook) {
+					$this->currentHooks[] = [$when, $this->getHook($hook)];
 				}
 			}
 		}
@@ -259,16 +259,16 @@ class Router implements RouterInterface
 		$callback($this);
 
 		$this->currentPrefix = $oldPrefix;
-		$this->currentFilters = $oldFilters;
+		$this->currentHooks = $oldHooks;
 	}
 
-	protected function getFilter($name)
+	protected function getHook($name)
 	{
-		if (!isset($this->filters[$name])) {
-			throw new \InvalidArgumentException("Filter with name $name is not defined");
+		if (!isset($this->hooks[$name])) {
+			throw new \InvalidArgumentException("Hook with name $name is not defined");
 		}
 
-		return $this->filters[$name];
+		return $this->hooks[$name];
 	}
 
 	/**
@@ -340,8 +340,8 @@ class Router implements RouterInterface
 	{
 		$route = new Route($methods, $path, $controller, $name, $options);
 
-		foreach ($this->currentFilters as $filter) {
-			$route->addFilter($filter[0], $filter[1]);
+		foreach ($this->currentHooks as $hook) {
+			$route->addHook($hook[0], $hook[1]);
 		}
 
 		return $route;
@@ -420,11 +420,11 @@ class Router implements RouterInterface
 		$this->currentRoute = $route;
 
 		if ($this->eventDispatcher !== null) {
-			$event = new Events\BeforeFilterEvent($request, $route);
+			$event = new Events\BeforeEvent($request, $route);
 			$this->eventDispatcher->dispatch("route.before", $event);
 
-			foreach ($route->getBeforeFilters() as $filter) {
-				$this->eventDispatcher->dispatch("route.before.$filter", $event);
+			foreach ($route->getBeforeHooks() as $hook) {
+				$this->eventDispatcher->dispatch("route.before.$hook", $event);
 			}
 		}
 
@@ -452,11 +452,11 @@ class Router implements RouterInterface
 		}
 
 		if ($this->eventDispatcher !== null) {
-			$event = new Events\AfterFilterEvent($request, $route, $response);
+			$event = new Events\AfterEvent($request, $route, $response);
 			$this->eventDispatcher->dispatch("route.after", $event);
 
-			foreach ($route->getAfterFilters() as $filter) {
-				$this->eventDispatcher->dispatch("route.after.$filter", $event);
+			foreach ($route->getAfterHooks() as $hook) {
+				$this->eventDispatcher->dispatch("route.after.$hook", $event);
 			}
 		}
 

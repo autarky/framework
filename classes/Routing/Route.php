@@ -48,12 +48,12 @@ class Route
 	/**
 	 * @var array
 	 */
-	protected $beforeFilters = [];
+	protected $beforeHooks = [];
 
 	/**
 	 * @var array
 	 */
-	protected $afterFilters = [];
+	protected $afterHooks = [];
 
 	/**
 	 * @var array|null
@@ -139,54 +139,54 @@ class Route
 	}
 
 	/**
-	 * Add a before filter.
+	 * Add a before hook.
 	 *
-	 * @param string $filter
+	 * @param string $hook
 	 */
-	public function addBeforeFilter($filter)
+	public function addBeforeHook($hook)
 	{
-		$this->beforeFilters[] = $filter;
+		$this->beforeHooks[] = $hook;
 	}
 
 	/**
-	 * Add an after filter.
+	 * Add an after hook.
 	 *
-	 * @param string $filter
+	 * @param string $hook
 	 */
-	public function addAfterFilter($filter)
+	public function addAfterHook($hook)
 	{
-		$this->afterFilters[] = $filter;
+		$this->afterHooks[] = $hook;
 	}
 
 	/**
-	 * Add a before or after filter.
+	 * Add a before or after hook.
 	 *
 	 * @param string  $when   "before" or "after"
-	 * @param string  $filter
+	 * @param string  $hook
 	 */
-	public function addFilter($when, $filter)
+	public function addHook($when, $hook)
 	{
-		$this->{'add'.ucfirst($when).'Filter'}($filter);
+		$this->{'add'.ucfirst($when).'Hook'}($hook);
 	}
 
 	/**
-	 * Get the route's before filters.
+	 * Get the route's before hooks.
 	 *
 	 * @return string[]
 	 */
-	public function getBeforeFilters()
+	public function getBeforeHooks()
 	{
-		return $this->beforeFilters;
+		return $this->beforeHooks;
 	}
 
 	/**
-	 * Get the route's after filters.
+	 * Get the route's after hooks.
 	 *
 	 * @return string[]
 	 */
-	public function getAfterFilters()
+	public function getAfterHooks()
 	{
-		return $this->afterFilters;
+		return $this->afterHooks;
 	}
 
 	/**
@@ -239,8 +239,8 @@ class Route
 	public static function __set_state($data)
 	{
 		$route = new static($data['methods'], $data['pattern'], $data['controller'], $data['name']);
-		$route->beforeFilters = $data['beforeFilters'];
-		$route->afterFilters = $data['afterFilters'];
+		$route->beforeHooks = $data['beforeHooks'];
+		$route->afterHooks = $data['afterHooks'];
 		if (static::$router !== null) {
 			static::$router->addCachedRoute($route);
 		}

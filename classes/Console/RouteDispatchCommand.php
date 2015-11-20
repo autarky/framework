@@ -64,11 +64,11 @@ EOS
 		$output->writeln('<info>Route path:</info> '.$route->getPattern());
 		$output->writeln('<info>HTTP methods:</info> '.implode('|', $route->getMethods()));
 
-		if ($filters = $route->getBeforeFilters()) {
-			$output->writeln('<info>Before filters:</info> '.implode(', ', $filters));
+		if ($hooks = $route->getBeforeHooks()) {
+			$output->writeln('<info>Before hooks:</info> '.implode(', ', $hooks));
 		}
-		if ($filters = $route->getAfterFilters()) {
-			$output->writeln('<info>After filters:</info> '.implode(', ', $filters));
+		if ($hooks = $route->getAfterHooks()) {
+			$output->writeln('<info>After hooks:</info> '.implode(', ', $hooks));
 		}
 
 		return 0;

@@ -24,7 +24,7 @@ class RouteListCommand extends Command
 		$this->setName('route:list')
 			->setDescription('Show a list of routes')
 			->setHelp(<<<'EOS'
-Shows a list of all routes registered, their name, controller, path and filters.
+Shows a list of all routes registered, their name, controller, path and hooks.
 EOS
 );
 	}
@@ -35,7 +35,7 @@ EOS
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$table = new Table($output);
-		$table->setHeaders(['Name', 'Methods', 'Path', 'Controller', 'Filters']);
+		$table->setHeaders(['Name', 'Methods', 'Path', 'Controller', 'Hooks']);
 
 		$router = $this->app->getContainer()
 			->resolve('Autarky\Routing\Router');
@@ -51,18 +51,18 @@ EOS
 				$controller = 'Closure';
 			}
 
-			$filters = '';
-			if ($before = $route->getBeforeFilters()) {
-				$filters .= 'Before: ' . implode(', ', $before);
+			$hooks = '';
+			if ($before = $route->getBeforeHooks()) {
+				$hooks .= 'Before: ' . implode(', ', $before);
 			}
-			if ($after = $route->getAfterFilters()) {
-				if ($filters !== '') {
-					$filters .= ' - ';
+			if ($after = $route->getAfterHooks()) {
+				if ($hooks !== '') {
+					$hooks .= ' - ';
 				}
-				$filters .= 'After: ' . implode(', ', $after);
+				$hooks .= 'After: ' . implode(', ', $after);
 			}
 
-			$table->addRow([$route->getName(), $methods, $route->getPattern(), $controller, $filters]);
+			$table->addRow([$route->getName(), $methods, $route->getPattern(), $controller, $hooks]);
 		}
 
 		$table->render();

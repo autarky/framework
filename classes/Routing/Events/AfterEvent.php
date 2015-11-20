@@ -19,7 +19,7 @@ use Autarky\Routing\Route;
  * Event that is fired after a route's controller has been invoked, before the
  * response is returned from the router to the HttpKernel.
  */
-class AfterFilterEvent extends AbstractRouteEvent
+class AfterEvent extends AbstractRouteEvent
 {
 	/**
 	 * @var Response

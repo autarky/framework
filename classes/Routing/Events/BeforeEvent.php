@@ -13,7 +13,7 @@ namespace Autarky\Routing\Events;
 /**
  * Event that is fired before a route's controller is invoked.
  */
-class BeforeFilterEvent extends AbstractRouteEvent
+class BeforeEvent extends AbstractRouteEvent
 {
 	/**
 	 * @var callable|null

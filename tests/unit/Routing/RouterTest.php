@@ -57,29 +57,29 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
-	public function addFiltersViaRouteGrouping()
+	public function addHooksViaRouteGrouping()
 	{
 		$router = $this->makeRouter();
-		$router->onBefore('foo', function($event) {
-			$event->setResponse('from filter');
+		$router->addBeforeHook('foo', function($event) {
+			$event->setResponse('from hook');
 		});
 		$router->group(['before' => 'foo'], function(Router $router) use(&$route) {
 			$route = $router->addRoute('get', '/foo', function() { return 'from route'; });
 		});
 		$response = $router->dispatch(Request::create('/foo'));
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-		$this->assertEquals('from filter', $response->getContent());
+		$this->assertEquals('from hook', $response->getContent());
 	}
 
 	/** @test */
-	public function beforeFilterCanChangeController()
+	public function beforeHookCanChangeController()
 	{
 		$router = $this->makeRouter();
 		$route = $router->addRoute('get', '/foo', function() { return 'old controller'; });
-		$router->onBefore('bar', function($event) {
+		$router->addBeforeHook('bar', function($event) {
 			$event->setController(function() { return 'new controller'; });
 		});
-		$route->addBeforeFilter('bar');
+		$route->addBeforeHook('bar');
 		$response = $router->dispatch(Request::create('/foo'));
 		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
 		$this->assertEquals('new controller', $response->getContent());
