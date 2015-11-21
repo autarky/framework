@@ -448,8 +448,6 @@ class Router implements RouterInterface
 			$response = $this->invoker->invoke($callable, $params, $constructorArgs);
 		}
 
-		// ensure that the response is a Response object before dispatching
-		// after events and returning it
 		if (!$response instanceof Response) {
 			$response = new Response($response);
 		}
@@ -460,6 +458,10 @@ class Router implements RouterInterface
 
 			foreach ($route->getAfterHooks() as $hook) {
 				$this->eventDispatcher->dispatch("route.after.$hook", $event);
+			}
+
+			if ($event->getResponse() !== $response) {
+				$response = $event->getResponse();
 			}
 		}
 
