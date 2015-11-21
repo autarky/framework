@@ -432,8 +432,11 @@ class Router implements RouterInterface
 		// that should override the route's response. if the event doesn't have
 		// a response, check if the event has a controller that should override
 		// the route's controller
-		if (isset($event) && !($response = $event->getResponse())) {
-			$callable = $event->getController() ?: $route->getController();
+		if (isset($event)) {
+			$response = $event->getResponse();
+			if (!$response) {
+				$callable = $event->getController() ?: $route->getController();
+			}
 		} else {
 			$callable = $route->getController();
 		}
