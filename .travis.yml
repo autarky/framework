@@ -21,7 +21,7 @@ before_install:
   - ./scripts/setup-travis.sh
 
 install:
-  - composer update ${COMPOSER_ARGS} --dev --no-interaction
+  - composer update ${COMPOSER_ARGS} --no-interaction
 
 script:
   - ./vendor/bin/phpunit --verbose
