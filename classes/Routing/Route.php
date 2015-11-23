@@ -46,16 +46,6 @@ class Route
 	protected $name;
 
 	/**
-	 * @var array
-	 */
-	protected $beforeHooks = [];
-
-	/**
-	 * @var array
-	 */
-	protected $afterHooks = [];
-
-	/**
 	 * @var array|null
 	 */
 	protected $params = null;
@@ -145,7 +135,10 @@ class Route
 	 */
 	public function addBeforeHook($hook)
 	{
-		$this->beforeHooks[] = $hook;
+		if (!isset($this->options['before'])) {
+			$this->options['before'] = [];
+		}
+		$this->options['before'][] = $hook;
 	}
 
 	/**
@@ -155,7 +148,10 @@ class Route
 	 */
 	public function addAfterHook($hook)
 	{
-		$this->afterHooks[] = $hook;
+		if (!isset($this->options['after'])) {
+			$this->options['after'] = [];
+		}
+		$this->options['after'][] = $hook;
 	}
 
 	/**
@@ -176,7 +172,7 @@ class Route
 	 */
 	public function getBeforeHooks()
 	{
-		return $this->beforeHooks;
+		return isset($this->options['before']) ? $this->options['before'] : [];
 	}
 
 	/**
@@ -186,7 +182,7 @@ class Route
 	 */
 	public function getAfterHooks()
 	{
-		return $this->afterHooks;
+		return isset($this->options['after']) ? $this->options['after'] : [];
 	}
 
 	/**
@@ -238,9 +234,8 @@ class Route
 	 */
 	public static function __set_state($data)
 	{
-		$route = new static($data['methods'], $data['pattern'], $data['controller'], $data['name']);
-		$route->beforeHooks = $data['beforeHooks'];
-		$route->afterHooks = $data['afterHooks'];
+		$route = new static($data['methods'], $data['pattern'],
+			$data['controller'], $data['name'], $data['options']);
 		if (static::$router !== null) {
 			static::$router->addCachedRoute($route);
 		}
