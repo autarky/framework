@@ -24,6 +24,6 @@ install:
   - composer update ${COMPOSER_ARGS} --dev --no-interaction
 
 script:
-  - phpunit --verbose
+  - ./vendor/bin/phpunit --verbose
 
 sudo: false
