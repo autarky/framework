@@ -13,6 +13,7 @@ namespace Autarky\Console;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
+use Autarky\Application as AutarkyApplication;
 use Autarky\Console\Command as AutarkyCommand;
 
 /**
@@ -23,16 +24,16 @@ class Application extends SymfonyApplication
 	/**
 	 * The Autarky Application object instance.
 	 *
-	 * @var \Autarky\Application
+	 * @var AutarkyApplication
 	 */
 	protected $app;
 
 	/**
 	 * Set the Autarky application instance.
 	 *
-	 * @param \Autarky\Application $app
+	 * @param AutarkyApplication $app
 	 */
-	public function setAutarkyApplication(\Autarky\Application $app)
+	public function setAutarkyApplication(AutarkyApplication $app)
 	{
 		$this->app = $app;
 	}
