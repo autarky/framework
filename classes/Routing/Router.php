@@ -11,6 +11,7 @@
 namespace Autarky\Routing;
 
 use Closure;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -449,7 +450,11 @@ class Router implements RouterInterface
 		}
 
 		if (!$response instanceof Response) {
-			$response = new Response($response);
+			if (is_array($response) || $response instanceof \stdClass) {
+				$response = new JsonResponse($response);
+			} else {
+				$response = new Response($response);
+			}
 		}
 
 		if ($this->eventDispatcher !== null) {
