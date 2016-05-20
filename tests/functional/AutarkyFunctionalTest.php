@@ -7,14 +7,20 @@ class AutarkyFunctionalTest extends PHPUnit_Framework_TestCase
 		return Symfony\Component\HttpFoundation\Request::create($url);
 	}
 
+	private function makeApp()
+	{
+		$app = new Autarky\Application('test', [
+			new Autarky\Container\ContainerProvider,
+			new Autarky\Routing\RoutingProvider,
+		]);
+		$app->boot();
+		return $app;
+	}
+
 	/** @test */
 	public function simple_route()
 	{
-		$app = new Autarky\Application('test', [
-		    new Autarky\Container\ContainerProvider,
-		    new Autarky\Routing\RoutingProvider,
-		]);
-		$app->boot();
+		$app = $this->makeApp();
 
 		$app->route('GET', '/', function() {
 		    return 'Hello world!';
@@ -28,11 +34,7 @@ class AutarkyFunctionalTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function controller_route()
 	{
-		$app = new Autarky\Application('test', [
-		    new Autarky\Container\ContainerProvider,
-		    new Autarky\Routing\RoutingProvider,
-		]);
-		$app->boot();
+		$app = $this->makeApp();
 
 		$ctrl = ['StubControllerWithDependency', 'respond'];
 		$app->route('GET', '/', $ctrl, 'test.route', [
@@ -46,13 +48,27 @@ class AutarkyFunctionalTest extends PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function mount_routes()
+	{
+		$app = $this->makeApp();
+
+		$routes = ['test.route' => [
+			'path' => '/',
+			'controller' => ['StubControllerWithDependency', 'respond'],
+			'params' => ['$parameter' => 'test: '],
+			'constructor_params' => ['StubInterface' => 'StubDependency'],
+		]];
+		$app->mount($routes, '/');
+
+		$request = $this->makeRequest();
+		$response = $app->run($request, false);
+		$this->assertEquals('test: StubDependency', $response->getContent());
+	}
+
+	/** @test */
 	public function response_transformation()
 	{
-		$app = new Autarky\Application('test', [
-		    new Autarky\Container\ContainerProvider,
-		    new Autarky\Routing\RoutingProvider,
-		]);
-		$app->boot();
+		$app = $this->makeApp();
 
 		$app->route('GET', '/string', function() {
 			return 'Hello world!';

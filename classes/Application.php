@@ -558,4 +558,12 @@ class Application implements HttpKernelInterface
 	{
 		return call_user_func_array([$this->getRouter(), 'addRoute'], func_get_args());
 	}
+
+	/**
+	 * @see \Autarky\Routing\RouterInterface::mount()
+	 */
+	public function mount()
+	{
+		return call_user_func_array([$this->getRouter(), 'mount'], func_get_args());
+	}
 }

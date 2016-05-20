@@ -15,7 +15,8 @@ class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 		$router = $this->mockRouter();
 		$data = $this->getRouteData();
 		$config = $this->makeConfig($router, $data, 'namespace');
-		$router->shouldReceive('addRoute')->once()->with(['get'], '/path', ['foo', 'bar'], 'namespace:foobar');
+		$router->shouldReceive('addRoute')->once()
+			->with(['get'], '/path', ['foo', 'bar'], 'namespace:foobar', []);
 		$config->mount();
 	}
 
@@ -26,7 +27,8 @@ class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 		$data = $this->getRouteData();
 		$config = $this->makeConfig($router, $data);
 		$config->override('foobar', ['methods' => ['get', 'post']]);
-		$router->shouldReceive('addRoute')->once()->with(['get', 'post'], '/path', ['foo', 'bar'], 'foobar');
+		$router->shouldReceive('addRoute')->once()
+			->with(['get', 'post'], '/path', ['foo', 'bar'], 'foobar', []);
 		$config->mount();
 	}
 
@@ -59,8 +61,10 @@ class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 				],
 			],
 		]);
-		$router->shouldReceive('addRoute')->with(['get'], '/path', ['Controller', 'get'], 'name')->once();
-		$router->shouldReceive('addRoute')->with(['post'], '/path', ['Controller', 'post'], null)->once();
+		$router->shouldReceive('addRoute')->once()
+			->with(['get'], '/path', ['Controller', 'get'], 'name', []);
+		$router->shouldReceive('addRoute')->once()
+			->with(['post'], '/path', ['Controller', 'post'], null, []);
 		$config->mount();
 	}
 
