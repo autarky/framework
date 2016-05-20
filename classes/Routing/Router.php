@@ -229,8 +229,8 @@ class Router implements RouterInterface
 			return;
 		}
 
-		(new Configuration($this, $routes))
-			->mount($path);
+		(new Configuration($routes))
+			->mount($this, $path);
 	}
 
 	/**

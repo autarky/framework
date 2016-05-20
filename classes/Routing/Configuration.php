@@ -32,13 +32,11 @@ class Configuration
 	protected $namespace;
 
 	/**
-	 * @param RouterInterface $router
 	 * @param array           $routes
 	 * @param string|null     $namespace
 	 */
-	public function __construct(RouterInterface $router, array $routes, $namespace = null)
+	public function __construct(array $routes, $namespace = null)
 	{
-		$this->router = $router;
 		$this->routes = $routes;
 
 		if ($namespace) {
@@ -80,33 +78,34 @@ class Configuration
 	/**
 	 * Mount the configuration.
 	 *
+	 * @param  RouterInterface $router
 	 * @param  string|null $prefix
 	 *
 	 * @return void
 	 */
-	public function mount($prefix = null)
+	public function mount(RouterInterface $router, $prefix = null)
 	{
-		if ($prefix) {
-			$this->router->group(['prefix' => $prefix], function() {
-				$this->registerRoutes();
+		if (trim($prefix, '/')) {
+			$router->group(['prefix' => $prefix], function($router) {
+				$this->registerRoutes($router);
 			});
 		} else {
-			$this->registerRoutes();
+			$this->registerRoutes($router);
 		}
 	}
 
-	protected function registerRoutes()
+	protected function registerRoutes(RouterInterface $router)
 	{
 		foreach ($this->routes as $name => $route) {
 			if ($this->namespace) {
 				$name = $this->namespace . ':' . $name;
 			}
 
-			$this->registerRoute($route, $name);
+			$this->registerRoute($router, $route, $name);
 		}
 	}
 
-	protected function registerRoute($route, $name)
+	protected function registerRoute(RouterInterface $router, $route, $name)
 	{
 		$path = $route['path'];
 
@@ -132,7 +131,7 @@ class Configuration
 		// add the route for each of them.
 		if (array_filter(array_keys($methods), 'is_string')) {
 			foreach ($methods as $method => $controller) {
-				$this->router->addRoute([$method], $path, $controller, $name, $options);
+				$router->addRoute([$method], $path, $controller, $name, $options);
 
 				// only set the name for the first route added. the URLs will be
 				// identical so it doesn't matter for URL generation.
@@ -142,7 +141,7 @@ class Configuration
 			// only a single method is being mapped
 			$controller = isset($route['controller']) ?
 				$route['controller'] : $route['handler'];
-			$this->router->addRoute($methods, $path, $controller, $name, $options);
+			$router->addRoute($methods, $path, $controller, $name, $options);
 		}
 	}
 }

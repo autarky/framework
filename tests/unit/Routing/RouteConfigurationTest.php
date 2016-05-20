@@ -14,10 +14,10 @@ class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 	{
 		$router = $this->mockRouter();
 		$data = $this->getRouteData();
-		$config = $this->makeConfig($router, $data, 'namespace');
+		$config = $this->makeConfig($data, 'namespace');
 		$router->shouldReceive('addRoute')->once()
 			->with(['get'], '/path', ['foo', 'bar'], 'namespace:foobar', []);
-		$config->mount();
+		$config->mount($router);
 	}
 
 	/** @test */
@@ -25,16 +25,16 @@ class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 	{
 		$router = $this->mockRouter();
 		$data = $this->getRouteData();
-		$config = $this->makeConfig($router, $data);
+		$config = $this->makeConfig($data);
 		$config->override('foobar', ['methods' => ['get', 'post']]);
 		$router->shouldReceive('addRoute')->once()
 			->with(['get', 'post'], '/path', ['foo', 'bar'], 'foobar', []);
-		$config->mount();
+		$config->mount($router);
 	}
 
-	protected function makeConfig($router, array $routes, $namespace = null)
+	protected function makeConfig(array $routes, $namespace = null)
 	{
-		return new \Autarky\Routing\Configuration($router, $routes, $namespace);
+		return new \Autarky\Routing\Configuration($routes, $namespace);
 	}
 
 	protected function getRouteData()
@@ -52,7 +52,7 @@ class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 	public function canRegisterMultiControllers()
 	{
 		$router = $this->mockRouter();
-		$config = $this->makeConfig($router, [
+		$config = $this->makeConfig([
 			'name' => [
 				'path' => '/path',
 				'methods' => [
@@ -65,7 +65,7 @@ class RouteConfigurationTest extends PHPUnit_Framework_TestCase
 			->with(['get'], '/path', ['Controller', 'get'], 'name', []);
 		$router->shouldReceive('addRoute')->once()
 			->with(['post'], '/path', ['Controller', 'post'], null, []);
-		$config->mount();
+		$config->mount($router);
 	}
 
 	protected function mockRouter()
