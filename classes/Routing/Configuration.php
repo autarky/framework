@@ -102,34 +102,47 @@ class Configuration
 				$name = $this->namespace . ':' . $name;
 			}
 
-			$path = $route['path'];
+			$this->registerRoute($route, $name);
+		}
+	}
 
-			if (isset($route['methods'])) {
-				$methods = (array) $route['methods'];
-			} elseif (isset($route['method'])) {
-				$methods = (array) $route['method'];
-			} else {
-				$methods = ['GET'];
-			}
+	protected function registerRoute($route, $name)
+	{
+		$path = $route['path'];
 
-			$options = [];
-			if (isset($route['params'])) {
-				$options['params'] = $route['params'];
-			}
-			if (isset($route['constructor_params'])) {
-				$options['constructor_params'] = $route['constructor_params'];
-			}
+		if (isset($route['methods'])) {
+			$methods = (array) $route['methods'];
+		} elseif (isset($route['method'])) {
+			$methods = (array) $route['method'];
+		} else {
+			$methods = ['GET'];
+		}
 
-			if (array_filter(array_keys($methods), 'is_string')) {
-				foreach ($methods as $method => $controller) {
-					$this->router->addRoute([$method], $path, $controller, $name);
-					$name = null;
-				}
-			} else {
-				$controller = isset($route['controller']) ?
-					$route['controller'] : $route['handler'];
-				$this->router->addRoute($methods, $path, $controller, $name);
+		$options = [];
+		if (isset($route['params'])) {
+			$options['params'] = $route['params'];
+		}
+		if (isset($route['constructor_params'])) {
+			$options['constructor_params'] = $route['constructor_params'];
+		}
+
+		// it is possible to provide a subarray to 'methods', which means the same
+		// route will serve multiple HTTP methods, but with different controllers
+		// for each method. if that is the case, iterate through the methods and
+		// add the route for each of them.
+		if (array_filter(array_keys($methods), 'is_string')) {
+			foreach ($methods as $method => $controller) {
+				$this->router->addRoute([$method], $path, $controller, $name, $options);
+
+				// only set the name for the first route added. the URLs will be
+				// identical so it doesn't matter for URL generation.
+				$name = null;
 			}
+		} else {
+			// only a single method is being mapped
+			$controller = isset($route['controller']) ?
+				$route['controller'] : $route['handler'];
+			$this->router->addRoute($methods, $path, $controller, $name, $options);
 		}
 	}
 }
