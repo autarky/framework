@@ -19,7 +19,7 @@ use PDO;
  */
 class PDOInstantiator implements PDOInstantiatorInterface
 {
-	public function instantiate($dsn, $username = null, $password = null, array $options = array())
+	public function instantiate($dsn, $username = null, $password = null, array $options = [])
 	{
 		return new PDO($dsn, $username, $password, $options);
 	}

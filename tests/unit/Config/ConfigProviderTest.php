@@ -5,7 +5,7 @@ use Autarky\Application;
 
 class ConfigProviderTest extends TestCase
 {
-	protected function makeApplication($providers = array(), $env = 'testing')
+	protected function makeApplication($providers = [], $env = 'testing')
 	{
 		$app = new Application($env, [
 			new \Autarky\Container\ContainerProvider(),

@@ -272,7 +272,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 *
 	 * @throws \ErrorException if the error level matches PHP's error reporting.
 	 */
-	public function handleError($level, $message, $file = '', $line = 0, $context = array())
+	public function handleError($level, $message, $file = '', $line = 0, $context = [])
 	{
 		if (error_reporting() & $level) {
 			throw new ErrorException($message, 0, $level, $file, $line);

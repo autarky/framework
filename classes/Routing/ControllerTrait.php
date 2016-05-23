@@ -36,7 +36,7 @@ trait ControllerTrait
 	 *
 	 * @return string
 	 */
-	protected function render($name, array $data = array())
+	protected function render($name, array $data = [])
 	{
 		return $this->container->resolve('Autarky\TwigTemplating\TemplatingEngine')
 			->render($name, $data);
@@ -50,7 +50,7 @@ trait ControllerTrait
 	 *
 	 * @return string
 	 */
-	protected function url($name, array $params = array())
+	protected function url($name, array $params = [])
 	{
 		return $this->container->resolve('Autarky\Routing\UrlGenerator')
 			->getRouteUrl($name, $params);
@@ -161,7 +161,7 @@ trait ControllerTrait
 	 *
 	 * @return void
 	 */
-	protected function log($level, $message, array $context = array())
+	protected function log($level, $message, array $context = [])
 	{
 		$this->getLogger()
 			->log($level, $message, $context);
@@ -199,7 +199,7 @@ trait ControllerTrait
 	 *
 	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
 	 */
-	protected function redirect($name, array $params = array(), $statusCode = 302)
+	protected function redirect($name, array $params = [], $statusCode = 302)
 	{
 		return new RedirectResponse($this->url($name, $params), $statusCode);
 	}

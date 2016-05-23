@@ -27,5 +27,5 @@ interface PDOInstantiatorInterface
 	 *
 	 * @return \PDO
 	 */
-	public function instantiate($dsn, $username = null, $password = null, array $options = array());
+	public function instantiate($dsn, $username = null, $password = null, array $options = []);
 }

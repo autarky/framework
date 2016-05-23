@@ -9,7 +9,7 @@ use PHPUnit_Framework_TestCase;
 
 abstract class TestCase extends PHPUnit_Framework_TestCase
 {
-	protected function makeApplication($providers = array(), $env = 'testing')
+	protected function makeApplication($providers = [], $env = 'testing')
 	{
 		$app = new Application($env, (array) $providers);
 		$app->setContainer($container = new Container);

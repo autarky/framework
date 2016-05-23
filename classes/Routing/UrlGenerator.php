@@ -87,7 +87,7 @@ class UrlGenerator
 	 *
 	 * @return string
 	 */
-	public function getRouteUrl($name, array $params = array(), $relative = false)
+	public function getRouteUrl($name, array $params = [], $relative = false)
 	{
 		$route = $this->router->getRoute($name);
 

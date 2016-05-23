@@ -134,7 +134,7 @@ class ChannelManager extends AbstractLogger implements LoggerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function log($level, $message, array $context = array())
+	public function log($level, $message, array $context = [])
 	{
 		$this->getChannel($this->defaultChannel)
 			->log($level, $message, $context);

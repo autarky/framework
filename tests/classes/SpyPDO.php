@@ -9,7 +9,7 @@ class SpyPDO extends \PDO
 	protected $options;
 	protected $execLog = [];
 
-	public function __construct($dsn, $username, $password, array $options = array())
+	public function __construct($dsn, $username, $password, array $options = [])
 	{
 		$this->dsn = $dsn;
 		$this->username = $username;
@@ -52,7 +52,7 @@ class SpyPDO extends \PDO
 		return $this->execLog;
 	}
 
-	public static function create($dsn, $username, $password, array $options = array())
+	public static function create($dsn, $username, $password, array $options = [])
 	{
 		return new static($dsn, $username, $password, $options);
 	}

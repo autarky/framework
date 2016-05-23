@@ -189,7 +189,7 @@ class ControllerTest extends PHPUnit_Framework_TestCase
 
 class StubController extends \Autarky\Routing\Controller
 {
-	public function call($method, array $args = array())
+	public function call($method, array $args = [])
 	{
 		return call_user_func_array([$this, $method], $args);
 	}

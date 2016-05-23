@@ -22,7 +22,7 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 		);
 	}
 
-	private function makeConfig($connection = 'default', array $connections = array())
+	private function makeConfig($connection = 'default', array $connections = [])
 	{
 		return new \Autarky\Config\ArrayStore(['database' => ['connection' => $connection, 'connections' => $connections]]);
 	}

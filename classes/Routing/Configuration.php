@@ -24,7 +24,7 @@ class Configuration
 	/**
 	 * @var array
 	 */
-	protected $routes = array();
+	protected $routes = [];
 
 	/**
 	 * @var string|null
