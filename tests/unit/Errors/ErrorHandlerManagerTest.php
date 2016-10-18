@@ -107,7 +107,7 @@ class StubHandler implements \Autarky\Errors\ErrorHandlerInterface {
 	public function __construct($ret) {
 		$this->ret = $ret;
 	}
-	public function handle(Exception $e) {
+	public function handle($e) {
 		return $this->ret;
 	}
 }

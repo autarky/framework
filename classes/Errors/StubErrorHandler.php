@@ -10,8 +10,6 @@
 
 namespace Autarky\Errors;
 
-use Exception;
-
 /**
  * Stub error handler that simply re-throws the exceptions given.
  *
@@ -80,7 +78,7 @@ class StubErrorHandler implements ErrorHandlerManagerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function handle(Exception $exception)
+	public function handle($exception)
 	{
 		throw $exception;
 	}

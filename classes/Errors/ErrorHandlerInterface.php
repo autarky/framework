@@ -10,8 +10,6 @@
 
 namespace Autarky\Errors;
 
-use Exception;
-
 /**
  * Class that can handle exceptions.
  */
@@ -20,9 +18,12 @@ interface ErrorHandlerInterface
 	/**
 	 * Handle an exception.
 	 *
-	 * @param  \Exception $exception
+	 * Note that this function can't be type-hinted for compatibility between
+	 * PHP5 and PHP7.
+	 *
+	 * @param  \Throwable $exception
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function handle(Exception $exception);
+	public function handle($exception);
 }

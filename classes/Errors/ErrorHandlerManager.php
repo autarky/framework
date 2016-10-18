@@ -10,6 +10,7 @@
 
 namespace Autarky\Errors;
 
+use Error;
 use Exception;
 use ErrorException;
 use ReflectionFunction;
@@ -126,7 +127,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function handle(Exception $exception)
+	public function handle($exception)
 	{
 		if ($this->rethrow) throw $exception;
 
@@ -149,6 +150,8 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 				if ($result !== null) {
 					return $this->makeResponse($result, $exception);
 				}
+			} catch (Error $newException) {
+				return $this->handle($newException);
 			} catch (Exception $newException) {
 				return $this->handle($newException);
 			}
@@ -161,11 +164,11 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 * Transform an exception handler's response into a Response object.
 	 *
 	 * @param  mixed      $response
-	 * @param  \Exception $exception
+	 * @param  \Throwable $exception
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	protected function makeResponse($response, Exception $exception)
+	protected function makeResponse($response, $exception)
 	{
 		if (!$response instanceof Response) {
 			$response = new Response($response);
@@ -187,11 +190,11 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 * Check if a handler's argument typehint matches an exception.
 	 *
 	 * @param  callable|ErrorHandlerInterface $handler
-	 * @param  \Exception                     $exception
+	 * @param  \Throwable                     $exception
 	 *
 	 * @return bool
 	 */
-	protected function matchesTypehint($handler, Exception $exception)
+	protected function matchesTypehint($handler, $exception)
 	{
 		if ($handler instanceof ErrorHandlerInterface) {
 			return true;
@@ -226,12 +229,12 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	/**
 	 * Call an exception handler.
 	 *
-	 * @param  mixed     $handler
-	 * @param  Exception $exception
+	 * @param  mixed      $handler
+	 * @param  \Throwable $exception
 	 *
 	 * @return mixed
 	 */
-	protected function callHandler($handler, Exception $exception)
+	protected function callHandler($handler, $exception)
 	{
 		if ($handler instanceof ErrorHandlerInterface) {
 			return $handler->handle($exception);
@@ -245,13 +248,13 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 * the response, as we can assume that the exception happened outside of
 	 * HttpKernelInterface::handle.
 	 *
-	 * @param  \Exception $exception
+	 * @param  \Throwable $exception
 	 *
 	 * @return Response
 	 *
 	 * @throws Exception  If PHP_SAPI is 'cli'
 	 */
-	public function handleUncaught(Exception $exception)
+	public function handleUncaught($exception)
 	{
 		if (PHP_SAPI === 'cli') {
 			throw $exception;

@@ -43,7 +43,7 @@ class DefaultErrorHandler implements ErrorHandlerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function handle(Exception $exception)
+	public function handle($exception)
 	{
 		if ($this->debug && class_exists('Whoops\Run')) {
 			return $this->handleWithWhoops($exception);
@@ -52,7 +52,7 @@ class DefaultErrorHandler implements ErrorHandlerInterface
 		return $this->handleWithSymfony($exception);
 	}
 
-	protected function handleWithWhoops(Exception $exception)
+	protected function handleWithWhoops($exception)
 	{
 		$whoops = new Run();
 		$whoops->allowQuit(false);
@@ -62,10 +62,10 @@ class DefaultErrorHandler implements ErrorHandlerInterface
 		return $whoops->handleException($exception);
 	}
 
-	protected function handleWithSymfony(Exception $exception)
+	protected function handleWithSymfony($exception)
 	{
 		if (!$exception instanceof FlattenException) {
-			$exception = FlattenException::create($exception);
+			$exception = static::flattenException($exception);
 		}
 
 		$handler = new ExceptionHandler($this->debug);
@@ -75,5 +75,42 @@ class DefaultErrorHandler implements ErrorHandlerInterface
 			$exception->getStatusCode(),
 			$exception->getHeaders()
 		);
+	}
+
+	protected function flattenException($exception, $statusCode = null, array $headers = array())
+	{
+		if ($exception instanceof FlattenException) {
+			return $exception;
+		}
+
+		$e = new FlattenException();
+		$e->setMessage($exception->getMessage());
+		$e->setCode($exception->getCode());
+
+		if ($exception instanceof HttpExceptionInterface) {
+			$statusCode = $exception->getStatusCode();
+			$headers = array_merge($headers, $exception->getHeaders());
+		}
+
+		if (null === $statusCode) {
+			$statusCode = 500;
+		}
+
+		$e->setStatusCode($statusCode);
+		$e->setHeaders($headers);
+		$e->setClass(get_class($exception));
+		$e->setFile($exception->getFile());
+		$e->setLine($exception->getLine());
+
+		if ($exception instanceof \Exception) {
+			$e->setTraceFromException($exception);
+		}
+
+		$previous = $exception->getPrevious();
+		if ($previous) {
+			$e->setPrevious(static::flattenException($previous));
+		}
+
+		return $e;
 	}
 }
