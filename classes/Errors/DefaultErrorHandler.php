@@ -14,6 +14,7 @@ use Exception;
 use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 
@@ -77,7 +78,7 @@ class DefaultErrorHandler implements ErrorHandlerInterface
 		);
 	}
 
-	protected function flattenException($exception, $statusCode = null, array $headers = array())
+	protected static function flattenException($exception, $statusCode = null, array $headers = array())
 	{
 		if ($exception instanceof FlattenException) {
 			return $exception;
