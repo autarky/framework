@@ -17,7 +17,7 @@ class DependantProviderTest extends TestCase
 	public function providerThrowsExceptionWithUnmetProviderDependency()
 	{
 		$app = $this->makeApplication(['SuccessfulDependantProvider']);
-		$this->setExpectedException('Autarky\Providers\ProviderException', 'Errors while registering provider: SuccessfulDependantProvider - Provider must be loaded: DependencyProvider');
+		$this->expectException('Autarky\Providers\ProviderException', 'Errors while registering provider: SuccessfulDependantProvider - Provider must be loaded: DependencyProvider');
 		$app->boot();
 	}
 
@@ -25,7 +25,7 @@ class DependantProviderTest extends TestCase
 	public function providerThrowsExceptionWithUnmetClassDependency()
 	{
 		$app = $this->makeApplication(['UnsuccessfulClassDependantProvider']);
-		$this->setExpectedException('Autarky\Providers\ProviderException', 'Errors while registering provider: UnsuccessfulClassDependantProvider - Class must exist: NonExistantClass');
+		$this->expectException('Autarky\Providers\ProviderException', 'Errors while registering provider: UnsuccessfulClassDependantProvider - Class must exist: NonExistantClass');
 		$app->boot();
 	}
 
@@ -33,7 +33,7 @@ class DependantProviderTest extends TestCase
 	public function providerThrowsExceptionWithUnmetContainerDependency()
 	{
 		$app = $this->makeApplication(['UnsuccessfulContainerDependantProvider']);
-		$this->setExpectedException('Autarky\Providers\ProviderException', 'Errors while registering provider: UnsuccessfulContainerDependantProvider - Class must be bound to the container: NonExistantInterface');
+		$this->expectException('Autarky\Providers\ProviderException', 'Errors while registering provider: UnsuccessfulContainerDependantProvider - Class must be bound to the container: NonExistantInterface');
 		$app->boot();
 	}
 }

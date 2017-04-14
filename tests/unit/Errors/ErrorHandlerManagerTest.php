@@ -7,7 +7,7 @@ use Autarky\Errors\HandlerResolver;
 use Autarky\Container\Container;
 use Symfony\Component\HttpFoundation\Response;
 
-class ErrorHandlerManagerTest extends PHPUnit_Framework_TestCase
+class ErrorHandlerManagerTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{

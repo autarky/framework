@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class ConsoleApplicationTest extends PHPUnit_Framework_TestCase
+class ConsoleApplicationTest extends PHPUnit\Framework\TestCase
 {
 	/** @test */
 	public function autarkyApplicationInstanceIsSetOnCommands()

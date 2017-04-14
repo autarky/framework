@@ -1,6 +1,6 @@
 <?php
 
-class AutarkyFunctionalTest extends PHPUnit_Framework_TestCase
+class AutarkyFunctionalTest extends PHPUnit\Framework\TestCase
 {
 	private function makeRequest($url = '/')
 	{

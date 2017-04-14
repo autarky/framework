@@ -83,7 +83,7 @@ class ArrayUtilTest extends TestCase
 	public function setThrowsExceptionOnNonArraySegment()
 	{
 		$data = ['foo' => 'bar'];
-		$this->setExpectedException('UnexpectedValueException', 'Non-array segment encountered');
+		$this->expectException('UnexpectedValueException', 'Non-array segment encountered');
 		ArrayUtil::set($data, 'foo.bar', 'baz');
 	}
 

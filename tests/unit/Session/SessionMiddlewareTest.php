@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class SessionMiddlewareTest extends PHPUnit_Framework_TestCase
+class SessionMiddlewareTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{

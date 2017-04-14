@@ -3,7 +3,7 @@
 use Mockery as m;
 use Autarky\Tests\DummyPDO;
 
-class ConnectionManagerTest extends PHPUnit_Framework_TestCase
+class ConnectionManagerTest extends PHPUnit\Framework\TestCase
 {
 	protected $manager;
 	protected $config;
@@ -75,7 +75,7 @@ class ConnectionManagerTest extends PHPUnit_Framework_TestCase
 		$config = ['default' => ['dsn' => 'sqlite::memory:']];
 		$this->config->set('database.connections', $config);
 
-		$this->setExpectedException('InvalidArgumentException',
+		$this->expectException('InvalidArgumentException',
 			'No config found for connection: other');
 		$pdo = $manager->getPdo('other');
 	}

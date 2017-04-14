@@ -36,7 +36,7 @@ class ApplicationTest extends TestCase
 	public function prematureGettingOfEnvironmentThrowsException()
 	{
 		$app = $this->makeApplication([], function() { return 'testenv'; });
-		$this->setExpectedException('RuntimeException');
+		$this->expectException('RuntimeException');
 		$app->getEnvironment();
 	}
 

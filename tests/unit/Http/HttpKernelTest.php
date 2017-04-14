@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class HttpKernelTest extends PHPUnit_Framework_TestCase
+class HttpKernelTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{
@@ -62,7 +62,7 @@ class HttpKernelTest extends PHPUnit_Framework_TestCase
 	{
 		$kernel = $this->makeKernel();
 		$this->router->shouldReceive('dispatch')->once()->andThrow(new \Exception('router exception'));
-		$this->setExpectedException('Exception', 'router exception');
+		$this->expectException('Exception', 'router exception');
 		$response = $kernel->handle(Request::create('/'), 1, false);
 	}
 

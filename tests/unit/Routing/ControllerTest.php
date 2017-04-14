@@ -4,7 +4,7 @@ use Mockery as m;
 
 use Autarky\Container\Container;
 
-class ControllerTest extends PHPUnit_Framework_TestCase
+class ControllerTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{

@@ -5,7 +5,7 @@ use Mockery as m;
 use Psr\Log\LogLevel;
 use Autarky\Logging\ChannelManager;
 
-class ChannelManagerTest extends PHPUnit_Framework_TestCase
+class ChannelManagerTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{

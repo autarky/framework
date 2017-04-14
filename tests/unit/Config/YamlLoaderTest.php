@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class YamlLoaderTest extends PHPUnit_Framework_TestCase
+class YamlLoaderTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{

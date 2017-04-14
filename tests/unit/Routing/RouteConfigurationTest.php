@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class RouteConfigurationTest extends PHPUnit_Framework_TestCase
+class RouteConfigurationTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{

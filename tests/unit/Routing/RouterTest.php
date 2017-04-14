@@ -13,7 +13,7 @@ use Autarky\Routing\Route;
 use Autarky\Routing\Router;
 use Autarky\Routing\Invoker;
 
-class RouterTest extends PHPUnit_Framework_TestCase
+class RouterTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{
@@ -42,7 +42,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function routeNotFoundThrowsException()
 	{
-		$this->setExpectedException('Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
+		$this->expectException('Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
 		$router = $this->makeRouter();
 		$router->dispatch(Request::create('/foo'));
 	}
@@ -50,7 +50,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function methodNotAllowedThrowsException()
 	{
-		$this->setExpectedException('Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException');
+		$this->expectException('Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException');
 		$router = $this->makeRouter();
 		$router->addRoute('get', '/foo', function() {});
 		$router->dispatch(Request::create('/foo', 'post'));

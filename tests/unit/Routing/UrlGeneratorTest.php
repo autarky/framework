@@ -12,7 +12,7 @@ use Autarky\Routing\RoutePathGenerator;
 use Autarky\Routing\Invoker;
 use Autarky\Routing\UrlGenerator;
 
-class UrlGeneratorTest extends PHPUnit_Framework_TestCase
+class UrlGeneratorTest extends PHPUnit\Framework\TestCase
 {
 	protected function makeRouterAndGenerator($request = false)
 	{
@@ -67,7 +67,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	{
 		list($router, $url) = $this->makeRouterAndGenerator();
 		$router->addRoute('get', $path, function() {}, 'name');
-		$this->setExpectedException('InvalidArgumentException', 'Too few parameters given');
+		$this->expectException('InvalidArgumentException', 'Too few parameters given');
 		$url->getRouteUrl('name', $params, true);
 	}
 
@@ -88,7 +88,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 	{
 		list($router, $url) = $this->makeRouterAndGenerator();
 		$router->addRoute('get', $path, function() {}, 'name');
-		$this->setExpectedException('InvalidArgumentException', 'Too many parameters given');
+		$this->expectException('InvalidArgumentException', 'Too many parameters given');
 		$url->getRouteUrl('name', $params, true);
 	}
 
@@ -109,7 +109,7 @@ class UrlGeneratorTest extends PHPUnit_Framework_TestCase
 		list($router, $url) = $this->makeRouterAndGenerator();
 		$url->setValidateParams(true);
 		$router->addRoute('get', $path, function() {}, 'name');
-		$this->setExpectedException('InvalidArgumentException', 'Route parameter pattern mismatch: Parameter #0 "v1"');
+		$this->expectException('InvalidArgumentException', 'Route parameter pattern mismatch: Parameter #0 "v1"');
 		$url->getRouteUrl('name', $params, true);
 	}
 

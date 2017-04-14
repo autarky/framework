@@ -1,6 +1,6 @@
 <?php
 
-class PathResolverTest extends PHPUnit_Framework_TestCase
+class PathResolverTest extends PHPUnit\Framework\TestCase
 {
 	private function makeResolver()
 	{

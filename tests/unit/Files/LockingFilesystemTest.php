@@ -2,7 +2,7 @@
 
 use Autarky\Files\LockingFilesystem;
 
-class LockingFilesystemTest extends PHPUnit_Framework_TestCase
+class LockingFilesystemTest extends PHPUnit\Framework\TestCase
 {
 	private function getTmpFilePath($suffix = null)
 	{
@@ -33,7 +33,7 @@ class LockingFilesystemTest extends PHPUnit_Framework_TestCase
 		$file = fopen($path, 'c');
 		flock($file, $lock);
 		$op = new LockingFilesystem();
-		$this->setExpectedException('Autarky\Files\IOException');
+		$this->expectException('Autarky\Files\IOException');
 		$op->write($path, 'foo');
 	}
 
@@ -49,7 +49,7 @@ class LockingFilesystemTest extends PHPUnit_Framework_TestCase
 		flock($file, $lock);
 		$op = new LockingFilesystem();
 		if ($lock & LOCK_EX) {
-			$this->setExpectedException('Autarky\Files\IOException');
+			$this->expectException('Autarky\Files\IOException');
 		}
 		$this->assertEquals('foo', $op->read($path));
 	}

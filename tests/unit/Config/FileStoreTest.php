@@ -5,7 +5,7 @@ use Mockery as m;
 use Autarky\Config\FileStore;
 use Autarky\Config\LoaderFactory;
 
-class FileStoreTest extends PHPUnit_Framework_TestCase
+class FileStoreTest extends PHPUnit\Framework\TestCase
 {
 	protected function getConfigPath()
 	{
@@ -118,7 +118,7 @@ class FileStoreTest extends PHPUnit_Framework_TestCase
 	public function fileReturningNonArrayThrowsException()
 	{
 		$config = $this->makeConfig();
-		$this->setExpectedException('Autarky\Config\LoadException');
+		$this->expectException('Autarky\Config\LoadException');
 		$config->get('notarray.foo');
 	}
 

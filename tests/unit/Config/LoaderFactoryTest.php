@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class LoaderFactoryTest extends PHPUnit_Framework_TestCase
+class LoaderFactoryTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{
@@ -27,7 +27,7 @@ class LoaderFactoryTest extends PHPUnit_Framework_TestCase
 	public function invalidExtensionThrowsException()
 	{
 		$factory = $this->makeFactory();
-		$this->setExpectedException('Autarky\Config\LoadException');
+		$this->expectException('Autarky\Config\LoadException');
 		$factory->getForPath('/foo/bar.baz');
 	}
 }

@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
+class ConnectionFactoryTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{
@@ -26,14 +26,14 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function missingDsnOrDriverThrowsException()
 	{
-		$this->setExpectedException('InvalidArgumentException', 'DSN or driver must be set');
+		$this->expectException('InvalidArgumentException', 'DSN or driver must be set');
 		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo([]);
 	}
 
 	/** @test */
 	public function missingUsernameThrowsException()
 	{
-		$this->setExpectedException('InvalidArgumentException',
+		$this->expectException('InvalidArgumentException',
 			'Missing username for connection: test');
 		$cfg = ['dsn' => 'pgsql:host=localhost', 'username' => ''];
 		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo($cfg, 'test');
@@ -42,7 +42,7 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function missingPasswordThrowsException()
 	{
-		$this->setExpectedException('InvalidArgumentException',
+		$this->expectException('InvalidArgumentException',
 			'Missing password for connection: test');
 		$cfg = ['dsn' => 'pgsql:host=localhost', 'username' => 'foo'];
 		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo($cfg, 'test');
@@ -51,7 +51,7 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function missingHostThrowsException()
 	{
-		$this->setExpectedException('InvalidArgumentException',
+		$this->expectException('InvalidArgumentException',
 			'Missing host for connection: test');
 		$cfg = ['driver' => 'pgsql', 'username' => 'foo', 'password' => 'foo'];
 		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo($cfg, 'test');
@@ -60,7 +60,7 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function missingDbnameThrowsException()
 	{
-		$this->setExpectedException('InvalidArgumentException',
+		$this->expectException('InvalidArgumentException',
 			'Missing dbname for connection: test');
 		$cfg = ['driver' => 'pgsql', 'host' => 'localhost',
 		        'username' => 'foo', 'password' => 'foo'];
@@ -93,7 +93,7 @@ class ConnectionFactoryTest extends PHPUnit_Framework_TestCase
 	/** @test */
 	public function missingSqlitePathThrowsException()
 	{
-		$this->setExpectedException('InvalidArgumentException',
+		$this->expectException('InvalidArgumentException',
 			'Missing path for connection: test');
 		$cfg = ['driver' => 'sqlite'];
 		$pdo = $this->makeFactory($this->mockInstantiator())->makePdo($cfg, 'test');

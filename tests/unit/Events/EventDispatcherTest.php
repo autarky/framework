@@ -4,7 +4,7 @@ use Mockery as m;
 
 use Autarky\Events\EventDispatcher;
 
-class EventDispatcherTest extends PHPUnit_Framework_TestCase
+class EventDispatcherTest extends PHPUnit\Framework\TestCase
 {
 	public function tearDown()
 	{
