@@ -17,7 +17,8 @@ class SessionProviderTest extends TestCase
 		$app->getConfig()->set('session.handler', 'null');
 		$app->getConfig()->set('session.storage', $storage);
 		$app->boot();
-		$this->assertInstanceOf($class, $app->resolve('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface'));
+		$obj = $app->resolve('Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface');
+		$this->assertInstanceOf($class, $obj);
 	}
 
 	public function getStorageData()
@@ -81,11 +82,14 @@ class SessionProviderTest extends TestCase
 	/** @test */
 	public function handlerIsWrappedInWriteCheckHandlerIfConfigured()
 	{
+		$handlerClass = 'Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler';
+		if (!class_exists($handlerClass)) {
+			$this->markTestSkipped("Class $handlerClass does not exist (Symfony 4)");
+		}
 		$app = $this->makeApplication([new SessionProvider]);
 		$app->getConfig()->set('session.handler', 'null');
 		$app->getConfig()->set('session.write_check', true);
 		$app->boot();
-		$this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Handler\WriteCheckSessionHandler',
-			$app->resolve('SessionHandlerInterface'));
+		$this->assertInstanceOf($handlerClass, $app->resolve('SessionHandlerInterface'));
 	}
 }

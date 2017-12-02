@@ -119,7 +119,12 @@ class HttpKernelTest extends PHPUnit_Framework_TestCase
 		$this->router->shouldReceive('dispatch')->once()
 			->andReturnUsing(function() use(&$triggered) {
 				$triggered = true;
-				$this->assertEquals(1, count($this->requests));
+				$this->assertNotNull($this->requests->getCurrentRequest());
+				$this->assertNotNull($this->requests->getMasterRequest());
+				$this->assertSame(
+					$this->requests->getCurrentRequest(),
+					$this->requests->getMasterRequest()
+				);
 				return new Response('foo');
 			});
 		$response = $kernel->handle($request = Request::create('/'));
