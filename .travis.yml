@@ -22,9 +22,13 @@ before_install:
   - ./scripts/setup-travis.sh
 
 install:
-  - composer update ${COMPOSER_ARGS} --no-interaction
+  - composer update ${COMPOSER_ARGS} --no-interaction --prefer-dist
 
 script:
   - ./vendor/bin/phpunit --verbose
 
 sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files
