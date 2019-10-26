@@ -10,19 +10,19 @@
 
 namespace Autarky\Errors;
 
-use Exception;
+use Throwable;
 
 /**
- * Class that can handle exceptions.
+ * Class that can handle throwable.
  */
 interface ErrorHandlerInterface
 {
 	/**
-	 * Handle an exception.
+	 * Handle throwable.
 	 *
-	 * @param  \Exception $exception
+	 * @param  \Throwable $throwable
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function handle(Exception $exception);
+	public function handle(Throwable $throwable);
 }

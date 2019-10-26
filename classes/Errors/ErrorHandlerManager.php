@@ -15,13 +15,14 @@ use ErrorException;
 use ReflectionFunction;
 use ReflectionMethod;
 use SplDoublyLinkedList;
+use Throwable;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FatalErrorException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 /**
- * Manager that can handle exceptions as well as keep track of multiple other
- * exception handlers.
+ * Manager that can handle throwables as well as keep track of multiple other
+ * throwable handlers.
  */
 class ErrorHandlerManager implements ErrorHandlerManagerInterface
 {
@@ -41,7 +42,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	protected $defaultHandler;
 
 	/**
-	 * Re-throw exceptions rather than handling them.
+	 * Re-throw throwables rather than handling them.
 	 *
 	 * @var boolean
 	 */
@@ -126,9 +127,9 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function handle(Exception $exception)
+	public function handle(Throwable $throwable)
 	{
-		if ($this->rethrow) throw $exception;
+		if ($this->rethrow) throw $throwable;
 
 		foreach ($this->handlers as $index => $handler) {
 			try {
@@ -140,41 +141,41 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 					$this->handlers->offsetSet($index, $handler);
 				}
 
-				if (!$this->matchesTypehint($handler, $exception)) {
+				if (!$this->matchesTypehint($handler, $throwable)) {
 					continue;
 				}
 
-				$result = $this->callHandler($handler, $exception);
+				$result = $this->callHandler($handler, $throwable);
 
 				if ($result !== null) {
-					return $this->makeResponse($result, $exception);
+					return $this->makeResponse($result, $throwable);
 				}
 			} catch (Exception $newException) {
 				return $this->handle($newException);
 			}
 		}
 
-		return $this->makeResponse($this->defaultHandler->handle($exception), $exception);
+		return $this->makeResponse($this->defaultHandler->handle($throwable), $throwable);
 	}
 
 	/**
 	 * Transform an exception handler's response into a Response object.
 	 *
 	 * @param  mixed      $response
-	 * @param  \Exception $exception
+	 * @param  \Throwable $throwable
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	protected function makeResponse($response, Exception $exception)
+	protected function makeResponse($response, Throwable $throwable)
 	{
 		if (!$response instanceof Response) {
 			$response = new Response($response);
 		}
 
 		if (!$response->isClientError() && !$response->isServerError() && !$response->isRedirect()) {
-			if ($exception instanceof HttpExceptionInterface) {
-				$response->setStatusCode($exception->getStatusCode());
-				$response->headers->add($exception->getHeaders());
+			if ($throwable instanceof HttpExceptionInterface) {
+				$response->setStatusCode($throwable->getStatusCode());
+				$response->headers->add($throwable->getHeaders());
 			} else {
 				$response->setStatusCode(500);
 			}
@@ -187,11 +188,11 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 * Check if a handler's argument typehint matches an exception.
 	 *
 	 * @param  callable|ErrorHandlerInterface $handler
-	 * @param  \Exception                     $exception
+	 * @param  \Throwable                     $throwable
 	 *
 	 * @return bool
 	 */
-	protected function matchesTypehint($handler, Exception $exception)
+	protected function matchesTypehint($handler, Throwable $throwable)
 	{
 		if ($handler instanceof ErrorHandlerInterface) {
 			return true;
@@ -220,24 +221,24 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 			return true;
 		}
 
-		return $handlerHint->isInstance($exception);
+		return $handlerHint->isInstance($throwable);
 	}
 
 	/**
 	 * Call an exception handler.
 	 *
 	 * @param  mixed     $handler
-	 * @param  Exception $exception
+	 * @param  Throwable $throwable
 	 *
 	 * @return mixed
 	 */
-	protected function callHandler($handler, Exception $exception)
+	protected function callHandler($handler, Throwable $throwable)
 	{
 		if ($handler instanceof ErrorHandlerInterface) {
-			return $handler->handle($exception);
+			return $handler->handle($throwable);
 		}
 
-		return call_user_func($handler, $exception);
+		return call_user_func($handler, $throwable);
 	}
 
 	/**
@@ -245,19 +246,19 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 * the response, as we can assume that the exception happened outside of
 	 * HttpKernelInterface::handle.
 	 *
-	 * @param  \Exception $exception
+	 * @param  \Throwable $throwable
 	 *
 	 * @return Response
 	 *
-	 * @throws Exception  If PHP_SAPI is 'cli'
+	 * @throws Throwable  If PHP_SAPI is 'cli'
 	 */
-	public function handleUncaught(Exception $exception)
+	public function handleUncaught($throwable)
 	{
 		if (PHP_SAPI === 'cli') {
-			throw $exception;
+			throw $throwable;
 		}
 
-		return $this->handle($exception)
+		return $this->handle($throwable)
 			->send();
 	}
 
