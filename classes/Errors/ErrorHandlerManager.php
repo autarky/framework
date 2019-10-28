@@ -228,7 +228,7 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 * Call an exception handler.
 	 *
 	 * @param  mixed     $handler
-	 * @param  Throwable $throwable
+	 * @param  \Throwable $throwable
 	 *
 	 * @return mixed
 	 */
@@ -250,9 +250,9 @@ class ErrorHandlerManager implements ErrorHandlerManagerInterface
 	 *
 	 * @return Response
 	 *
-	 * @throws Throwable  If PHP_SAPI is 'cli'
+	 * @throws \Throwable  If PHP_SAPI is 'cli'
 	 */
-	public function handleUncaught($throwable)
+	public function handleUncaught(Throwable $throwable)
 	{
 		if (PHP_SAPI === 'cli') {
 			throw $throwable;
