@@ -10,12 +10,12 @@
 
 namespace Autarky\Errors;
 
-use Exception;
 use Symfony\Component\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
+use Throwable;
 
 /**
  * The default default error handler. Returns a whoops error screen if the
@@ -43,37 +43,37 @@ class DefaultErrorHandler implements ErrorHandlerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function handle(Exception $exception)
+	public function handle(Throwable $throwable)
 	{
 		if ($this->debug && class_exists('Whoops\Run')) {
-			return $this->handleWithWhoops($exception);
+			return $this->handleWithWhoops($throwable);
 		}
 
-		return $this->handleWithSymfony($exception);
+		return $this->handleWithSymfony($throwable);
 	}
 
-	protected function handleWithWhoops(Exception $exception)
+	protected function handleWithWhoops(Throwable $throwable)
 	{
 		$whoops = new Run();
 		$whoops->allowQuit(false);
 		$whoops->writeToOutput(false);
 		$whoops->pushHandler(new PrettyPageHandler());
 
-		return $whoops->handleException($exception);
+		return $whoops->handleException($throwable);
 	}
 
-	protected function handleWithSymfony(Exception $exception)
+	protected function handleWithSymfony(Throwable $throwable)
 	{
-		if (!$exception instanceof FlattenException) {
-			$exception = FlattenException::create($exception);
+		if (!$throwable instanceof FlattenException) {
+			$throwable = FlattenException::createFromThrowable($throwable);
 		}
 
 		$handler = new ExceptionHandler($this->debug);
 
 		return Response::create(
-			$handler->getHtml($exception),
-			$exception->getStatusCode(),
-			$exception->getHeaders()
+			$handler->getHtml($throwable),
+			$throwable->getStatusCode(),
+			$throwable->getHeaders()
 		);
 	}
 }

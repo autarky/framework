@@ -10,10 +10,10 @@
 
 namespace Autarky\Errors;
 
-use Exception;
+use Throwable;
 
 /**
- * Stub error handler that simply re-throws the exceptions given.
+ * Stub error handler that simply re-throws the throwables given.
  *
  * Written primarily for testing purposes.
  *
@@ -80,8 +80,8 @@ class StubErrorHandler implements ErrorHandlerManagerInterface
 	/**
 	 * {@inheritdoc}
 	 */
-	public function handle(Exception $exception)
+	public function handle(Throwable $throwable)
 	{
-		throw $exception;
+		throw $throwable;
 	}
 }

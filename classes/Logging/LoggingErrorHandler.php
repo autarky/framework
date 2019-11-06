@@ -11,8 +11,8 @@
 namespace Autarky\Logging;
 
 use Autarky\Errors\ErrorHandlerInterface;
-use Exception;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * This simple error handler logs exceptions.
@@ -26,8 +26,8 @@ class LoggingErrorHandler implements ErrorHandlerInterface
 		$this->logger = $logger;
 	}
 
-	public function handle(Exception $exception)
+	public function handle(Throwable $throwable)
 	{
-		$this->logger->error($exception);
+		$this->logger->error($throwable);
 	}
 }
