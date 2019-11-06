@@ -34,6 +34,7 @@ class SessionProviderTest extends TestCase
 	/**
 	 * @test
 	 * @dataProvider getHandlerData
+	 * @runInSeparateProcess
 	 */
 	public function resolvesCorrectHandler($handler, $class, $depends = null)
 	{

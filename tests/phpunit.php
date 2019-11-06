@@ -1,7 +1,9 @@
 <?php
-define('TESTS_RSC_DIR', __DIR__.'/resources');
+if (!defined('TESTS_RSC_DIR')) {
+	define('TESTS_RSC_DIR', __DIR__.'/resources');
+}
 
-$loader = require dirname(__DIR__) . '/vendor/autoload.php';
+$loader = require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 Mockery::getConfiguration()->allowMockingNonExistentMethods(false);
 
